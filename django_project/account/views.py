@@ -1,7 +1,10 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from .forms import SignUpForm, LoginForm
+from .decorators import recipient_required
 from django.shortcuts import render
+from .models import User
 
 def base(request):
     return render(request, 'base.html', {})
@@ -21,8 +24,14 @@ def contact(request):
 def dashboard(request):
     return render(request, 'dashboard.html', {})
 
+@recipient_required
 def recipient_dashboard(request):
-    return render(request, 'recipient_dashboard.html', {})
+    recipient = User.objects.get(user=request.user)
+    recipient_data = {
+        'name': recipient.username,
+        'email': recipient.email,
+    }
+    return render(request, 'recipient_dashboard.html', {'recipient_data': recipient_data})
 
 
 def register_package(request):

@@ -17,3 +17,4 @@ class User(AbstractUser):
         ('recipient', 'recipient'),
     )
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='sender', verbose_name='role')
+    is_recipient = models.BooleanField(default=False)

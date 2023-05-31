@@ -125,6 +125,15 @@ STATICFILES_DIRS = [
 ]
 
 AUTH_USER_MODEL = 'account.User'
+LOGIN_REDIRECT_URL = 'recipient_dashboard'
+
+# settings.py
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'your_app.custom_backend.CustomBackend',
+]
+
+
 
 # # Default primary key field type
 # # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
