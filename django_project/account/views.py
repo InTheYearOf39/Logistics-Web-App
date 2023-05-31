@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login, logout
 from .forms import SignUpForm, LoginForm
-from django.contrib.auth import authenticate, login
-# Create your views here.
+from django.shortcuts import render
 
 def base(request):
     return render(request, 'base.html', {})
@@ -21,9 +21,12 @@ def contact(request):
 def dashboard(request):
     return render(request, 'dashboard.html', {})
 
-def index(request):
-    return render(request, 'index.html')
+def register_package(request):
+    return render(request, 'register_package.html', {})
 
+def logout_user(request):
+    logout(request)
+    return redirect('logout.html/')
 
 def register(request):
     msg = None
@@ -57,14 +60,3 @@ def login_view(request):
             msg = 'error validating form'
     return render(request, 'login.html', {'form': form, 'msg': msg})
 
-
-def sender(request):
-    return render(request,'sender.html')
-
-
-def receiver(request):
-    return render(request,'receiver.html')
-
-
-def courrier(request):
-    return render(request,'courrier.html')
