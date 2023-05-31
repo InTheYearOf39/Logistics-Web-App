@@ -28,4 +28,5 @@ urlpatterns = [
     path('about/', user_views.about, name='about'),
     path('contact/', user_views.contact, name='contact'),
     path('dashboard/', user_views.dashboard, name='dashboard'),
+    path('register_package/', user_views.register_package, name='register_package'),
 ]
