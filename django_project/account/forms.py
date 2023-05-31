@@ -20,6 +20,22 @@ class LoginForm(forms.Form):
 
 
 class SignUpForm(UserCreationForm):
+    courier = "courier"
+    sender = "sender"
+    recipient = "recipient"
+
+    ROLE_CHOICES = [
+        (courier, "courier"),
+        (sender, "sender"),
+        (recipient, "recipient")
+    ]
+
+    role = forms.ChoiceField(
+        required=True,
+        choices=ROLE_CHOICES,
+        widget=forms.RadioSelect,
+    )
+
     username = forms.CharField(
         widget=forms.TextInput(
             attrs={
@@ -49,6 +65,11 @@ class SignUpForm(UserCreationForm):
         )
     )
 
+    # role = forms.ChoiceField(
+    #             choices = ROLE_CHOICES,
+    #             required = True,
+    #             widget = forms.Select(attrs = {'class': 'control--checkbox', 'placeholder': ''}),
+    #             )
     class Meta:
         model = User
-        fields = ('username', 'email', 'password1', 'password2', 'is_sender', 'is_courrier', 'is_receiver')
+        fields = ('username', 'email', 'password1', 'password2', 'role')

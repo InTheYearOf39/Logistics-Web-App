@@ -48,15 +48,9 @@ def login_view(request):
             username = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password')
             user = authenticate(username=username, password=password)
-            if user is not None and user.is_sender:
+            if user is not None:
                 login(request, user)
-                return redirect('senderpage')
-            elif user is not None and user.is_receiver:
-                login(request, user)
-                return redirect('receiverpage')
-            elif user is not None and user.is_courrier:
-                login(request, user)
-                return redirect('courrierpage')
+                return redirect('dashboard')
             else:
                 msg= 'invalid credentials'
         else:
