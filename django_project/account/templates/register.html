@@ -55,24 +55,35 @@
                     <label for="password">confirm Password</label>
                       {{ form.password2 }}
                   </div>
+
                   <div class="d-flex mb-5 align-items-center">
-                    <label class="control control--checkbox mb-0"><span class="caption">Admin</span>
-                        {{ form.is_admin }}
+                    {% for choice in form.role %}
+                      <label class="control control--checkbox mb-0">
+                        <span class="caption pr-3">{{ choice.choice_label }}</span>
+                        {{ choice.tag }}
+                        <div class="control__indicator"></div>
+                      </label>
+                    {% endfor %}
+                  </div>
+                  
+                  <!-- <div class="d-flex mb-5 align-items-center">
+                    <label class="control control--checkbox mb-0"><span class="caption">Sender</span>
+                        {{ form.is_sender }}
+                      <div class="control__indicator"></div>
+                    </label>
+                  </div> -->
+                  <!-- <div class="d-flex mb-5 align-items-center">
+                    <label class="control control--checkbox mb-0"><span class="caption">Receiver</span>
+                        {{ form.is_receiver }}
                       <div class="control__indicator"></div>
                     </label>
                   </div>
                   <div class="d-flex mb-5 align-items-center">
-                    <label class="control control--checkbox mb-0"><span class="caption">customer</span>
-                        {{ form.is_customer }}
+                    <label class="control control--checkbox mb-0"><span class="caption">Courrier</span>
+                        {{ form.is_courrier }}
                       <div class="control__indicator"></div>
                     </label>
-                  </div>
-                  <div class="d-flex mb-5 align-items-center">
-                    <label class="control control--checkbox mb-0"><span class="caption">employee</span>
-                        {{ form.is_employee }}
-                      <div class="control__indicator"></div>
-                    </label>
-                  </div>
+                  </div> -->
                     <span class="text-error">{{ form.errors }}</span>
                   <input type="submit"  value="Register" class="btn btn-pill text-white btn-block btn-primary">
                 </form>
