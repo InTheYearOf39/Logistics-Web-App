@@ -21,6 +21,10 @@ def contact(request):
 def dashboard(request):
     return render(request, 'dashboard.html', {})
 
+def recipient_dashboard(request):
+    return render(request, 'recipient_dashboard.html', {})
+
+
 def register_package(request):
     return render(request, 'register_package.html', {})
 
