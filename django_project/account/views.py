@@ -58,7 +58,14 @@ def login_view(request):
             user = authenticate(username=username, password=password)
             if user is not None:
                 login(request, user)
-                return redirect('recipient_dashboard')
+                dashboard_mapping = {
+                        'courier': 'courier_dashboard',
+                        'sender': 'sender_dashboard',
+                        'recipient': 'recipient_dashboard',
+                    }
+                dashboard_url = dashboard_mapping.get(user.role)
+                if dashboard_url:
+                    return redirect(dashboard_url)
             else:
                 msg= 'invalid credentials'
         else:
