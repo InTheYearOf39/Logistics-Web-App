@@ -5,6 +5,7 @@ from django.shortcuts import render
 from .forms import PackageForm
 from .models import Package
 
+
 def base(request):
     return render(request, 'base.html', {})
 
@@ -20,8 +21,9 @@ def services(request):
 def contact(request):
     return render(request, 'contact.html', {})
 
-def dashboard(request):
-    return render(request, 'dashboard.html', {})
+def sender_dashboard(request):
+    packages = request.user.packages.all()
+    return render(request, 'sender_dashboard.html', {'packages': packages})
 
 def recipient_dashboard(request):
     return render(request, 'recipient_dashboard.html', {})
@@ -40,7 +42,16 @@ def register(request):
         if form.is_valid():
             user = form.save()
             msg = 'user created'
-            return redirect('dashboard')
+
+            dashboard_mapping = {
+                'courier': 'courier_dashboard',
+                'sender': 'sender_dashboard',
+                'recipient': 'recipient_dashboard',
+            }
+            dashboard_url = dashboard_mapping.get(user.role)
+            
+            return redirect(dashboard_url)
+
         else:
             msg = 'form is not valid'
     else:
@@ -72,30 +83,22 @@ def login_view(request):
             msg = 'error validating form'
     return render(request, 'login.html', {'form': form, 'msg': msg})
 
-from .models import Package
+
 
 def register_package(request):
     if request.method == 'POST':
         form = PackageForm(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect('dashboard')
+            package = form.save(commit=False)
+            package.user = request.user
+            package.save()
+            return redirect('sender_dashboard')
+        else:
+            error_message = 'Error processing your request'
     else:
         form = PackageForm()
+        error_message = None
     
-    packages = Package.objects.all()  # Retrieve all packages from the database
+    # packages = Package.objects.all()  # Retrieve all packages from the database
     
-    return render(request, 'dashboard.html', {'form': form, 'packages': packages})
-
-
-# def register_package(request):
-#     if request.method == 'POST':
-#         form = PackageForm(request.POST)
-#         if form.is_valid():
-#             form.save()
-#             # Optionally, you can perform additional actions with the saved package object
-#             return redirect('dashboard')  # Redirect to the dashboard page
-#     else:
-#         form = PackageForm()
-    
-#     return render(request, 'register_package.html', {'form': form})
+    return render(request, 'register_package.html', {'form': form, 'error_message': error_message})
