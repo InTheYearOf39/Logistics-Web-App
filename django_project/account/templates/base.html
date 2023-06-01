@@ -54,7 +54,14 @@
           <li><a href="{% url 'services' %}">Services</a></li>
           <!-- <li><a href="{% url 'home' %}">Pricing</a></li> -->
           <li><a href="{% url 'contact' %}">Contact</a></li>
+
+          {% if user.is_authenticated %}
+          <li><a href="{% url 'logout_user' %}"><button style="margin-left: 10px; font-size: 16px;" class="btn btn-sm btn-danger px-3 py-2 border-width-2 d-none d-lg-inline-block" >Logout</button></a></li>
+
+          {% else %}
           <li><a class="get-a-quote" href="{% url 'login_view' %}">Login</a></li>
+
+          {% endif %}
         </ul>
       </nav><!-- .navbar -->
 
