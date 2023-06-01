@@ -3,7 +3,9 @@ from django.contrib.auth import authenticate, login, logout
 from .forms import SignUpForm, LoginForm
 from django.shortcuts import render
 from .forms import PackageForm
-from .models import Package, Notification
+from .models import Package, Notification, OfflineNotification
+from django.http import JsonResponse
+
 
 def base(request):
     return render(request, 'base.html', {})
@@ -32,6 +34,9 @@ def sender_dashboard(request):
 def courier_dashboard(request):
     return render(request, 'courier_dash.html', {})
 
+def completed_package(request):
+    return render(request, 'completed_package.html', {})
+
 def register_package(request):
     return render(request, 'register_package.html', {})
 
@@ -53,8 +58,13 @@ def get_notification_count(request):
                 # Create a notification message for completed packages
                 message = f"The package '{package.packageName}' has been delivered."
 
-                # Create a notification and associate it with the recipient user
-                notification = Notification.objects.create(user=user, message=message)
+                # Check if the user is online
+                if user.is_online:
+                    # Create a notification and associate it with the recipient user
+                    notification = Notification.objects.create(user=user, message=message)
+                else:
+                    # Create an offline notification and associate it with the recipient user
+                    offline_notification = OfflineNotification.objects.create(user=user, message=message)
 
                 # Set the package's notification_sent field to True to prevent duplicate notifications
                 package.notification_sent = True
@@ -122,4 +132,22 @@ def register_package(request):
     packages = Package.objects.all()  # Retrieve all packages from the database
     
     return render(request, 'sender_dashboard.html', {'form': form, 'packages': packages})
+
+
+def delivered_packages_api(request):
+    delivered_packages = Package.objects.filter(status='Completed')
+
+    # Create a list to hold the package data
+    package_list = []
+    for package in delivered_packages:
+        package_data = {
+            'number': package.pk,
+            'title': package.packageName,
+            'deliveringTo': package.recipientName,
+            'status': package.status,
+        }
+        package_list.append(package_data)
+
+    return JsonResponse(package_list, safe=False)
+
 
