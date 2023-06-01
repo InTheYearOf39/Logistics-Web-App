@@ -91,6 +91,7 @@ def register_package(request):
         if form.is_valid():
             package = form.save(commit=False)
             package.user = request.user
+            package.status = 'upcoming'
             package.save()
             return redirect('sender_dashboard')
         else:
