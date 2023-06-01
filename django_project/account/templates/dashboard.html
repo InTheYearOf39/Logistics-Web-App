@@ -43,10 +43,11 @@
             {% for package in packages %}
               <tr>
                 <td>{{ forloop.counter }}</td>
-                <td>{{ package.title }}</td>
-                <td>{{ package.recipient_name }}</td>
-                <td>{{ package.sender_address }}</td>
-                <td>{{ package.recipient_address }}</td>
+                <td>{{ package.packageName }}</td>
+                <td>{{ package.packageDescripton }}</td>
+                <td>{{ package.recipientName }}</td>
+                <td>{{ package.sendersAddress }}</td>
+                <td>{{ package.recipientAddress }}</td>
                 <td>
                   {% if package.status == 'upcoming' %}
                     <button class="btn btn-sm btn-primary text-white w-50">Upcoming</button>
