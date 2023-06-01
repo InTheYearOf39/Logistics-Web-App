@@ -27,7 +27,7 @@ class Package(models.Model):
     
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='packages', null=True)
     packageName = models.CharField(max_length=100)
-    packageDescripton = models.TextField()
+    packageDescription = models.TextField()
     recipientName = models.CharField(max_length=100)
     recipientAddress = models.CharField(max_length=200)
     sendersAddress = models.CharField(max_length=200)
