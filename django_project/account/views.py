@@ -26,6 +26,9 @@ def dashboard(request):
 def recipient_dashboard(request):
     return render(request, 'recipient_dashboard.html', {})
 
+def sender_dashboard(request):
+    return render(request, 'sender_dashboard.html', {})
+
 def register_package(request):
     return render(request, 'register_package.html', {})
 

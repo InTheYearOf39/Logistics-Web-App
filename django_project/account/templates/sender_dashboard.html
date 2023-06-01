@@ -1,0 +1,66 @@
+{% extends 'dashboard_base.html' %}
+
+{% load static %}
+
+
+{% block content %}
+
+      <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">Sender Dashboard</h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+
+          <div class="btn-group me-2">
+            <a href="{% url 'register_package' %}" class="btn btn-sm btn-outline-secondary">ADD PACKAGE +</a>
+          </div>
+
+          <!-- <div class="btn-group me-2">
+            <button type="button" class="btn btn-sm btn-outline-secondary">ADD PACKAGE +</button>
+          </div> -->
+
+
+          <!-- <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle">
+            <span data-feather="calendar"></span>
+            This week
+          </button> -->
+        </div>
+      </div>
+
+
+      <h2>Packages</h2>
+      <div class="table-responsive">
+        <table class="table table-striped table-sm">
+          <thead>
+            <tr>
+              <th scope="col">No.</th>
+              <th scope="col">Package Title</th>
+              <th scope="col">Recipient</th>
+              <th scope="col">Address From</th>
+              <th scope="col">Address To</th>
+              <th scope="col">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for package in packages %}
+              <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ package.title }}</td>
+                <td>{{ package.recipient_name }}</td>
+                <td>{{ package.sender_address }}</td>
+                <td>{{ package.recipient_address }}</td>
+                <td>
+                  {% if package.status == 'upcoming' %}
+                    <button class="btn btn-sm btn-primary text-white w-50">Upcoming</button>
+                  {% elif package.status == 'ongoing' %}
+                    <button class="btn btn-sm btn-info text-white w-50">Ongoing</button>
+                  {% elif package.status == 'completed' %}
+                    <button class="btn btn-sm btn-success text-white w-50">Completed</button>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        
+      </div>
+   {% endblock %}
+
