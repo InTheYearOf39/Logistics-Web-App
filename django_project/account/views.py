@@ -2,7 +2,6 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from .forms import SignUpForm, LoginForm
-from .decorators import recipient_required
 from django.shortcuts import render
 from .models import User
 
@@ -24,15 +23,8 @@ def contact(request):
 def dashboard(request):
     return render(request, 'dashboard.html', {})
 
-@recipient_required
 def recipient_dashboard(request):
-    recipient = User.objects.get(user=request.user)
-    recipient_data = {
-        'name': recipient.username,
-        'email': recipient.email,
-    }
-    return render(request, 'recipient_dashboard.html', {'recipient_data': recipient_data})
-
+    return render(request, 'recipient_dashboard.html', {})
 
 def register_package(request):
     return render(request, 'register_package.html', {})
@@ -66,7 +58,7 @@ def login_view(request):
             user = authenticate(username=username, password=password)
             if user is not None:
                 login(request, user)
-                return redirect('dashboard')
+                return redirect('recipient_dashboard')
             else:
                 msg= 'invalid credentials'
         else:
