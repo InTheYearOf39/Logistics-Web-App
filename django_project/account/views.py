@@ -23,6 +23,9 @@ def contact(request):
 def dashboard(request):
     return render(request, 'dashboard.html', {})
 
+def recipient_dashboard(request):
+    return render(request, 'recipient_dashboard.html', {})
+
 def register_package(request):
     return render(request, 'register_package.html', {})
 
@@ -55,7 +58,14 @@ def login_view(request):
             user = authenticate(username=username, password=password)
             if user is not None:
                 login(request, user)
-                return redirect('dashboard')
+                dashboard_mapping = {
+                        'courier': 'courier_dashboard',
+                        'sender': 'sender_dashboard',
+                        'recipient': 'recipient_dashboard',
+                    }
+                dashboard_url = dashboard_mapping.get(user.role)
+                if dashboard_url:
+                    return redirect(dashboard_url)
             else:
                 msg= 'invalid credentials'
         else:
