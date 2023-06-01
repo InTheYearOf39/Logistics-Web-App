@@ -100,6 +100,4 @@ def register_package(request):
         form = PackageForm()
         error_message = None
     
-    # packages = Package.objects.all()  # Retrieve all packages from the database
-    
     return render(request, 'register_package.html', {'form': form, 'error_message': error_message})
