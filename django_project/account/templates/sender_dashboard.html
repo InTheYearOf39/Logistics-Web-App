@@ -37,6 +37,7 @@
               <th scope="col">Recipient</th>
               <th scope="col">Address From</th>
               <th scope="col">Address To</th>
+              <th scope="col">Delivery Number</th>
               <th scope="col">Status</th>
             </tr>
           </thead>
@@ -49,6 +50,7 @@
                 <td>{{ package.recipientName }}</td>
                 <td>{{ package.sendersAddress }}</td>
                 <td>{{ package.recipientAddress }}</td>
+                <td>{{ package.delivery_number }}</td>
                 <td>
                   {% if package.status == 'upcoming' %}
                     <button class="btn btn-sm btn-primary text-white w-50">Upcoming</button>

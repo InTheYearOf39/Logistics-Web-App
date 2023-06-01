@@ -4,6 +4,10 @@ from .forms import SignUpForm, LoginForm
 from django.shortcuts import render
 from .forms import PackageForm
 from .models import Package
+from django.contrib.auth.decorators import login_required
+import random
+import string
+
 
 
 def base(request):
@@ -21,6 +25,7 @@ def services(request):
 def contact(request):
     return render(request, 'contact.html', {})
 
+@login_required
 def sender_dashboard(request):
     packages = request.user.packages.all()
     return render(request, 'sender_dashboard.html', {'packages': packages})
@@ -49,6 +54,7 @@ def register(request):
                 'recipient': 'recipient_dashboard',
             }
             dashboard_url = dashboard_mapping.get(user.role)
+            login(request, user)
             
             return redirect(dashboard_url)
 
@@ -83,7 +89,10 @@ def login_view(request):
             msg = 'error validating form'
     return render(request, 'login.html', {'form': form, 'msg': msg})
 
-
+def generate_delivery_number():
+    prefix = 'dn'
+    digits = ''.join(random.choices(string.digits, k=5))
+    return f'{prefix}{digits}'
 
 def register_package(request):
     if request.method == 'POST':
@@ -91,6 +100,7 @@ def register_package(request):
         if form.is_valid():
             package = form.save(commit=False)
             package.user = request.user
+            package.delivery_number = generate_delivery_number()
             package.status = 'upcoming'
             package.save()
             return redirect('sender_dashboard')
