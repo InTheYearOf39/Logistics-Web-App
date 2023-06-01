@@ -78,6 +78,8 @@ def register_package(request):
     if request.method == 'POST':
         form = PackageForm(request.POST)
         if form.is_valid():
+            package = form.save(commit=False)
+            package.status = 'upcoming'
             form.save()
             return redirect('dashboard')
     else:
@@ -86,16 +88,3 @@ def register_package(request):
     packages = Package.objects.all()  # Retrieve all packages from the database
     
     return render(request, 'dashboard.html', {'form': form, 'packages': packages})
-
-
-# def register_package(request):
-#     if request.method == 'POST':
-#         form = PackageForm(request.POST)
-#         if form.is_valid():
-#             form.save()
-#             # Optionally, you can perform additional actions with the saved package object
-#             return redirect('dashboard')  # Redirect to the dashboard page
-#     else:
-#         form = PackageForm()
-    
-#     return render(request, 'register_package.html', {'form': form})
