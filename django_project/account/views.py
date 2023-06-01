@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate, login, logout
 from .forms import SignUpForm, LoginForm
 from django.shortcuts import render
 from .forms import PackageForm
-from .models import Package
+from .models import Package, Notification
 
 def base(request):
     return render(request, 'base.html', {})
@@ -29,8 +29,43 @@ def recipient_dashboard(request):
 def sender_dashboard(request):
     return render(request, 'sender_dashboard.html', {})
 
+def courier_dashboard(request):
+    return render(request, 'courier_dash.html', {})
+
 def register_package(request):
     return render(request, 'register_package.html', {})
+
+def get_notification_count(request):
+    # Get the current user
+    user = request.user
+
+    # Retrieve the count of unread notifications for the user
+    notification_count = Notification.objects.filter(user=user, is_read=False).count()
+
+    # Send notifications dynamically based on package status
+    if user.role == 'recipient':
+        # Get the packages where the recipient is the current user
+        packages = Package.objects.filter(recipient=user)
+
+        # Loop through the packages and check the status
+        for package in packages:
+            if package.status == 'completed' and not package.notification_sent:
+                # Create a notification message for completed packages
+                message = f"The package '{package.packageName}' has been delivered."
+
+                # Create a notification and associate it with the recipient user
+                notification = Notification.objects.create(user=user, message=message)
+
+                # Set the package's notification_sent field to True to prevent duplicate notifications
+                package.notification_sent = True
+                package.save()
+
+    context = {
+        'notification_count': notification_count
+    }
+
+    return render(request, 'notification_count.html', context)
+
 
 def logout_user(request):
     logout(request)
@@ -79,11 +114,12 @@ def register_package(request):
     if request.method == 'POST':
         form = PackageForm(request.POST)
         if form.is_valid():
-            package = form.save()
-            # Optionally, you can perform additional actions with the saved package object
-            return redirect('dashboard')  # Redirect to the dashboard page
+            form.save()
+            return redirect('sender_dashboard')
     else:
         form = PackageForm()
     
-    return render(request, 'register_package.html', {'form': form})
+    packages = Package.objects.all()  # Retrieve all packages from the database
+    
+    return render(request, 'sender_dashboard.html', {'form': form, 'packages': packages})
 
