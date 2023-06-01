@@ -23,7 +23,7 @@ from account import views as user_views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('account.urls')),
-    path('home/', user_views.index, name='home'),
+    path('', user_views.index, name='home'),
     path('base/', user_views.base, name='base'),
     path('services/', user_views.services, name='services'),
     path('about/', user_views.about, name='about'),
