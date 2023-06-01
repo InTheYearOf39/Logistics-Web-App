@@ -1,2 +1,7 @@
 env/
 db.sqlite3
+
+*.pyc
+__pycache__/
+
+Logistics-Web-App\django_project\django_project\__pycache__\urls.cpython-310.pyc

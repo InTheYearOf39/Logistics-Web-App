@@ -3,8 +3,7 @@ from django.contrib.auth import authenticate, login, logout
 from .forms import SignUpForm, LoginForm
 from django.shortcuts import render
 from .forms import PackageForm
-from .models import Package, Notification, OfflineNotification
-from django.http import JsonResponse
+from .models import Package
 
 
 def base(request):
@@ -22,8 +21,9 @@ def services(request):
 def contact(request):
     return render(request, 'contact.html', {})
 
-def dashboard(request):
-    return render(request, 'dashboard.html', {})
+def sender_dashboard(request):
+    packages = request.user.packages.all()
+    return render(request, 'sender_dashboard.html', {'packages': packages})
 
 def recipient_dashboard(request):
     return render(request, 'recipient_dashboard.html', {})
@@ -48,7 +48,16 @@ def register(request):
         if form.is_valid():
             user = form.save()
             msg = 'user created'
-            return redirect('dashboard')
+
+            dashboard_mapping = {
+                'courier': 'courier_dashboard',
+                'sender': 'sender_dashboard',
+                'recipient': 'recipient_dashboard',
+            }
+            dashboard_url = dashboard_mapping.get(user.role)
+            
+            return redirect(dashboard_url)
+
         else:
             msg = 'form is not valid'
     else:
@@ -80,19 +89,21 @@ def login_view(request):
             msg = 'error validating form'
     return render(request, 'login.html', {'form': form, 'msg': msg})
 
+
+
 def register_package(request):
     if request.method == 'POST':
         form = PackageForm(request.POST)
         if form.is_valid():
-            form.save()
+            package = form.save(commit=False)
+            package.user = request.user
+            package.status = 'upcoming'
+            package.save()
             return redirect('sender_dashboard')
+        else:
+            error_message = 'Error processing your request'
     else:
         form = PackageForm()
+        error_message = None
     
-    packages = Package.objects.all()  # Retrieve all packages from the database
-    
-    return render(request, 'sender_dashboard.html', {'form': form, 'packages': packages})
-
-
-
-
+    return render(request, 'register_package.html', {'form': form, 'error_message': error_message})

@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-
+from django.conf import settings
 # Create your models here.
 
 
@@ -25,6 +25,7 @@ class Package(models.Model):
         ('completed', 'Completed'),
     )
     
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='packages', null=True)
     packageName = models.CharField(max_length=100)
     packageDescripton = models.TextField()
     recipientName = models.CharField(max_length=100)
@@ -50,3 +51,5 @@ class OfflineNotification(models.Model):
     is_read = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
+
+        return self.packageName
