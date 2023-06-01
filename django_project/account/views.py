@@ -2,6 +2,8 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from .forms import SignUpForm, LoginForm
 from django.shortcuts import render
+from .forms import PackageForm
+from .models import Package
 
 def base(request):
     return render(request, 'base.html', {})
@@ -59,4 +61,16 @@ def login_view(request):
         else:
             msg = 'error validating form'
     return render(request, 'login.html', {'form': form, 'msg': msg})
+
+def register_package(request):
+    if request.method == 'POST':
+        form = PackageForm(request.POST)
+        if form.is_valid():
+            package = form.save()
+            # Optionally, you can perform additional actions with the saved package object
+            return redirect('dashboard')  # Redirect to the dashboard page
+    else:
+        form = PackageForm()
+    
+    return render(request, 'register_package.html', {'form': form})
 
