@@ -81,9 +81,21 @@ class SignUpForm(UserCreationForm):
         model = User
         fields = ('username', 'email', 'password1', 'password2', 'role')
         
-
-
 class PackageForm(forms.ModelForm):
-    class Meta:
-        model = Package
-        fields = ['packageName', 'packageDescripton', 'recipientName', 'recipientAddress', 'sendersAddress']
+        widgets = {
+            'packageName': forms.TextInput(attrs={'class': 'form-control'}),
+            'packageDescription': forms.TextInput(attrs={'class': 'form-control'}),
+            'recipientName': forms.TextInput(attrs={'class': 'form-control'}),
+            'recipientAddress': forms.TextInput(attrs={'class': 'form-control'}),
+            'sendersAddress': forms.TextInput(attrs={'class': 'form-control'}),
+            'status': forms.Select(attrs={'class': 'form-control'}),
+        }
+
+        class Meta:
+            model = Package
+            fields = ['packageName', 'packageDescripton', 'recipientName', 'recipientAddress', 'sendersAddress']
+
+# class PackageForm(forms.ModelForm):
+#     class Meta:
+#         model = Package
+#         fields = ['packageName', 'packageDescripton', 'recipientName', 'recipientAddress', 'sendersAddress']
