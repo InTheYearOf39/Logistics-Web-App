@@ -10,22 +10,75 @@
         
         <div class="col-md-8 col-lg-10">
           <h4 class="my-5">Add Package</h4>
+
+          <!-- <form class="needs-validation" novalidate action="{% url 'register_package' %}" method="post">
+            {% csrf_token %}
+            <div class="row g-3">
+              <div class="col-sm-6">
+                <label for="packageName" class="form-label">Package Name</label>
+                <input type="text" class="form-control" id="packageName" name="packageName" placeholder="" value="" required>
+                <div class="invalid-feedback">
+                  Valid Package name is required.
+                </div>
+              </div>
+          
+              <div class="col-12">
+                <label for="packageDescripton" class="form-label">Package Descripton</label>
+                <div class="input-group has-validation">
+                  <input type="text" class="form-control" id="packageDescripton" name="packageDescripton" placeholder="Recipient Name" required>
+                  <div class="invalid-feedback">
+                    Recipient Name is required.
+                  </div>
+                </div>
+              </div>
+          
+              <div class="col-12">
+                <label for="recipientName" class="form-label">Recipient Name</label>
+                <div class="input-group has-validation">
+                  <input type="text" class="form-control" id="recipientName" name="recipientName" placeholder="Recipient Name" required>
+                  <div class="invalid-feedback">
+                    Recipient Name is required.
+                  </div>
+                </div>
+              </div>
+          
+              <div class="col-12">
+                <label for="recipientAddress" class="form-label">Recipient Address</label>
+                <input type="text" class="form-control" id="recipientAddress" name="recipientAddress" placeholder="Recipient Address">
+                <div class="invalid-feedback">
+                  Please enter a valid email address for shipping updates.
+                </div>
+              </div>
+          
+              <div class="col-12">
+                <label for="sendersAddress" class="form-label"> Sender's Address</label>
+                <input type="text" class="form-control" id="sendersAddress" name="sendersAddress" placeholder="Sender's Address" required>
+                <div class="invalid-feedback">
+                  Please enter your shipping address.
+                </div>
+              </div>
+            </div>
+          
+            <button class="w-25 btn btn-primary" type="submit">Click to confirm</button>
+          </form> -->
+          
+
           <!-- <form class="needs-validation" novalidate action="/register_package/" method="post"></form> -->
           <form class="needs-validation" novalidate action="{% url 'register_package' %}" method="post">
             {% csrf_token %}
             <div class="row g-3">
               <div class="col-sm-6">
-                <label for="firstName" class="form-label">Package Name</label>
-                <input type="text" class="form-control" id="packageName" placeholder="" value="" required>
+                <label for="packageName" class="form-label">Package Name</label>
+                <input type="text" class="form-control" id="packageName" name="packageName" placeholder="Package Name" value="" required>
                 <div class="invalid-feedback">
                   Valid Package name is required.
                 </div>
               </div>
 
               <div class="col-12">
-                <label for="username" class="form-label">Package Descripton</label>
+                <label for="packageDescripton" class="form-label">Package Descripton</label>
                 <div class="input-group has-validation">
-                  <input type="text" class="form-control" id="packageDescripton" placeholder="Recipient Name" required>
+                  <input type="text" class="form-control" id="packageDescripton" name="packageDescripton" placeholder="Recipient Name" required>
                 <div class="invalid-feedback">
                     Recipient Name is required.
                   </div>
@@ -33,9 +86,9 @@
               </div>
   
               <div class="col-12">
-                <label for="username" class="form-label">Recipient Name</label>
+                <label for="recipientName" class="form-label">Recipient Name</label>
                 <div class="input-group has-validation">
-                  <input type="text" class="form-control" id="recipientName" placeholder="Recipient Name" required>
+                  <input type="text" class="form-control" id="recipientName" name="recipientName" placeholder="Recipient Name" required>
                 <div class="invalid-feedback">
                     Recipient Name is required.
                   </div>
@@ -43,16 +96,16 @@
               </div>
   
               <div class="col-12">
-                <label for="email" class="form-label">Recipient Address</label>
-                <input type="email" class="form-control" id="recipientAddress" placeholder="Recipient Address">
+                <label for="recipientAddress" class="form-label">Recipient Address</label>
+                <input type="text" class="form-control" id="recipientAddress" name="recipientAddress" placeholder="Recipient Address">
                 <div class="invalid-feedback">
                   Please enter a valid email address for shipping updates.
                 </div>
               </div>
   
               <div class="col-12">
-                <label for="address" class="form-label"> Sender's Address</label>
-                <input type="text" class="form-control" id="sendersAddress" placeholder="Sender's Address" required>
+                <label for="sendersAddress" class="form-label"> Sender's Address</label>
+                <input type="text" class="form-control" id="sendersAddress" name="sendersAddress" placeholder="Sender's Address" required>
                 <div class="invalid-feedback">
                   Please enter your shipping address.
                 </div>

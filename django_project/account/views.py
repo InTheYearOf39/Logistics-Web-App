@@ -72,46 +72,20 @@ def login_view(request):
             msg = 'error validating form'
     return render(request, 'login.html', {'form': form, 'msg': msg})
 
-# def register_package(request):
-#     if request.method == 'POST':
-#         form = PackageForm(request.POST)
-#         if form.is_valid():
-#             packageName = form.cleaned_data['packageName']
-#             packageDescription = form.cleaned_data['packageDescription']
-#             recipientName = form.cleaned_data['recipientName']
-#             recipientAddress = form.cleaned_data['recipientAddress']
-#             sendersAddress = form.cleaned_data['sendersAddress']
-#             status = form.cleaned_data['status']
-            
-#             # Save the data to the Package model
-#             package = Package(
-#                 packageName=packageName,
-#                 packageDescription=packageDescription,
-#                 recipientName=recipientName,
-#                 recipientAddress=recipientAddress,
-#                 sendersAddress=sendersAddress,
-#                 status=status
-#             )
-#             package.save()
-            
-#             return redirect('dashboard')  # Replace 'dashboard' with the appropriate URL pattern name for your dashboard view
-#     else:
-#         form = PackageForm()
-#     return render(request, 'register_package.html', {'form': form})
-
-
+from .models import Package
 
 def register_package(request):
     if request.method == 'POST':
         form = PackageForm(request.POST)
         if form.is_valid():
             form.save()
-            # Optionally, you can perform additional actions with the saved package object
-            return redirect('dashboard')  # Redirect to the dashboard page
+            return redirect('dashboard')
     else:
         form = PackageForm()
     
-    return render(request, 'register_package.html', {'form': form})
+    packages = Package.objects.all()  # Retrieve all packages from the database
+    
+    return render(request, 'dashboard.html', {'form': form, 'packages': packages})
 
 
 # def register_package(request):
@@ -119,7 +93,9 @@ def register_package(request):
 #         form = PackageForm(request.POST)
 #         if form.is_valid():
 #             form.save()
-#             return redirect('dashboard')  # Replace 'dashboard' with the appropriate URL pattern name for your dashboard view
+#             # Optionally, you can perform additional actions with the saved package object
+#             return redirect('dashboard')  # Redirect to the dashboard page
 #     else:
 #         form = PackageForm()
+    
 #     return render(request, 'register_package.html', {'form': form})
