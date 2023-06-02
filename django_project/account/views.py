@@ -33,6 +33,9 @@ def sender_dashboard(request):
 def recipient_dashboard(request):
     return render(request, 'recipient_dashboard.html', {})
 
+def courier_dash(request):
+    return render(request, 'courier_dash.html', {})
+
 def register_package(request):
     return render(request, 'register_package.html', {})
 

@@ -1,0 +1,85 @@
+{% extends 'courier_dash_base.html' %}
+
+{% load static %}
+
+
+{% block content %}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Welcome, Courier</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <!-- <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle">
+            <span data-feather="calendar"></span>
+            This week
+          </button> -->
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-2">
+        <div class="section section-total">
+            <h4>Total</h4>
+            <button class="btn btn-sm btn-primary text-white w-100">In Detail</button>
+        </div>
+    </div>
+    <div class="col-sm-2">
+        <div class="section section-pending">
+            <h4>Pending</h4>
+            <button class="btn btn-sm btn-primary text-white w-100">In Detail</button>
+        </div>
+    </div>
+    <div class="col-sm-2">
+        <div class="section section-delivered">
+            <h4>Delivered</h4>
+            <button class="btn btn-sm btn-primary text-white w-100">In Detail</button>
+        </div>
+    </div>
+    <div class="col-sm-2">
+        <div class="section section-failed">
+            <h4>Failed</h4>
+            <button class="btn btn-sm btn-primary text-white w-100">In Detail</button>
+        </div>
+    </div>
+    <div class="col-sm-2">
+        <div class="section section-in-transit">
+            <h4>In-Transit</h4>
+            <button class="btn btn-sm btn-primary text-white w-100">In Detail</button>
+        </div>
+    </div>
+</div>
+
+
+<!--     <div class="table-responsive mt-4">
+        <table class="table table-striped table-sm">
+            <thead>
+                <tr>
+                    <th scope="col">No.</th>
+                    <th scope="col">Package Title</th>
+                    <th scope="col">Recipient Address</th>
+                    <th scope="col">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>01</td>
+                    <td>Fridge</td>
+                    <td>MAQULA</td>
+                    <td><button class="btn btn-sm btn-primary text-white w-50">upcoming</button></td>
+                </tr>
+                <tr>
+                    <td>02</td>
+                    <td>Sofa Set</td>
+                    <td>MAQULA</td>
+                    <td><button class="btn btn-sm btn-info text-white w-50">Ongoing</button></td>
+                </tr>
+                <tr>
+                    <td>03</td>
+                    <td>Five Bags of Irish</td>
+                    <td>Total Wandegeya</td>
+                    <td><button class="btn btn-sm btn-success text-white w-50">Completed</button></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+ -->
+</div>
+{% endblock %}
