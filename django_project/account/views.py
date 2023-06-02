@@ -5,6 +5,10 @@ from django.shortcuts import render
 from .forms import PackageForm
 from .models import Package
 from django.contrib.auth.decorators import login_required
+import random
+import string
+from .utils import get_time_of_day
+
 
 def base(request):
     return render(request, 'base.html', {})
@@ -21,13 +25,26 @@ def services(request):
 def contact(request):
     return render(request, 'contact.html', {})
 
-@login_required()
+@login_required
 def sender_dashboard(request):
+    greeting_message = get_time_of_day()
     packages = request.user.packages.all()
-    return render(request, 'sender_dashboard.html', {'packages': packages})
+    context = {
+        'greeting_message': greeting_message,
+        'packages': packages
+    }
+    return render(request, 'sender_dashboard.html', context)
 
 def recipient_dashboard(request):
     return render(request, 'recipient_dashboard.html', {})
+
+def courier_dashboard(request):
+    greeting_message = get_time_of_day()
+    context = {
+        'greeting_message': greeting_message
+    }
+    return render(request, 'courier_dashboard.html', context)
+
 
 def register_package(request):
     return render(request, 'register_package.html', {})
@@ -85,7 +102,10 @@ def login_view(request):
             msg = 'error validating form'
     return render(request, 'login.html', {'form': form, 'msg': msg})
 
-
+def generate_delivery_number():
+    prefix = 'dn'
+    digits = ''.join(random.choices(string.digits, k=5))
+    return f'{prefix}{digits}'
 
 def register_package(request):
     if request.method == 'POST':
@@ -93,6 +113,7 @@ def register_package(request):
         if form.is_valid():
             package = form.save(commit=False)
             package.user = request.user
+            package.delivery_number = generate_delivery_number()
             package.status = 'upcoming'
             package.save()
             return redirect('sender_dashboard')
@@ -103,3 +124,7 @@ def register_package(request):
         error_message = None
     
     return render(request, 'register_package.html', {'form': form, 'error_message': error_message})
+
+
+
+
