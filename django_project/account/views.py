@@ -7,6 +7,8 @@ from .models import Package
 from django.contrib.auth.decorators import login_required
 import random
 import string
+from .utils import get_time_of_day
+
 
 
 
@@ -27,14 +29,24 @@ def contact(request):
 
 @login_required
 def sender_dashboard(request):
+    greeting_message = get_time_of_day()
     packages = request.user.packages.all()
-    return render(request, 'sender_dashboard.html', {'packages': packages})
+    context = {
+        'greeting_message': greeting_message,
+        'packages': packages
+    }
+    return render(request, 'sender_dashboard.html', context)
 
 def recipient_dashboard(request):
     return render(request, 'recipient_dashboard.html', {})
 
 def courier_dash(request):
-    return render(request, 'courier_dash.html', {})
+    greeting_message = get_time_of_day()
+    context = {
+        'greeting_message': greeting_message
+    }
+    return render(request, 'courier_dash.html', context)
+
 
 def register_package(request):
     return render(request, 'register_package.html', {})
@@ -52,7 +64,7 @@ def register(request):
             msg = 'user created'
 
             dashboard_mapping = {
-                'courier': 'courier_dashboard',
+                'courier': 'courier_dash',
                 'sender': 'sender_dashboard',
                 'recipient': 'recipient_dashboard',
             }
@@ -79,7 +91,7 @@ def login_view(request):
             if user is not None:
                 login(request, user)
                 dashboard_mapping = {
-                        'courier': 'courier_dashboard',
+                        'courier': 'courier_dash',
                         'sender': 'sender_dashboard',
                         'recipient': 'recipient_dashboard',
                     }
@@ -114,3 +126,7 @@ def register_package(request):
         error_message = None
     
     return render(request, 'register_package.html', {'form': form, 'error_message': error_message})
+
+
+
+
