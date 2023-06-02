@@ -19,7 +19,7 @@ class User(AbstractUser):
         ('sender', 'sender'),
         ('recipient', 'recipient'),
     )
-    role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='sender', verbose_name='role')
+    role = models.CharField(max_length=10, choices=ROLE_CHOICES, verbose_name='role', null=False)
 
 class Package(models.Model):
     STATUS_CHOICES = (

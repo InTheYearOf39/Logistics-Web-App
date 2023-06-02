@@ -55,7 +55,7 @@
     <nav id="sidebarMenu" class="col-md-3 col-lg-1 d-md-block bg-light sidebar collapse">
       <div class="position-sticky pt-3">
         <div class="container">
-        <img src="{% static '/img/team/team-1.jpg' %}" class="rounded mx-auto d-block" alt="..." width="80px" height="80px" >
+          {% block profile_image %} {% endblock %}
         </div>
 
         <ul class="nav flex-column mt-3">
@@ -94,7 +94,8 @@
 
         {% block content %}
 
-
+       
+       
         {% endblock %}
 
     </main>
