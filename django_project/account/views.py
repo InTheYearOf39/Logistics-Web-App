@@ -4,7 +4,7 @@ from .forms import SignUpForm, LoginForm
 from django.shortcuts import render
 from .forms import PackageForm
 from .models import Package
-
+from django.contrib.auth.decorators import login_required
 
 def base(request):
     return render(request, 'base.html', {})
@@ -21,6 +21,7 @@ def services(request):
 def contact(request):
     return render(request, 'contact.html', {})
 
+@login_required()
 def sender_dashboard(request):
     packages = request.user.packages.all()
     return render(request, 'sender_dashboard.html', {'packages': packages})
@@ -49,6 +50,7 @@ def register(request):
                 'recipient': 'recipient_dashboard',
             }
             dashboard_url = dashboard_mapping.get(user.role)
+            login(request, user)
             
             return redirect(dashboard_url)
 

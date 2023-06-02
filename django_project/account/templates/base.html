@@ -52,16 +52,23 @@
           <li><a href="{% url 'home' %}" class="active">Home</a></li>
           <li><a href="{% url 'about' %}">About</a></li>
           <li><a href="{% url 'services' %}">Services</a></li>
-          <!-- <li><a href="{% url 'home' %}">Pricing</a></li> -->
           <li><a href="{% url 'contact' %}">Contact</a></li>
 
-          {% if user.is_authenticated %}
-          <li><a href="{% url 'logout_user' %}"><button style="margin-left: 10px; font-size: 16px;" class="btn btn-sm btn-danger px-3 py-2 border-width-2 d-none d-lg-inline-block" >Logout</button></a></li>
-
+        {% if user.is_authenticated %}
+          <!-- <li><a href="{% url 'logout_user' %}"><button style="margin-left: 10px; font-size: 16px;" class="btn btn-sm btn-danger px-3 py-2 border-width-2 d-none d-lg-inline-block" >Logout</button></a></li> -->
+            {% if user.role == 'sender' %}
+          <li><a href="{% url 'sender_dashboard' %}"><img src="{% static 'img/avatar.png' %}" alt="" width="30px" height="30px"></button></a></li>
+            {% elif user.role == 'courier' %}
+          <li><a href="{% url 'courier_dashboard' %}"><img src="{% static 'img/avatar.png' %}" alt="" width="30px" height="30px"></button></a></li>
+            {% else %}
+          <li><a href="{% url 'courier_dashboard' %}"><img src="{% static 'img/avatar.png' %}" alt="" width="30px" height="30px"></button></a></li>
+            {% endif %}
+          <li><a href="{% url 'logout_user' %}"><img src="{% static 'img/logout.png' %}" alt="" width="50px" height="50px"></button></a></li>
+              
           {% else %}
           <li><a class="get-a-quote" href="{% url 'login_view' %}">Login</a></li>
 
-          {% endif %}
+        {% endif %}
         </ul>
       </nav><!-- .navbar -->
 

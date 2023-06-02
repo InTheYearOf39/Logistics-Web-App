@@ -31,7 +31,7 @@ class Package(models.Model):
     recipientName = models.CharField(max_length=100)
     recipientAddress = models.CharField(max_length=200)
     sendersAddress = models.CharField(max_length=200)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, null=False)
     
     def __str__(self):
         return self.packageName
