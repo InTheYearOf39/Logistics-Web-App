@@ -10,8 +10,6 @@ import string
 from .utils import get_time_of_day
 
 
-
-
 def base(request):
     return render(request, 'base.html', {})
 
@@ -40,12 +38,12 @@ def sender_dashboard(request):
 def recipient_dashboard(request):
     return render(request, 'recipient_dashboard.html', {})
 
-def courier_dash(request):
+def courier_dashboard(request):
     greeting_message = get_time_of_day()
     context = {
         'greeting_message': greeting_message
     }
-    return render(request, 'courier_dash.html', context)
+    return render(request, 'courier_dashboard.html', context)
 
 
 def register_package(request):
@@ -64,7 +62,7 @@ def register(request):
             msg = 'user created'
 
             dashboard_mapping = {
-                'courier': 'courier_dash',
+                'courier': 'courier_dashboard',
                 'sender': 'sender_dashboard',
                 'recipient': 'recipient_dashboard',
             }
@@ -91,7 +89,7 @@ def login_view(request):
             if user is not None:
                 login(request, user)
                 dashboard_mapping = {
-                        'courier': 'courier_dash',
+                        'courier': 'courier_dashboard',
                         'sender': 'sender_dashboard',
                         'recipient': 'recipient_dashboard',
                     }
