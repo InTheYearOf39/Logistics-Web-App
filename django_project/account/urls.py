@@ -8,5 +8,6 @@ urlpatterns = [
     path('register/', views.register, name='register'),
     path('logout/', auth_views.LogoutView.as_view(template_name='index.html'), name='logout_user'),
     path('register_package/', views.register_package, name='register_package'),
-    path('recipient_dashboard/', views.recipient_dashboard, name='recipient_dashboard')
+    path('recipient_dashboard/', views.recipient_dashboard, name='recipient_dashboard'),
+    path('courier_dash/', views.courier_dash, name='courier_dash'),
 ]
