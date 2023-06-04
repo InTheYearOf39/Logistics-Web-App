@@ -19,7 +19,7 @@ class User(AbstractUser):
         ('sender', 'sender'),
         ('recipient', 'recipient'),
     )
-    role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='sender', verbose_name='role')
+
     
 class UserManagement(models.Model):
     # User management fields and relationships
@@ -29,6 +29,9 @@ class UserManagement(models.Model):
 
     def __str__(self):
         return self.username
+
+    role = models.CharField(max_length=10, choices=ROLE_CHOICES, verbose_name='role', null=False)
+
 
 class Package(models.Model):
     STATUS_CHOICES = (
@@ -41,7 +44,7 @@ class Package(models.Model):
     
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='packages', null=True)
     packageName = models.CharField(max_length=100)
-    packageDescripton = models.TextField()
+    packageDescription = models.TextField()
     recipientName = models.CharField(max_length=100)
     recipientAddress = models.CharField(max_length=200)
     sendersAddress = models.CharField(max_length=200)

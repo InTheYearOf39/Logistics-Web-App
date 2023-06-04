@@ -93,7 +93,7 @@ class PackageForm(forms.ModelForm):
 
         class Meta:
             model = Package
-            fields = ['packageName', 'packageDescripton', 'recipientName', 'recipientAddress', 'sendersAddress']
+            fields = ['packageName', 'packageDescription', 'recipientName', 'recipientAddress', 'sendersAddress']
 
 # class PackageForm(forms.ModelForm):
 #     class Meta:

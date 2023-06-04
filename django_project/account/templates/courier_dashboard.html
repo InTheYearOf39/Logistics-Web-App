@@ -1,12 +1,20 @@
-{% extends 'courier_dash_base.html' %}
+{% extends 'dashboard_base.html' %}
 
 {% load static %}
+
+
+
+{% block profile_image %} 
+    <img src="{% static '/img/team/team-3.jpg' %}" class="rounded mx-auto d-block" alt="..." width="80px" height="80px" >
+{% endblock %}
+
+
 
 
 {% block content %}
 
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-    <h1 class="h2">Welcome, Courier</h1>
+    <h1 class="h2">{{ greeting_message }}, {{ user.username }}</h1>
     <div class="btn-toolbar mb-2 mb-md-0">
         <!-- <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle">
             <span data-feather="calendar"></span>

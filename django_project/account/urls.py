@@ -18,4 +18,5 @@ urlpatterns = [
     path('delete/<int:user_id>/', views.delete_user, name='delete_user'),
     path('view_packages/', views.view_packages, name='view_packages'),
     path('couriers/', views.couriers, name='couriers'),
+
 ]

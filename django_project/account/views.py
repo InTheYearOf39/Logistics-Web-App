@@ -9,7 +9,7 @@ from .models import Package, User, UserManagement
 from django.contrib.auth.decorators import login_required
 import random
 import string
-
+from .utils import get_time_of_day
 
 
 def base(request):
@@ -29,14 +29,24 @@ def contact(request):
 
 @login_required
 def sender_dashboard(request):
+    greeting_message = get_time_of_day()
     packages = request.user.packages.all()
-    return render(request, 'sender_dashboard.html', {'packages': packages})
+    context = {
+        'greeting_message': greeting_message,
+        'packages': packages
+    }
+    return render(request, 'sender_dashboard.html', context)
 
 def recipient_dashboard(request):
     return render(request, 'recipient_dashboard.html', {})
 
-def courier_dash(request):
-    return render(request, 'courier_dash.html', {})
+def courier_dashboard(request):
+    greeting_message = get_time_of_day()
+    context = {
+        'greeting_message': greeting_message
+    }
+    return render(request, 'courier_dashboard.html', context)
+
 
 def completed_pack(request):
     return render(request, 'completed_pack.html', {})
@@ -204,3 +214,4 @@ def delete_user(request, user_id):
         return redirect('user_management')
 
     return render(request, 'delete_user.html', {'user': user})
+

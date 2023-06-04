@@ -1,6 +1,13 @@
-{% extends 'recipient_dashboard_base.html' %}
+{% extends 'dashboard_base.html' %}
 
 {% load static %}
+
+
+
+{% block profile_image %} 
+    <img src="{% static '/img/team/team-2.jpg' %}" class="rounded mx-auto d-block" alt="..." width="80px" height="80px" >
+{% endblock %}
+
 
 
 {% block content %}

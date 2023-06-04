@@ -1,27 +1,25 @@
-{% extends 'dashboard_base.html' %}
+{% extends 'dashboard_base.html' %} 
 
 {% load static %}
+
+
+
+{% block profile_image %} 
+    <img src="{% static '/img/team/team-1.jpg' %}" class="rounded mx-auto d-block" alt="..." width="80px" height="80px" >
+{% endblock %}
+
 
 
 {% block content %}
 
       <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-        <h1 class="h2">Dashboard</h1>
+        <h1 class="h2">{{ greeting_message }}, {{ user.username }}</h1>
         <div class="btn-toolbar mb-2 mb-md-0">
 
           <div class="btn-group me-2">
             <a href="{% url 'register_package' %}" class="btn btn-sm btn-outline-secondary">ADD PACKAGE +</a>
           </div>
 
-          <!-- <div class="btn-group me-2">
-            <button type="button" class="btn btn-sm btn-outline-secondary">ADD PACKAGE +</button>
-          </div> -->
-
-
-          <!-- <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle">
-            <span data-feather="calendar"></span>
-            This week
-          </button> -->
         </div>
       </div>
 
@@ -33,7 +31,7 @@
             <tr>
               <th scope="col">No.</th>
               <th scope="col">Package Title</th>
-              <th scope="col">Package Descripton</th>
+              <th scope="col">Package Description</th>
               <th scope="col">Recipient</th>
               <th scope="col">Address From</th>
               <th scope="col">Address To</th>
@@ -46,18 +44,18 @@
               <tr>
                 <td>{{ forloop.counter }}</td>
                 <td>{{ package.packageName }}</td>
-                <td>{{ package.packageDescripton }}</td>
+                <td>{{ package.packageDescription }}</td>
                 <td>{{ package.recipientName }}</td>
                 <td>{{ package.sendersAddress }}</td>
                 <td>{{ package.recipientAddress }}</td>
                 <td>{{ package.delivery_number }}</td>
                 <td>
                   {% if package.status == 'upcoming' %}
-                    <button class="btn btn-sm btn-primary text-white w-50">Upcoming</button>
+                    <button class="btn btn-sm btn-primary text-white w-75">Upcoming</button>
                   {% elif package.status == 'ongoing' %}
-                    <button class="btn btn-sm btn-info text-white w-50">Ongoing</button>
+                    <button class="btn btn-sm btn-info text-white w-75">Ongoing</button>
                   {% elif package.status == 'completed' %}
-                    <button class="btn btn-sm btn-success text-white w-50">Completed</button>
+                    <button class="btn btn-sm btn-success text-white w-75">Completed</button>
                   {% endif %}
                 </td>
               </tr>
