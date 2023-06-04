@@ -1,0 +1,65 @@
+{% extends 'admin_dashboard_base.html' %}
+
+{% load static %}
+
+
+{% block content %}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Welcome, Administrator</h1>
+    <!--         <div class="btn-toolbar mb-2 mb-md-0">
+          <div class="btn-group me-2">
+            <button type="button" class="btn btn-sm btn-outline-secondary">Share</button> 
+            <button type="button" class="btn btn-sm btn-outline-secondary">notifications</button>
+          </div>
+            <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle">
+            <span data-feather="calendar"></span>
+            This week
+          </button> 
+        </div>
+    -->
+</div>
+
+
+<h2>Section title</h2>
+<div class="container">
+    <div class="row">
+        <div class="col-lg-4">
+            <div class="card bg-white text-black mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Upcoming Packages</h5>
+                    <p class="card-text">01</p>
+                    <p class="card-text">Fridge</p>
+                    <p class="card-text">MAQULA</p>
+                    <!--
+                        <button class="btn btn-sm btn-outline-light">Upcoming</button> 
+                    -->                
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card bg-white text-black mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Ongoing Packages</h5>
+                    <p class="card-text">02</p>
+                    <p class="card-text">Sofa Set</p>
+                    <p class="card-text">MAQULA</p>
+                    <!-- <button class="btn btn-sm btn-outline-light">Ongoing</button> -->
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card bg-white text-black mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Completed Packages</h5>
+                    <p class="card-text">03</p>
+                    <p class="card-text">Five Bags of Irish</p>
+                    <p class="card-text">Total Wandegeya</p>
+                    <!-- <button class="btn btn-sm btn-outline-light">Completed</button> -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
