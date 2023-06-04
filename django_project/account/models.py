@@ -20,6 +20,15 @@ class User(AbstractUser):
         ('recipient', 'recipient'),
     )
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='sender', verbose_name='role')
+    
+class UserManagement(models.Model):
+    # User management fields and relationships
+    username = models.CharField(max_length=150)
+    email = models.EmailField()
+    role = models.CharField(max_length=10, choices=User.ROLE_CHOICES)
+
+    def __str__(self):
+        return self.username
 
 class Package(models.Model):
     STATUS_CHOICES = (
