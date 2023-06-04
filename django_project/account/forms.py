@@ -99,3 +99,17 @@ class PackageForm(forms.ModelForm):
 #     class Meta:
 #         model = Package
 #         fields = ['packageName', 'packageDescripton', 'recipientName', 'recipientAddress', 'sendersAddress']
+
+class CustomUserCreationForm(UserCreationForm):
+    role = forms.ChoiceField(choices=User.ROLE_CHOICES)
+
+    class Meta:
+        model = User
+        fields = ('username', 'email', 'password1', 'role')
+        
+class UserEditForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ('username', 'email', 'role')
+
+
