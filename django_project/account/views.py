@@ -26,6 +26,14 @@ def services(request):
 def contact(request):
     return render(request, 'contact.html', {})
 
+def riders(request):
+    couriers = User.objects.filter(role='courier')  # Retrieve only the couriers from the database
+    
+    context = {
+        'couriers': couriers
+    }
+    return render(request, 'admin/riders.html', context)
+
 def users(request):
     users = User.objects.all()  # Retrieve all users from the database
     
