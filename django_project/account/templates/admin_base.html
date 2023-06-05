@@ -63,40 +63,23 @@
           <li class="nav-item">
             <a class="nav-link active" aria-current="page" href="#">
               <span data-feather="home"></span>
-              Profile
+              Packages
             </a>
           </li>
-          
+
           <li class="nav-item">
-        {% if user.is_authenticated %}
-          {% if user.role == 'courier' %}
-            <a class="nav-link" href="{% url 'courier_dashboard' %}">
-              <span data-feather="shopping-cart"></span>
-              Packages
+            <a class="nav-link" href="#">
+              <span data-feather="users"></span>
+              Users
             </a>
-          {% elif user.role == 'sender' %}
-            <a class="nav-link" href="{% url 'sender_dashboard' %}">
-              <span data-feather="shopping-cart"></span>
-              Packages
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <span data-feather="users"></span>
+              Riders
             </a>
-          {% elif user.role == 'recipient' %}
-            <a class="nav-link" href="{% url 'recipient_dashboard' %}">
-              <span data-feather="shopping-cart"></span>
-              Packages
-            </a>
-          {% elif user.role == 'admin' %}
-            <a class="nav-link" href="{% url 'view_packages' %}">
-              <span data-feather="shopping-cart"></span>
-              Packages
-            </a>
-          {% endif %}
-        {% else %}
-          <a class="nav-link" href="#">
-            <span data-feather="shopping-cart"></span>
-            Packages
-          </a>
-        {% endif %}
-         </li>
+          </li>
 
           <li class="nav-item">
             <a class="nav-link" href="#">
