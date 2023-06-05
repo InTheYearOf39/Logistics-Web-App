@@ -9,7 +9,7 @@ import random
 import string
 from .utils import get_time_of_day
 from account.models import User
-
+from django.db.models import Q
 
 def base(request):
     return render(request, 'base.html', {})
@@ -36,7 +36,9 @@ def users(request):
     return render(request, 'admin/users.html', context)
 
 def admin(request):
-    packages = Package.objects.all()
+    packages = Package.objects.filter(
+        Q(status='ongoing') | Q(status='upcoming')
+    )
     greeting_message = get_time_of_day()
     context = {
         'greeting_message': greeting_message,

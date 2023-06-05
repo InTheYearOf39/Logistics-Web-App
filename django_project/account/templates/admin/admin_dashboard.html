@@ -23,6 +23,7 @@
               <th scope="col">Address To</th>
               <th scope="col">Delivery Number</th>
               <th scope="col">Status</th>
+              <th scope="col">Ready</th>
             </tr>
           </thead>
           <tbody>
@@ -36,13 +37,18 @@
                 <td>{{ package.delivery_number }}</td>
                 <td>
                   {% if package.status == 'upcoming' %}
-                   <a href=""><button class="btn btn-sm btn-primary text-white w-75">Assign</button></a> 
+                   <img src="{% static 'img/pending.png' %}" alt="" width="30px" height="30px">
                   {% elif package.status == 'ongoing' %}
-                    <button class="btn btn-sm btn-info text-white w-75">Ongoing</button>
+                    <img src="{% static 'img/started.png' %}" alt="" width="30px" height="30px">
                   {% elif package.status == 'completed' %}
-                    <button class="btn btn-sm btn-success text-white w-75">Completed</button>
+                    <img src="{% static 'img/completed.png' %}" alt="" width="30px" height="30px">
                   {% endif %}
                 </td>
+                <td>
+                {% if package.status == 'upcoming' %}
+                   <a href=""><button class="btn btn-sm btn-primary text-white w-75">Assign</button></a> 
+                {% endif %}
+            </td>
               </tr>
             {% endfor %}
           </tbody>
