@@ -1,0 +1,54 @@
+{% extends 'admin/admin_base.html' %}
+
+{% load static %}
+
+
+{% block content %}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">{{ greeting_message }}, {{ user.username }}</h1>
+</div>
+
+
+<h2>Packages</h2>
+<div class="container">
+    <div class="table-responsive">
+        <table class="table table-striped table-sm">
+          <thead>
+            <tr>
+              <th scope="col">No.</th>
+              <th scope="col">Package Title</th>
+              <th scope="col">Recipient</th>
+              <th scope="col">Address From</th>
+              <th scope="col">Address To</th>
+              <th scope="col">Delivery Number</th>
+              <th scope="col">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for package in packages %}
+              <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ package.packageName }}</td>
+                <td>{{ package.recipientName }}</td>
+                <td>{{ package.sendersAddress }}</td>
+                <td>{{ package.recipientAddress }}</td>
+                <td>{{ package.delivery_number }}</td>
+                <td>
+                  {% if package.status == 'upcoming' %}
+                   <a href=""><button class="btn btn-sm btn-primary text-white w-75">Assign</button></a> 
+                  {% elif package.status == 'ongoing' %}
+                    <button class="btn btn-sm btn-info text-white w-75">Ongoing</button>
+                  {% elif package.status == 'completed' %}
+                    <button class="btn btn-sm btn-success text-white w-75">Completed</button>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        
+      </div>
+</div>
+
+{% endblock %}

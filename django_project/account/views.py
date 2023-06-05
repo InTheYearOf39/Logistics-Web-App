@@ -29,11 +29,13 @@ def view_packages(request):
     return render(request, 'view_packages.html', {})
 
 def admin(request):
+    packages = Package.objects.all()
     greeting_message = get_time_of_day()
     context = {
-        'greeting_message': greeting_message
+        'greeting_message': greeting_message,
+        'packages': packages
     }
-    return render(request, 'admin_dashboard.html', context)
+    return render(request, 'admin/admin_dashboard.html', context)
 
 @login_required
 def sender_dashboard(request):
