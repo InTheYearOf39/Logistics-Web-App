@@ -1,11 +1,9 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.forms import UserChangeForm
-from .forms import CustomUserCreationForm, UserEditForm
 from .forms import SignUpForm, LoginForm
 from django.shortcuts import render
 from .forms import PackageForm
-from .models import Package, User, UserManagement
+from .models import Package
 from django.contrib.auth.decorators import login_required
 import random
 import string
@@ -26,6 +24,16 @@ def services(request):
 
 def contact(request):
     return render(request, 'contact.html', {})
+
+def view_packages(request):
+    return render(request, 'view_packages.html', {})
+
+def admin(request):
+    greeting_message = get_time_of_day()
+    context = {
+        'greeting_message': greeting_message
+    }
+    return render(request, 'admin_dashboard.html', context)
 
 @login_required
 def sender_dashboard(request):
@@ -48,27 +56,8 @@ def courier_dashboard(request):
     return render(request, 'courier_dashboard.html', context)
 
 
-def completed_pack(request):
-    return render(request, 'completed_pack.html', {})
-
-def completed_packages(request):
-    completed_packages = Package.objects.filter(status='completed')
-    return render(request, 'completed_packages.html', {'completed_packages': completed_packages})
-
 def register_package(request):
     return render(request, 'register_package.html', {})
-
-def admin_dashboard(request):
-    return render(request, 'admin_dashboard.html', {})
-
-def user_management(request):
-    users = User.objects.all()
-
-    context = {
-        'users': users
-    }
-
-    return render(request, 'user_management.html', context)
 
 def logout_user(request):
     logout(request)
@@ -83,6 +72,7 @@ def register(request):
             msg = 'user created'
 
             dashboard_mapping = {
+                # 'admin': 'admin_dashboard',
                 'courier': 'courier_dashboard',
                 'sender': 'sender_dashboard',
                 'recipient': 'recipient_dashboard',
@@ -110,6 +100,7 @@ def login_view(request):
             if user is not None:
                 login(request, user)
                 dashboard_mapping = {
+                        'admin': 'admin_dashboard',
                         'courier': 'courier_dashboard',
                         'sender': 'sender_dashboard',
                         'recipient': 'recipient_dashboard',
@@ -147,71 +138,5 @@ def register_package(request):
     return render(request, 'register_package.html', {'form': form, 'error_message': error_message})
 
 
-def couriers(request):
-    available_riders = Package.objects.filter(status='upcoming', user__isnull=False)
-    in_transit_riders = Package.objects.filter(status='ongoing', user__isnull=False)
-    unavailable_riders = Package.objects.filter(status='completed', user__isnull=False)
 
-    return render(request, 'couriers.html', {
-        'available_riders': available_riders,
-        'in_transit_riders': in_transit_riders,
-        'unavailable_riders': unavailable_riders,
-    })
-
-
-def view_packages(request):
-    ongoing_packages = Package.objects.filter(status='ongoing')
-    completed_packages = Package.objects.filter(status='completed')
-    upcoming_packages = Package.objects.filter(status='upcoming')
-    new_packages = Package.objects.order_by('-id')[:10]  # Example: Get the 10 latest packages
-
-    return render(request, 'view_packages.html', {
-        'ongoing_packages': ongoing_packages,
-        'completed_packages': completed_packages,
-        'upcoming_packages': upcoming_packages,
-        'new_packages': new_packages,
-    })
-
-def create_user(request):
-    if request.method == 'POST':
-        form = CustomUserCreationForm(request.POST)
-        if form.is_valid():
-            user = form.save()  # Save the user registration form
-            # Create a user management entry for the created user
-            user_management = UserManagement(username=user.username, email=user.email, role=user.role)
-            user_management.save()
-            return redirect('user_management')  # Redirect to the user management page
-    else:
-        form = CustomUserCreationForm()
-
-    context = {
-        'form': form
-    }
-    return render(request, 'create_user.html', context)
-
-def edit_user(request, user_id):
-    user = get_object_or_404(User, id=user_id)
-
-    if request.method == 'POST':
-        form = UserEditForm(request.POST, instance=user)
-        if form.is_valid():
-            form.save()
-            return redirect('user_management')  # Redirect to the user management page
-    else:
-        form = UserEditForm(instance=user)
-
-    context = {
-        'form': form
-    }
-
-    return render(request, 'edit_user.html', context)
-
-def delete_user(request, user_id):
-    user = get_object_or_404(User, id=user_id)
-
-    if request.method == 'POST':
-        user.delete()
-        return redirect('user_management')
-
-    return render(request, 'delete_user.html', {'user': user})
 

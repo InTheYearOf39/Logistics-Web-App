@@ -15,23 +15,12 @@ import string
 
 class User(AbstractUser):
     ROLE_CHOICES = (
+        ('admin', 'admin'),
         ('courier', 'courier'),
         ('sender', 'sender'),
         ('recipient', 'recipient'),
     )
-
-    
-class UserManagement(models.Model):
-    # User management fields and relationships
-    username = models.CharField(max_length=150)
-    email = models.EmailField()
-    role = models.CharField(max_length=10, choices=User.ROLE_CHOICES)
-
-    def __str__(self):
-        return self.username
-
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, verbose_name='role', null=False)
-
 
 class Package(models.Model):
     STATUS_CHOICES = (
