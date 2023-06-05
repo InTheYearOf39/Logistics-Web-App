@@ -36,9 +36,11 @@ def users(request):
     return render(request, 'admin/users.html', context)
 
 def admin(request):
+    packages = Package.objects.all()
     greeting_message = get_time_of_day()
     context = {
-        'greeting_message': greeting_message
+        'greeting_message': greeting_message,
+        'packages': packages
     }
     return render(request, 'admin/admin_dashboard.html', context)
 
