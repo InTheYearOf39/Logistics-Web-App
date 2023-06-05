@@ -12,4 +12,5 @@ urlpatterns = [
     path('recipient_dashboard/', views.recipient_dashboard, name='recipient_dashboard'),
     path('courier_dashboard/', views.courier_dashboard, name='courier_dashboard'),
     path('users/', views.users, name='users'),
+    path('riders/', views.riders, name='riders'),
 ]
