@@ -11,5 +11,5 @@ urlpatterns = [
     path('register_package/', views.register_package, name='register_package'),
     path('recipient_dashboard/', views.recipient_dashboard, name='recipient_dashboard'),
     path('courier_dashboard/', views.courier_dashboard, name='courier_dashboard'),
-    path('view_packages/', views.view_packages, name='view_packages'),
+    path('users/', views.users, name='users'),
 ]

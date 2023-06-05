@@ -41,6 +41,15 @@ class SignUpForm(UserCreationForm):
         widget=forms.RadioSelect,
     )
 
+    name = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": "name"
+            }
+        )
+    )
+
     username = forms.CharField(
         widget=forms.TextInput(
             attrs={
@@ -74,14 +83,9 @@ class SignUpForm(UserCreationForm):
         )
     )
 
-    # role = forms.ChoiceField(
-    #             choices = ROLE_CHOICES,
-    #             required = True,
-    #             widget = forms.Select(attrs = {'class': 'control--checkbox', 'placeholder': ''}),
-    #             )
     class Meta:
         model = User
-        fields = ('username', 'email', 'password1', 'password2', 'role')
+        fields = ('name', 'username', 'email', 'password1', 'password2', 'role')
         
 class PackageForm(forms.ModelForm):
         widgets = {
@@ -96,8 +100,3 @@ class PackageForm(forms.ModelForm):
         class Meta:
             model = Package
             fields = ['packageName', 'packageDescription', 'recipientName', 'recipientAddress', 'sendersAddress']
-
-# class PackageForm(forms.ModelForm):
-#     class Meta:
-#         model = Package
-#         fields = ['packageName', 'packageDescripton', 'recipientName', 'recipientAddress', 'sendersAddress']

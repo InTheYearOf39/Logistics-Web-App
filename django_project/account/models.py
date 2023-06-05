@@ -7,12 +7,6 @@ import string
 # Create your models here.
 
 
-# class User(AbstractUser):
-#     is_sender= models.BooleanField('Is sender', default=False)
-#     is_receiver = models.BooleanField('Is receiver', default=False)
-#     is_courrier = models.BooleanField('Is courrier', default=False)
-
-
 class User(AbstractUser):
     ROLE_CHOICES = (
         ('admin', 'admin'),
@@ -20,7 +14,9 @@ class User(AbstractUser):
         ('sender', 'sender'),
         ('recipient', 'recipient'),
     )
+    name = models.CharField(max_length=20,null=False)
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, verbose_name='role', null=False)
+
 
 class Package(models.Model):
     STATUS_CHOICES = (

@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import login_required
 import random
 import string
 from .utils import get_time_of_day
+from account.models import User
 
 
 def base(request):
@@ -25,15 +26,21 @@ def services(request):
 def contact(request):
     return render(request, 'contact.html', {})
 
-def view_packages(request):
-    return render(request, 'view_packages.html', {})
+def users(request):
+    users = User.objects.all()  # Retrieve all users from the database
+    
+    context = {
+        'users': users
+    }
+    
+    return render(request, 'admin/users.html', context)
 
 def admin(request):
     greeting_message = get_time_of_day()
     context = {
         'greeting_message': greeting_message
     }
-    return render(request, 'admin_dashboard.html', context)
+    return render(request, 'admin/admin_dashboard.html', context)
 
 @login_required
 def sender_dashboard(request):
