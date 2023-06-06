@@ -15,6 +15,7 @@ from account.models import User
 from django.db.models import Q
 from django.shortcuts import redirect, get_object_or_404
 from django.http import HttpResponse
+from .models import Package
 
 
 
@@ -72,41 +73,22 @@ def assign_courier(request, package_id):
         
         return redirect('admin_dashboard')  # Redirect back to the admin dashboard or any desired page
 
-        return redirect('admin_dashboard')
-
     
     couriers = User.objects.filter(role='courier')
     
     return render(request, 'admin/assign_courier.html', {'package_id': package_id, 'couriers': couriers})
 
-# def assign_courier(request, package_id):
-#     package = get_object_or_404(Package, id=package_id)
-    
-#     if request.method == 'POST':
-#         courier_id = request.POST.get('courier')
-#         courier = get_object_or_404(User, id=courier_id, role='courier')
-        
-#         package.courier = courier
-#         package.status = 'ongoing'  # Update the status to "ongoing"
-#         package.save()
-        
-#         return redirect('admin_dashboard')  # Redirect back to the admin dashboard or any desired page
-    
-#     couriers = User.objects.filter(role='courier')
-    
-#     return render(request, 'admin/assign_courier.html', {'package': package, 'couriers': couriers})
 
-
-# def admin(request):
-#     packages = Package.objects.filter(
-#         Q(status='ongoing') | Q(status='upcoming')
-#     )
-#     greeting_message = get_time_of_day()
-#     context = {
-#         'greeting_message': greeting_message,
-#         'packages': packages
-#     }
-#     return render(request, 'admin/admin_dashboard.html', context)
+def admin(request):
+    packages = Package.objects.filter(
+        Q(status='ongoing') | Q(status='upcoming')
+    )
+    greeting_message = get_time_of_day()
+    context = {
+        'greeting_message': greeting_message,
+        'packages': packages
+    }
+    return render(request, 'admin/admin_dashboard.html', context)
 
 def admin(request):
     packages = Package.objects.filter(
@@ -147,11 +129,15 @@ def recipient_dashboard(request):
     return render(request, 'recipient_dashboard.html', context)
 
 def courier_dashboard(request):
+    assigned_packages = Package.objects.filter(courier=request.user, status__in=['ongoing', 'completed'])
     greeting_message = get_time_of_day()
     context = {
-        'greeting_message': greeting_message
+        'greeting_message': greeting_message,
+        'assigned_packages': assigned_packages,
     }
     return render(request, 'courier_dashboard.html', context)
+
+
 
 
 def register_package(request):
@@ -234,23 +220,7 @@ def register_package(request):
 
     return render(request, 'register_package.html', {'form': form})
 
-# def register_package(request):
-#     if request.method == 'POST':
-#         form = PackageForm(request.POST)
-#         if form.is_valid():
-#             package = form.save(commit=False)
-#             package.user = request.user
-#             package.delivery_number = generate_delivery_number()
-#             package.status = 'upcoming'
-#             package.save()
-#             return redirect('sender_dashboard')
-#         else:
-#             error_message = 'Error processing your request'
-#     else:
-#         form = PackageForm()
-#         error_message = None
-    
-#     return render(request, 'register_package.html', {'form': form, 'error_message': error_message})
+
 
 
 
