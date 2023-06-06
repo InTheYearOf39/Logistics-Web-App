@@ -11,6 +11,7 @@ from .utils import get_time_of_day
 from account.models import User
 from django.db.models import Q
 from django.shortcuts import redirect, get_object_or_404
+from django.http import HttpResponse
 
 def base(request):
     return render(request, 'base.html', {})
@@ -44,6 +45,7 @@ def users(request):
     
     return render(request, 'admin/users.html', context)
 
+
 def assign_courier(request, package_id):
     package = get_object_or_404(Package, id=package_id)
     
@@ -51,15 +53,39 @@ def assign_courier(request, package_id):
         courier_id = request.POST.get('courier')
         courier = get_object_or_404(User, id=courier_id, role='courier')
         
+        previous_courier_status = courier.status  # Save the previous status
+        
         package.courier = courier
         package.status = 'ongoing'  # Update the status to "ongoing"
         package.save()
+        
+        # Update the courier status to "on-trip" only if they were not already on-trip
+        if previous_courier_status != 'on-trip':
+            courier.status = 'on-trip'
+            courier.save()
         
         return redirect('admin_dashboard')  # Redirect back to the admin dashboard or any desired page
     
     couriers = User.objects.filter(role='courier')
     
     return render(request, 'admin/assign_courier.html', {'package_id': package_id, 'couriers': couriers})
+
+# def assign_courier(request, package_id):
+#     package = get_object_or_404(Package, id=package_id)
+    
+#     if request.method == 'POST':
+#         courier_id = request.POST.get('courier')
+#         courier = get_object_or_404(User, id=courier_id, role='courier')
+        
+#         package.courier = courier
+#         package.status = 'ongoing'  # Update the status to "ongoing"
+#         package.save()
+        
+#         return redirect('admin_dashboard')  # Redirect back to the admin dashboard or any desired page
+    
+#     couriers = User.objects.filter(role='courier')
+    
+#     return render(request, 'admin/assign_courier.html', {'package': package, 'couriers': couriers})
 
 
 def admin(request):
@@ -84,7 +110,11 @@ def sender_dashboard(request):
     return render(request, 'sender_dashboard.html', context)
 
 def recipient_dashboard(request):
-    return render(request, 'recipient_dashboard.html', {})
+    greeting_message = get_time_of_day()
+    context = {
+        'greeting_message': greeting_message
+    }
+    return render(request, 'recipient_dashboard.html', context)
 
 def courier_dashboard(request):
     greeting_message = get_time_of_day()
@@ -163,17 +193,34 @@ def register_package(request):
         if form.is_valid():
             package = form.save(commit=False)
             package.user = request.user
-            package.delivery_number = generate_delivery_number()
+            package.delivery_number = package._generate_delivery_number()
             package.status = 'upcoming'
             package.save()
             return redirect('sender_dashboard')
         else:
-            error_message = 'Error processing your request'
+            return HttpResponse(form.errors)
     else:
-        form = PackageForm()
-        error_message = None
+        form = PackageForm(initial={'courier': None})  # Exclude courier field from the form
+
+    return render(request, 'register_package.html', {'form': form})
+
+# def register_package(request):
+#     if request.method == 'POST':
+#         form = PackageForm(request.POST)
+#         if form.is_valid():
+#             package = form.save(commit=False)
+#             package.user = request.user
+#             package.delivery_number = generate_delivery_number()
+#             package.status = 'upcoming'
+#             package.save()
+#             return redirect('sender_dashboard')
+#         else:
+#             error_message = 'Error processing your request'
+#     else:
+#         form = PackageForm()
+#         error_message = None
     
-    return render(request, 'register_package.html', {'form': form, 'error_message': error_message})
+#     return render(request, 'register_package.html', {'form': form, 'error_message': error_message})
 
 
 

@@ -6,7 +6,6 @@ import string
 
 # Create your models here.
 
-
 class User(AbstractUser):
     ROLE_CHOICES = (
         ('admin', 'admin'),
@@ -14,8 +13,26 @@ class User(AbstractUser):
         ('sender', 'sender'),
         ('recipient', 'recipient'),
     )
-    name = models.CharField(max_length=20,null=False)
+    STATUS_CHOICES = (
+        ('available', 'Available'),
+        ('on-trip', 'On Trip'),
+    )
+    name = models.CharField(max_length=20, null=False)
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, verbose_name='role', null=False)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='available')
+
+    def __str__(self):
+        return self.username
+        
+# class User(AbstractUser):
+#     ROLE_CHOICES = (
+#         ('admin', 'admin'),
+#         ('courier', 'courier'),
+#         ('sender', 'sender'),
+#         ('recipient', 'recipient'),
+#     )
+#     name = models.CharField(max_length=20,null=False)
+#     role = models.CharField(max_length=10, choices=ROLE_CHOICES, verbose_name='role', null=False)
 
 class Package(models.Model):
     STATUS_CHOICES = (
