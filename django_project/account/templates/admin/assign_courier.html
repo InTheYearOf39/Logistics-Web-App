@@ -1,13 +1,13 @@
 {% extends 'admin/admin_base.html' %}
 
 {% block content %}
-  <div class="container">
-    <h1>Assign Courier</h1>
+  <div class="container mt-5">
+    <h1 class="mb-4">Assign Courier</h1>
     <form method="post" action="{% url 'assign_courier' package_id=package_id %}">
       {% csrf_token %}
       
       <div class="form-group">
-        <label for="courier">Select Courier</label>
+        <label for="courier" class="mb-2">Select Courier</label>
         <select class="form-control" id="courier" name="courier">
           <option value="" selected disabled>-- Select Courier --</option>
           {% for courier in couriers %}
@@ -15,9 +15,16 @@
           {% endfor %}
         </select>
       </div>
+
+      <div class="row mt-4">
+        <div class="col-2">
+          <button type="submit" class="btn btn-sm btn-primary w-100">Assign</button>
+        </div>
+        <div class="col-2">
+          <a href="{% url 'admin_dashboard' %}" class="btn btn-sm btn-secondary w-100">Back</a>
+        </div>
+      </div>
       
-      <button type="submit" class="btn btn-primary">Assign</button>
-      <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">Cancel</a>
     </form>
   </div>
 {% endblock %}
