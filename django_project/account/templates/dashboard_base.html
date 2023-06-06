@@ -60,14 +60,22 @@
         </div>
 
         <ul class="nav flex-column mt-3">
+
           <li class="nav-item">
             <a class="nav-link active" aria-current="page" href="#">
               <span data-feather="home"></span>
-              Profile
+              Packages
+            </a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <span data-feather="users"></span>
+              History
             </a>
           </li>
           
-          <li class="nav-item">
+          <!-- <li class="nav-item">
         {% if user.is_authenticated %}
           {% if user.role == 'courier' %}
             <a class="nav-link" href="{% url 'courier_dashboard' %}">
@@ -96,20 +104,21 @@
             Packages
           </a>
         {% endif %}
-         </li>
+         </li> -->
 
           <li class="nav-item">
             <a class="nav-link" href="#">
               <span data-feather="users"></span>
-              History
+              Reports
             </a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="#">
               <span data-feather="bar-chart-2"></span>
-              Reports
+              Profile
             </a>
           </li>
+
         </ul>
 
       </div>

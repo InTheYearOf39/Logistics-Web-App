@@ -10,6 +10,7 @@ import string
 from .utils import get_time_of_day
 from account.models import User
 from django.db.models import Q
+from django.shortcuts import redirect, get_object_or_404
 
 def base(request):
     return render(request, 'base.html', {})
@@ -42,6 +43,22 @@ def users(request):
     }
     
     return render(request, 'admin/users.html', context)
+
+def assign_courier(request, package_id):
+    package = get_object_or_404(Package, id=package_id)
+    
+    if request.method == 'POST':
+        courier_id = request.POST.get('courier')
+        courier = get_object_or_404(User, id=courier_id, role='courier')
+        
+        package.courier = courier
+        package.save()
+        
+        return redirect('admin_dashboard')  # Redirect back to the admin dashboard or any desired page
+    
+    couriers = User.objects.filter(role='courier')
+    
+    return render(request, 'admin/assign_courier.html', {'package_id': package_id, 'couriers': couriers})
 
 def admin(request):
     packages = Package.objects.filter(

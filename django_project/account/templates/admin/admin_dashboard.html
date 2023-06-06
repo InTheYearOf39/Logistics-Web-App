@@ -45,8 +45,10 @@
                   {% endif %}
                 </td>
                 <td>
-                {% if package.status == 'upcoming' %}
-                   <a href=""><button class="btn btn-sm btn-primary text-white w-75">Assign</button></a> 
+                  {% if not package.courier %}
+                  <a href="{% url 'assign_courier' package_id=package.id %}">
+                    <button class="btn btn-sm btn-primary text-white w-75">Assign</button>
+                  </a> 
                 {% endif %}
             </td>
               </tr>

@@ -1,6 +1,7 @@
 from django.urls import path
 from . import views
 from django.contrib.auth import views as auth_views
+from .views import assign_courier
 
 urlpatterns = [
 
@@ -13,4 +14,5 @@ urlpatterns = [
     path('courier_dashboard/', views.courier_dashboard, name='courier_dashboard'),
     path('users/', views.users, name='users'),
     path('riders/', views.riders, name='riders'),
+    path('assign_courier/<int:package_id>/', assign_courier, name='assign_courier'),
 ]
