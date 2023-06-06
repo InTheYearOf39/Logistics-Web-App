@@ -52,6 +52,7 @@ def assign_courier(request, package_id):
         courier = get_object_or_404(User, id=courier_id, role='courier')
         
         package.courier = courier
+        package.status = 'ongoing'  # Update the status to "ongoing"
         package.save()
         
         return redirect('admin_dashboard')  # Redirect back to the admin dashboard or any desired page
@@ -59,6 +60,7 @@ def assign_courier(request, package_id):
     couriers = User.objects.filter(role='courier')
     
     return render(request, 'admin/assign_courier.html', {'package_id': package_id, 'couriers': couriers})
+
 
 def admin(request):
     packages = Package.objects.filter(
