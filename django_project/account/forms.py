@@ -88,6 +88,7 @@ class SignUpForm(UserCreationForm):
         fields = ('name', 'username', 'email', 'password1', 'password2', 'role')
 
 class PackageForm(forms.ModelForm):
+    
     class Meta:
         model = Package
         fields = ['packageName', 'packageDescription', 'recipientName', 'recipientAddress', 'sendersAddress']
