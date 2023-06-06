@@ -88,7 +88,6 @@ class SignUpForm(UserCreationForm):
         fields = ('name', 'username', 'email', 'password1', 'password2', 'role')
 
 class PackageForm(forms.ModelForm):
-    courier = forms.ModelChoiceField(queryset=User.objects.filter(role='courier'), empty_label=None, widget=forms.Select(attrs={'class': 'form-control'}))
     
     class Meta:
         model = Package
