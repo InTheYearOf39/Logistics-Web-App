@@ -1,16 +1,15 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
-from .forms import SignUpForm, LoginForm
+from django.db.models import Q, Case, When, IntegerField
+from django.shortcuts import redirect, get_object_or_404
 from django.shortcuts import render
-from .forms import PackageForm
-from .models import Package
 from django.contrib.auth.decorators import login_required
+from .forms import SignUpForm, LoginForm
+from .utils import get_time_of_day
+from .forms import PackageForm
+from .models import Package, User
 import random
 import string
-from .utils import get_time_of_day
-from account.models import User
-from django.db.models import Q
-from django.shortcuts import redirect, get_object_or_404
 
 def base(request):
     return render(request, 'base.html', {})
@@ -52,26 +51,47 @@ def assign_courier(request, package_id):
         courier = get_object_or_404(User, id=courier_id, role='courier')
         
         package.courier = courier
-        package.status = 'ongoing'  # Update the status to "ongoing"
+        package.status = 'ongoing'
         package.save()
         
-        return redirect('admin_dashboard')  # Redirect back to the admin dashboard or any desired page
+        return redirect('admin_dashboard')
     
     couriers = User.objects.filter(role='courier')
     
     return render(request, 'admin/assign_courier.html', {'package_id': package_id, 'couriers': couriers})
 
 
+# def admin(request):
+#     packages = Package.objects.filter(
+#         Q(status='ongoing') | Q(status='upcoming')
+#     )
+#     greeting_message = get_time_of_day()
+#     context = {
+#         'greeting_message': greeting_message,
+#         'packages': packages
+#     }
+#     return render(request, 'admin/admin_dashboard.html', context)
+
 def admin(request):
     packages = Package.objects.filter(
         Q(status='ongoing') | Q(status='upcoming')
+    ).order_by(
+        Case(
+            When(status='upcoming', then=0),
+            When(status='ongoing', then=1),
+            default=2,
+            output_field=IntegerField()
+        ),
+        '-assigned_at'  # Sort by assignment day in descending order
     )
+
     greeting_message = get_time_of_day()
     context = {
         'greeting_message': greeting_message,
         'packages': packages
     }
     return render(request, 'admin/admin_dashboard.html', context)
+
 
 @login_required
 def sender_dashboard(request):
