@@ -6,24 +6,33 @@
 {% block content %}
 
 <h2 class="my-5">Couriers</h2>
-      <div class="table-responsive">
-        <table class="table table-striped table-sm">
-          <thead>
-            <tr>
-              <th scope="col">Name</th>
-              <th scope="col">User Name</th>
-              <th scope="col">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for courier in couriers %}
-              <tr>
-                <td>{{ courier.name }}</td>
-                <td>{{ courier.username }}</td>
-                <td>{{ courier.status }}</td>
-              </tr>
-            {% endfor %}
-          </tbody>
-        </table>
+<div class="table-responsive">
+  <table class="table table-striped table-sm">
+    <thead>
+      <tr>
+        <th scope="col">Name</th>
+        <th scope="col">User Name</th>
+        <th scope="col">Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for courier in couriers %}
+        <tr>
+          <td>{{ courier.name }}</td>
+          <td>{{ courier.username }}</td>
+          <td>
+            {% if courier.status == 'on-trip' %}
+              On Trip
+            {% else %}
+              Available
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+
 
 {% endblock %}
