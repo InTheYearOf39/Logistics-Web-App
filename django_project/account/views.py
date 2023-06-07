@@ -140,9 +140,6 @@ def courier_dashboard(request):
 
 
 
-def register_package(request):
-    return render(request, 'register_package.html', {})
-
 def logout_user(request):
     logout(request)
     return redirect('logout.html/')
