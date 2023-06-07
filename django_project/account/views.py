@@ -9,11 +9,13 @@ from .models import Package, User
 import random
 import string
 from .utils import get_time_of_day
-from account.models import User
-from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import redirect, get_object_or_404
+from django.contrib import messages
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
+from django.http import HttpResponseRedirect
 from django.urls import reverse
+
 
 def base(request):
     return render(request, 'base.html', {})
@@ -196,24 +198,51 @@ def generate_delivery_number():
     digits = ''.join(random.choices(string.digits, k=5))
     return f'{prefix}{digits}'
 
+
 def register_package(request):
     if request.method == 'POST':
         form = PackageForm(request.POST)
         if form.is_valid():
             package = form.save(commit=False)
             package.user = request.user
-            package.delivery_number = package._generate_delivery_number()
+            package.delivery_number = generate_delivery_number()
+            
+            # Check if the selected courier is already assigned to a package
+            courier = package.courier
+            if courier and courier.assigned_packages.exists():
+                messages.error(request, 'Selected courier is already assigned to a package.')
+                return redirect('register_package')
+            
             package.status = 'upcoming'
             package.save()
             return redirect('sender_dashboard')
         else:
-            return HttpResponse(form.errors)
+            error_message = 'Error processing your request'
     else:
-        form = PackageForm(initial={'courier': None})  # Exclude courier field from the form
+        form = PackageForm()
+        error_message = None
 
-    return render(request, 'register_package.html', {'form': form})
+    return render(request, 'register_package.html', {'form': form, 'error_message': error_message})
 
 
+
+
+# def register_package(request):
+#     if request.method == 'POST':
+#         form = PackageForm(request.POST)
+#         if form.is_valid():
+#             package = form.save(commit=False)
+#             package.user = request.user
+#             package.delivery_number = package._generate_delivery_number()
+#             package.status = 'upcoming'
+#             package.save()
+#             return redirect('sender_dashboard')
+#         else:
+#             return HttpResponse(form.errors)
+#     else:
+#         form = PackageForm(initial={'courier': None})  # Exclude courier field from the form
+
+#     return render(request, 'register_package.html', {'form': form})
 
 
 
