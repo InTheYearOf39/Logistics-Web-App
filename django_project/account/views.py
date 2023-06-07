@@ -245,21 +245,3 @@ def notify_arrival(request, package_id):
         messages.error(request, "Failed to send email notification. Please try again later.")
 
     return redirect('courier_dashboard')  # Replace with the appropriate URL
-
-# def notify_arrival(request, package_id):
-#     # Retrieve the package object
-#     package = Package.objects.get(pk=package_id)
-
-#     # Send the email
-#     subject = "Package Arrival Notification"
-#     message = f"Dear {package.recipientName},\n\nYour package with delivery number {package.delivery_number} has arrived at its destination.\n\nThank you,\nThe Courier Service Team"
-#     sender = "<blessingisrael625@gmail.com>"  # Replace with your email address
-#     receiver = package.recipientEmail
-
-#     try:
-#         send_mail(subject, message, sender, [receiver])
-#         messages.success(request, "Email notification sent successfully.")
-#     except Exception as e:
-#         messages.error(request, "Failed to send email notification. Please try again later.")
-
-#     return redirect('courier_dashboard')  # Replace with the appropriate URL
