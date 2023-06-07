@@ -38,6 +38,7 @@ class Package(models.Model):
     packageName = models.CharField(max_length=100)
     packageDescription = models.TextField()
     recipientName = models.CharField(max_length=100)
+    recipientEmail = models.CharField(max_length=100)
     recipientAddress = models.CharField(max_length=200)
     sendersAddress = models.CharField(max_length=200)
     delivery_number = models.CharField(max_length=7, unique=True)
