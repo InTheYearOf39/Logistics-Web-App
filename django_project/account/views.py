@@ -127,7 +127,7 @@ def recipient_dashboard(request):
     return render(request, 'recipient_dashboard.html', context)
 
 def courier_dashboard(request):
-    assigned_packages = Package.objects.filter(courier=request.user, status__in=['ongoing', 'completed'])
+    assigned_packages = Package.objects.filter(courier=request.user, status__in=['ongoing', 'arrived'])
     greeting_message = get_time_of_day()
     context = {
         'greeting_message': greeting_message,
@@ -234,13 +234,18 @@ def notify_arrival(request, package_id):
 
     # Send the email with OTP
     subject = "Package Arrival Notification"
-    message = f"Dear {package.recipientName},\n\nYour package with delivery number {package.delivery_number} has arrived at its destination.\n\nOTP: Your One Time Password is: {otp}, please do not share this to anyone but your courier.\n\nThank you,\nThe Courier Service Team"
+    message = f"Dear {package.recipientName},\n\nYour package with delivery number {package.delivery_number} has arrived at its destination.\n\nOTP: Your One Time Password is: {otp}, please do not share this with anyone but your courier.\n\nThank you,\nThe Courier Service Team"
     sender = settings.EMAIL_HOST_USER
     receiver = package.recipientEmail
 
     try:
         send_mail(subject, message, sender, [receiver])
         messages.success(request, "Email notification sent successfully.")
+
+        # Update the status to 'arrived'
+        if package.status == 'ongoing':
+            package.status = 'arrived'
+            package.save()
     except Exception as e:
         messages.error(request, "Failed to send email notification. Please try again later.")
 

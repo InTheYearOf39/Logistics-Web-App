@@ -45,15 +45,15 @@
                     <td>{{ package.recipientAddress }}</td>
                     <td>{{ package.delivery_number }}</td>
                     <td>
+                        
                         {% if package.status == 'ongoing' %}
                         <form action="{% url 'notify_arrival' package_id=package.id %}" method="post">
-                        <!-- <form action="{% url 'notify_arrival' package_id=package.id %}" method="post"> -->
-                            {% csrf_token %}
-                            <button type="button" class="btn btn-sm btn-warning text-white" data-bs-toggle="modal" data-bs-target="#staticBackdrop" style="color: orange;">Notify Arrival</button>
-                        </form>
+                        {% csrf_token %}
+                         <button type="submit" class="btn btn-sm btn-info text-white" >Notify Arrival</button>
+                         </form>
                         {% else %}
-                            N/A
-                        {% endif %}
+                        <button type="button" class="btn btn-sm btn-warning text-white" data-bs-toggle="modal" data-bs-target="#staticBackdrop">Arrived</button>
+                         {% endif %}
                     </td>
                 </tr>
                 {% endfor %}
@@ -61,10 +61,6 @@
         </table>
     </div>
 </div>
-
-        
-
-
 
 <!-- Modal -->
 <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
