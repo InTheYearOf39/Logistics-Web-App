@@ -228,14 +228,18 @@ def register_package(request):
 
     return render(request, 'register_package.html', {'form': form, 'error_message': error_message})
 
+
 def notify_arrival(request, package_id):
     # Retrieve the package object
     package = Package.objects.get(pk=package_id)
 
-    # Send the email
+    # Generate OTP
+    otp = random.randint(100000, 999999)
+
+    # Send the email with OTP
     subject = "Package Arrival Notification"
-    message = f"Dear {package.recipientName},\n\nYour package with delivery number {package.delivery_number} has arrived at its destination.\n\nThank you,\nThe Courier Service Team"
-    sender = "<blessingisrael625@gmail.com>"  # Replace with your email address
+    message = f"Dear {package.recipientName},\n\nYour package with delivery number {package.delivery_number} has arrived at its destination.\n\nOTP: Your One Time Password is: {otp}, please do not share this to anyone but your courier.\n\nThank you,\nThe Courier Service Team"
+    sender = settings.EMAIL_HOST_USER
     receiver = package.recipientEmail
 
     try:
@@ -245,3 +249,21 @@ def notify_arrival(request, package_id):
         messages.error(request, "Failed to send email notification. Please try again later.")
 
     return redirect('courier_dashboard')  # Replace with the appropriate URL
+
+# def notify_arrival(request, package_id):
+#     # Retrieve the package object
+#     package = Package.objects.get(pk=package_id)
+
+#     # Send the email
+#     subject = "Package Arrival Notification"
+#     message = f"Dear {package.recipientName},\n\nYour package with delivery number {package.delivery_number} has arrived at its destination.\n\nThank you,\nThe Courier Service Team"
+#     sender = "<blessingisrael625@gmail.com>"  # Replace with your email address
+#     receiver = package.recipientEmail
+
+#     try:
+#         send_mail(subject, message, sender, [receiver])
+#         messages.success(request, "Email notification sent successfully.")
+#     except Exception as e:
+#         messages.error(request, "Failed to send email notification. Please try again later.")
+
+#     return redirect('courier_dashboard')  # Replace with the appropriate URL
