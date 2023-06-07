@@ -1,23 +1,20 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.db.models import Q, Case, When, IntegerField
-from django.shortcuts import redirect, get_object_or_404
-from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from .forms import SignUpForm, LoginForm
-from .utils import get_time_of_day
+from .utils import get_time_of_day, generate_one_time_pin
 from .forms import PackageForm
 from .models import Package, User
 import random
 import string
 from .utils import get_time_of_day
-from account.models import User
-from django.db.models import Q
 from django.shortcuts import redirect, get_object_or_404
-from django.http import HttpResponse
-from .models import Package
 from django.contrib import messages
-
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.http import HttpResponseRedirect
+from django.urls import reverse
 
 
 def base(request):
@@ -72,7 +69,7 @@ def assign_courier(request, package_id):
             courier.status = 'on-trip'
             courier.save()
         
-        return redirect('admin_dashboard')  # Redirect back to the admin dashboard or any desired page
+        return redirect('admin_dashboard')  
 
     
     couriers = User.objects.filter(role='courier')
@@ -249,6 +246,29 @@ def register_package(request):
 
 
 
+def notify_arrival(request, package_id):
+    if request.method == 'POST':
+        # Retrieve the package based on the package_id
+        package = Package.objects.get(pk=package_id)
+        
+        # Generate a one-time pin (you can use any logic to generate it)
+        one_time_pin = generate_one_time_pin()
+        
+        # Update the package status and save it
+        package.status = 'completed'
+        package.one_time_pin = one_time_pin
+        package.save()
+        
+        # Prepare the email data
+        recipient_email = package.user.email  # Assuming the recipient's email is stored in the User model
+        subject = 'Arrival Notification'
+        message = render_to_string('arrival_notification_email.html', {'package': package})
+        
+        # Send the email
+        send_mail(subject, message, 'sender@example.com', [recipient_email], fail_silently=False)
+        
+        # Redirect back to the courier dashboard or any other appropriate page
+        return HttpResponseRedirect(reverse('courier_dashboard'))
 
 
 
