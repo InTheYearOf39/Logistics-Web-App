@@ -60,10 +60,10 @@ class Package(models.Model):
         return f'{self.PACKAGE_PREFIX}{digits}'
 
 
-class OneTimePIN(models.Model):
-    package = models.OneToOneField('Package', on_delete=models.CASCADE)
-    pin = models.CharField(max_length=6)
-    created_at = models.DateTimeField(default=timezone.now)
+# class OneTimePIN(models.Model):
+#     package = models.OneToOneField('Package', on_delete=models.CASCADE)
+#     pin = models.CharField(max_length=6)
+#     created_at = models.DateTimeField(default=timezone.now)
     
-    def __str__(self):
-        return self.pin
+#     def __str__(self):
+#         return self.pin
