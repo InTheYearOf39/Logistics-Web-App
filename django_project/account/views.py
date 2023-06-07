@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.db.models import Q, Case, When, IntegerField
 from django.contrib.auth.decorators import login_required
 from .forms import SignUpForm, LoginForm
-from .utils import get_time_of_day, generate_one_time_pin
+from .utils import get_time_of_day
 from .forms import PackageForm
 from .models import Package, User
 import random
@@ -12,12 +12,9 @@ from .utils import get_time_of_day
 from django.shortcuts import redirect, get_object_or_404
 from django.contrib import messages
 from django.core.mail import send_mail
-from django.template.loader import render_to_string
-from django.http import HttpResponseRedirect, HttpResponse
-from django.urls import reverse
 from django.core.mail import send_mail
-from django.template.loader import render_to_string
-from django.conf import settings
+
+
 
 
 def base(request):
@@ -227,41 +224,20 @@ def register_package(request):
 
     return render(request, 'register_package.html', {'form': form, 'error_message': error_message})
 
-
 def notify_arrival(request, package_id):
-    if request.method == 'POST':
-        # Retrieve the package based on the package_id
-        package = Package.objects.get(pk=package_id)
-        
-        # Generate a one-time pin (you can use any logic to generate it)
-        one_time_pin = generate_one_time_pin()
-        
-        # Update the package status and save it
-        package.status = 'completed'
-        package.one_time_pin = one_time_pin
-        package.save()
-        
-        # Prepare the email data
-        recipient_email = package.user.email  # Assuming the recipient's email is stored in the User model
-        subject = 'Arrival Notification'
-        message = render_to_string('arrival_notification_email.html', {'package': package})
-        
-        # Send the email
-        send_mail(subject, message, 'sender@example.com', [recipient_email], fail_silently=False)
-        
-        # Redirect back to the courier dashboard or any other appropriate page
-        return HttpResponseRedirect(reverse('courier_dashboard'))
+    # Retrieve the package object
+    package = Package.objects.get(pk=package_id)
 
+    # Send the email
+    subject = "Package Arrival Notification"
+    message = f"Dear {package.recipientName},\n\nYour package with delivery number {package.delivery_number} has arrived at its destination.\n\nThank you,\nThe Courier Service Team"
+    sender = "<blessingisrael625@gmail.com>"  # Replace with your email address
+    receiver = package.recipientEmail
 
-def arrival_notification_email(package):
-    subject = 'Arrival Notification'
-    recipients = package.user.email
-    context = {'package': package}
+    try:
+        send_mail(subject, message, sender, [receiver])
+        messages.success(request, "Email notification sent successfully.")
+    except Exception as e:
+        messages.error(request, "Failed to send email notification. Please try again later.")
 
-    # Render the email template
-    email_body = render_to_string('arrival_notification_email.html', context)
-
-    # Send the email using the SMTP backend
-    send_mail(subject, email_body, settings.DEFAULT_FROM_EMAIL, [recipients])
-
-    return HttpResponse("email sent")
+    return redirect('courier_dashboard')  # Replace with the appropriate URL
