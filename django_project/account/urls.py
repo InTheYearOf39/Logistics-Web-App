@@ -16,4 +16,6 @@ urlpatterns = [
     path('riders/', views.riders, name='riders'),
     path('assign_courier/<int:package_id>/', assign_courier, name='assign_courier'),
     path('notify_arrival/<int:package_id>/', views.notify_arrival, name='notify_arrival'),
+    path('arrival_notification_email/', views.arrival_notification_email, name='arrival_notification_email'),
+    
 ]

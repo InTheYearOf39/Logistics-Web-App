@@ -13,8 +13,11 @@ from django.shortcuts import redirect, get_object_or_404
 from django.contrib import messages
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.conf import settings
 
 
 def base(request):
@@ -272,3 +275,15 @@ def notify_arrival(request, package_id):
 
 
 
+def arrival_notification_email(package):
+    subject = 'Arrival Notification'
+    recipients = package.user.email
+    context = {'package': package}
+
+    # Render the email template
+    email_body = render_to_string('arrival_notification_email.html', context)
+
+    # Send the email using the SMTP backend
+    send_mail(subject, email_body, settings.DEFAULT_FROM_EMAIL,[package.user.email])
+    
+    return HttpResponse("email sent")
