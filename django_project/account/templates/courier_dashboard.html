@@ -51,7 +51,7 @@
                         {% if package.status == 'ongoing' %}
                             <form action="{% url 'notify_arrival' package_id=package.id %}" method="post">
                                 {% csrf_token %}
-                                <button type="submit" class="btn btn-sm btn-primary text-white" style="color: orange;">Notify Arrival</button>
+                                <button type="submit" class="btn btn-sm btn-warning text-white" style="color: orange;">Notify Arrival</button>
                             </form>
                         {% else %}
                             N/A
