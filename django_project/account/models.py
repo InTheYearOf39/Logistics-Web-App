@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from django.conf import settings
+from django.utils import timezone
 import random
 import string
 
@@ -57,3 +57,12 @@ class Package(models.Model):
     def _generate_delivery_number(self):
         digits = ''.join(random.choices(string.digits, k=5))
         return f'{self.PACKAGE_PREFIX}{digits}'
+
+
+class OneTimePIN(models.Model):
+    package = models.OneToOneField('Package', on_delete=models.CASCADE)
+    pin = models.CharField(max_length=6)
+    created_at = models.DateTimeField(default=timezone.now)
+    
+    def __str__(self):
+        return self.pin

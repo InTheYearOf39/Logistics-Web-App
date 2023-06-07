@@ -16,13 +16,63 @@
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
     <h1 class="h2">{{ greeting_message }}, {{ user.username }}</h1>
     <div class="btn-toolbar mb-2 mb-md-0">
-        <!-- <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle">
-            <span data-feather="calendar"></span>
-            This week
-          </button> -->
+       
     </div>
 </div>
-<div class="row">
+
+<h2>Packages</h2>
+<div class="container">
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">No.</th>
+                    <th scope="col">Package Title</th>
+                    <th scope="col">Recipient</th>
+                    <th scope="col">Address From</th>
+                    <th scope="col">Address To</th>
+                    <th scope="col">Delivery Number</th>
+                    <th scope="col">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for package in assigned_packages %}
+                <tr>
+                    <th scope="row">{{ forloop.counter }}</th>
+                    <td>{{ package.packageName }}</td>
+                    <td>{{ package.recipientName }}</td>
+                    <td>{{ package.sendersAddress }}</td>
+                    <td>{{ package.recipientAddress }}</td>
+                    <td>{{ package.delivery_number }}</td>
+                    <td>
+                        <!-- {% if package.status == 'ongoing' %}
+                            <button class="btn btn-sm btn-warning text-white" style="color: orange;">Delivering</button> -->
+
+                        {% if package.status == 'ongoing' %}
+                            <form action="{% url 'notify_arrival' package_id=package.id %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-primary text-white" style="color: orange;">Notify Arrival</button>
+                            </form>
+                        {% else %}
+                            N/A
+                        {% endif %}
+
+                        <!-- {% elif package.status == 'completed' %}
+                            <button class="btn btn-sm btn-success text-white" style="color: green;">Completed</button>
+                        {% else %}
+                            N/A
+                        {% endif %} -->
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+        
+
+<!-- <div class="row">
     <div class="col-sm-2">
         <div class="section section-total">
             <h4>Total</h4>
@@ -53,7 +103,7 @@
             <button class="btn btn-sm btn-primary text-white w-100">In Detail</button>
         </div>
     </div>
-</div>
+</div> -->
 
 </div>
 {% endblock %}
