@@ -99,3 +99,4 @@ class PackageForm(forms.ModelForm):
             'recipientAddress': forms.TextInput(attrs={'class': 'form-control'}),
             'sendersAddress': forms.TextInput(attrs={'class': 'form-control'}),
         }
+
