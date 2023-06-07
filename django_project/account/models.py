@@ -28,6 +28,7 @@ class Package(models.Model):
     STATUS_CHOICES = (
         ('upcoming', 'Upcoming'),
         ('ongoing', 'Ongoing'),
+        ('arrived', 'arrived'),
         ('completed', 'Completed'),
     )
 
@@ -59,11 +60,3 @@ class Package(models.Model):
         digits = ''.join(random.choices(string.digits, k=5))
         return f'{self.PACKAGE_PREFIX}{digits}'
 
-
-# class OneTimePIN(models.Model):
-#     package = models.OneToOneField('Package', on_delete=models.CASCADE)
-#     pin = models.CharField(max_length=6)
-#     created_at = models.DateTimeField(default=timezone.now)
-    
-#     def __str__(self):
-#         return self.pin
