@@ -228,27 +228,6 @@ def register_package(request):
     return render(request, 'register_package.html', {'form': form, 'error_message': error_message})
 
 
-
-
-# def register_package(request):
-#     if request.method == 'POST':
-#         form = PackageForm(request.POST)
-#         if form.is_valid():
-#             package = form.save(commit=False)
-#             package.user = request.user
-#             package.delivery_number = package._generate_delivery_number()
-#             package.status = 'upcoming'
-#             package.save()
-#             return redirect('sender_dashboard')
-#         else:
-#             return HttpResponse(form.errors)
-#     else:
-#         form = PackageForm(initial={'courier': None})  # Exclude courier field from the form
-
-#     return render(request, 'register_package.html', {'form': form})
-
-
-
 def notify_arrival(request, package_id):
     if request.method == 'POST':
         # Retrieve the package based on the package_id
@@ -274,7 +253,6 @@ def notify_arrival(request, package_id):
         return HttpResponseRedirect(reverse('courier_dashboard'))
 
 
-
 def arrival_notification_email(package):
     subject = 'Arrival Notification'
     recipients = package.user.email
@@ -284,6 +262,6 @@ def arrival_notification_email(package):
     email_body = render_to_string('arrival_notification_email.html', context)
 
     # Send the email using the SMTP backend
-    send_mail(subject, email_body, settings.DEFAULT_FROM_EMAIL,[package.user.email])
-    
+    send_mail(subject, email_body, settings.DEFAULT_FROM_EMAIL, [recipients])
+
     return HttpResponse("email sent")
