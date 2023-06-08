@@ -127,7 +127,7 @@ def recipient_dashboard(request):
     return render(request, 'recipient_dashboard.html', context)
 
 def courier_dashboard(request):
-    assigned_packages = Package.objects.filter(courier=request.user, status__in=['ongoing', 'arrived'])
+    assigned_packages = Package.objects.filter(courier=request.user, status__in=['ongoing', 'arrived','completed'])
     greeting_message = get_time_of_day()
     context = {
         'greeting_message': greeting_message,
@@ -247,6 +247,7 @@ def notify_arrival(request, package_id):
         # Update the status to 'arrived'
         if package.status == 'ongoing':
             package.status = 'arrived'
+            package.status = 'completed'
             package.save()
     except Exception as e:
         messages.error(request, "Failed to send email notification. Please try again later.")

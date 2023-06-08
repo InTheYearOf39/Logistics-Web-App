@@ -42,8 +42,7 @@
                             {% csrf_token %}
                             <button type="submit" class="btn btn-sm btn-info text-white">Notify Arrival</button>
                         </form>
-                        {% else %}
-                        {% if package.status == 'arrived' %}
+                        {% elif package.status == 'arrived' %}
                         <form action="{% url 'confirm_delivery' package_id=package.id %}" method="post">
                             {% csrf_token %}
                             <div class="modal fade" id="staticBackdrop{{ package.id }}" data-bs-backdrop="static"
@@ -73,7 +72,11 @@
                             <button type="button" class="btn btn-sm btn-warning text-white" data-bs-toggle="modal"
                                 data-bs-target="#staticBackdrop{{ package.id }}">Arrived</button>
                         </form>
-                        {% endif %}
+                        {% else %}
+                        <form action="{% url 'notify_arrival' package_id=package.id %}" method="post">
+                            {% csrf_token %}
+                            <button type="button" class="btn btn-sm btn-success text-white">Completed</button>
+                        </form>
                         {% endif %}
                     </td>
                 </tr>
