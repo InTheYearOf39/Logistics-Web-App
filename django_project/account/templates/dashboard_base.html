@@ -25,6 +25,12 @@
         user-select: none;
       }
 
+      
+      .nav-link:not(.active):hover {
+        color: rgb(0, 89, 255);
+      }
+
+
       @media (min-width: 768px) {
         .bd-placeholder-img-lg {
           font-size: 3.5rem;
@@ -63,14 +69,14 @@
         <ul class="nav flex-column mt-3">
 
           <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="#">
+            <a class="nav-link" aria-current="page" href="{% url 'courier_dashboard' %}">
               <span data-feather="home"></span>
               Packages
             </a>
           </li>
 
           <li class="nav-item">
-            <a class="nav-link" href="#">
+            <a class="nav-link" href="{% url 'history' %}">
               <span data-feather="users"></span>
               History
             </a>
@@ -84,7 +90,7 @@
           </li>
           <li class="nav-item">
             <a class="nav-link" href="#">
-              <span data-feather="bar-chart-2"></span>
+              <span data-feather="users"></span>
               Profile
             </a>
           </li>

@@ -32,13 +32,37 @@ def services(request):
 def contact(request):
     return render(request, 'contact.html', {})
 
+def history(request):
+    assigned_packages = Package.objects.filter(courier=request.user, status__in=['completed'])
+    greeting_message = get_time_of_day()
+    context = {
+        'greeting_message': greeting_message,
+        'assigned_packages': assigned_packages,
+    }
+    return render(request, 'ride_history.html', context)
+
 def riders(request):
     couriers = User.objects.filter(role='courier')  # Retrieve only the couriers from the database
+    
+    # Update the status of couriers based on their assigned packages
+    for courier in couriers:
+        if courier.assigned_packages.exists():
+            latest_package = courier.assigned_packages.latest('id')
+            if latest_package.status == 'completed':
+                courier.status = 'available'
+            else:
+                courier.status = 'on-trip'
+        else:
+            courier.status = 'available'
+        courier.save()
     
     context = {
         'couriers': couriers
     }
     return render(request, 'admin/riders.html', context)
+
+
+
 
 def users(request):
     users = User.objects.all()  # Retrieve all users from the database
@@ -63,30 +87,18 @@ def assign_courier(request, package_id):
         package.status = 'ongoing'
         package.save()
         
-
         # Update the courier status to "on-trip" only if they were not already on-trip
         if previous_courier_status != 'on-trip':
             courier.status = 'on-trip'
             courier.save()
         
         return redirect('admin_dashboard')  
-
     
-    couriers = User.objects.filter(role='courier')
+    couriers = User.objects.filter(role='courier', status='available')  # Filter couriers by status='available'
     
     return render(request, 'admin/assign_courier.html', {'package_id': package_id, 'couriers': couriers})
 
 
-def admin(request):
-    packages = Package.objects.filter(
-        Q(status='ongoing') | Q(status='upcoming')
-    )
-    greeting_message = get_time_of_day()
-    context = {
-        'greeting_message': greeting_message,
-        'packages': packages
-    }
-    return render(request, 'admin/admin_dashboard.html', context)
 
 def admin(request):
     packages = Package.objects.filter(
@@ -268,3 +280,15 @@ def confirm_delivery(request, package_id):
             messages.error(request, "Invalid OTP. Please try again.")
 
     return redirect('courier_dashboard')  # Replace with the appropriate URL
+
+
+def admin_history(request):
+    packages = Package.objects.filter(
+        Q(status='completed')
+    )
+    context = {
+        'packages': packages
+    }
+    return render(request, 'admin/admin_history.html', context)
+
+
