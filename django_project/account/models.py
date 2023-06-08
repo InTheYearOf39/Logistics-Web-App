@@ -26,10 +26,10 @@ class User(AbstractUser):
 
 class Package(models.Model):
     STATUS_CHOICES = (
-        ('upcoming', 'Upcoming'),
-        ('ongoing', 'Ongoing'),
+        ('upcoming', 'upcoming'),
+        ('ongoing', 'ongoing'),
         ('arrived', 'arrived'),
-        ('completed', 'Completed'),
+        ('completed', 'completed'),
     )
 
     PACKAGE_PREFIX = 'dn'

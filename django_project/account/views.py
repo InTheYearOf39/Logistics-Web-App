@@ -32,6 +32,15 @@ def services(request):
 def contact(request):
     return render(request, 'contact.html', {})
 
+def history(request):
+    assigned_packages = Package.objects.filter(courier=request.user, status__in=['completed'])
+    greeting_message = get_time_of_day()
+    context = {
+        'greeting_message': greeting_message,
+        'assigned_packages': assigned_packages,
+    }
+    return render(request, 'ride_history.html', context)
+
 def riders(request):
     couriers = User.objects.filter(role='courier')  # Retrieve only the couriers from the database
     
@@ -268,3 +277,5 @@ def confirm_delivery(request, package_id):
             messages.error(request, "Invalid OTP. Please try again.")
 
     return redirect('courier_dashboard')  # Replace with the appropriate URL
+
+
