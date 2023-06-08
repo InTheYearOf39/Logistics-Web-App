@@ -32,14 +32,17 @@ def services(request):
 def contact(request):
     return render(request, 'contact.html', {})
 
-def history(request):
+def sender_history(request):
+    return render(request, 'sender_history.html', {})
+
+def courier_history(request):
     assigned_packages = Package.objects.filter(courier=request.user, status__in=['completed'])
     greeting_message = get_time_of_day()
     context = {
         'greeting_message': greeting_message,
         'assigned_packages': assigned_packages,
     }
-    return render(request, 'ride_history.html', context)
+    return render(request, 'courier_history.html', context)
 
 def riders(request):
     couriers = User.objects.filter(role='courier')  # Retrieve only the couriers from the database
@@ -122,13 +125,33 @@ def admin(request):
 
 
 @login_required
+# def sender_dashboard(request):
+#     greeting_message = get_time_of_day()
+#     packages = request.user.packages.all()
+#     context = {
+#         'greeting_message': greeting_message,
+#         'packages': packages
+#     }
+#     return render(request, 'sender_dashboard.html', context)
+
 def sender_dashboard(request):
+    packages = Package.objects.filter(
+        Q(status='ongoing') | Q(status='upcoming')
+    ).order_by(
+        Case(
+            When(status='upcoming', then=0),
+            When(status='ongoing', then=1),
+            default=2,
+            output_field=IntegerField()
+        ),
+        '-created_at'  # Sort by creation day in descending order
+    )
+
     greeting_message = get_time_of_day()
-    packages = request.user.packages.all()
     context = {
         'greeting_message': greeting_message,
         'packages': packages
-    }
+        }
     return render(request, 'sender_dashboard.html', context)
 
 def recipient_dashboard(request):

@@ -44,7 +44,8 @@ class Package(models.Model):
     sendersAddress = models.CharField(max_length=200)
     delivery_number = models.CharField(max_length=7, unique=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES)
-    assigned_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    assigned_at = models.DateTimeField(null=True, blank=True)
     otp = models.CharField(max_length=6, null=True, blank=True)
 
 
@@ -53,9 +54,11 @@ class Package(models.Model):
 
     def save(self, *args, **kwargs):
         if self.courier is None and self.status == 'ongoing':
-            raise ValueError("Courier must be assigned for packages with 'ongoing' status.")
+            raise ValueError("Courier must be assigned for packages with 'ongoing' status.")      
         if not self.delivery_number:
             self.delivery_number = self._generate_delivery_number()
+        if self.courier:
+                self.assigned_at = timezone.now()
         super().save(*args, **kwargs)
 
     def _generate_delivery_number(self):

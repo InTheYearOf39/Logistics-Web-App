@@ -51,12 +51,12 @@
                 <td>{{ package.delivery_number }}</td>
                 <td>
                   {% if package.status == 'upcoming' %}
-                    <button class="btn btn-sm btn-primary text-white w-75">Upcoming</button>
-                  {% elif package.status == 'ongoing' %}
-                    <button class="btn btn-sm btn-info text-white w-75">Ongoing</button>
-                  {% elif package.status == 'completed' %}
-                    <button class="btn btn-sm btn-success text-white w-75">Completed</button>
-                  {% endif %}
+                    <img src="{% static 'img/pending.png' %}" alt="" width="30px" height="30px">
+                    {% elif package.status == 'ongoing' %}
+                    <img src="{% static 'img/started.png' %}" alt="" width="30px" height="30px">
+                    {% elif package.status == 'completed' %}
+                    <img src="{% static 'img/success.png' %}" alt="" width="30px" height="30px">
+                    {% endif %}
                 </td>
               </tr>
             {% endfor %}
