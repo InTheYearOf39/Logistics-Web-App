@@ -44,25 +44,50 @@ def courier_history(request):
     }
     return render(request, 'courier_history.html', context)
 
-def riders(request):
-    couriers = User.objects.filter(role='courier')  # Retrieve only the couriers from the database
+# def riders(request):
+#     couriers = User.objects.filter(role='courier')  # Retrieve only the couriers from the database
     
-    # Update the status of couriers based on their assigned packages
+#     # Update the status of couriers based on their assigned packages
+#     for courier in couriers:
+#         if courier.assigned_packages.exists():
+#             latest_package = courier.assigned_packages.latest('id')
+#             if latest_package.status == 'completed':
+#                 courier.status = 'available'
+#             else:
+#                 courier.status = 'on-trip'
+#         else:
+#             courier.status = 'available'
+#         courier.save()
+    
+#     context = {
+#         'couriers': couriers
+#     }
+#     return render(request, 'admin/riders.html', context)
+
+def riders(request):
+    couriers = User.objects.filter(role='courier')  
+    
     for courier in couriers:
-        if courier.assigned_packages.exists():
-            latest_package = courier.assigned_packages.latest('id')
-            if latest_package.status == 'completed':
-                courier.status = 'available'
-            else:
+        assigned_packages = courier.assigned_packages.all()
+        
+        if assigned_packages.exists():
+   
+            if assigned_packages.filter(status__in=['ongoing', 'arrived']).exists():
                 courier.status = 'on-trip'
+            else:
+                courier.status = 'available'
         else:
             courier.status = 'available'
+        
         courier.save()
     
     context = {
         'couriers': couriers
     }
     return render(request, 'admin/riders.html', context)
+
+
+
 
 
 
