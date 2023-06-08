@@ -11,9 +11,7 @@
       <select class="form-control" id="courier" name="courier" required>
         <option value="" selected disabled>-- Select Courier --</option>
         {% for courier in couriers %}
-          {% if not courier.assigned_packages.exists %}
-            <option value="{{ courier.id }}">{{ courier.name }}</option>
-          {% endif %}
+          <option value="{{ courier.id }}">{{ courier.name }}</option>
         {% endfor %}
       </select>
       <div class="invalid-feedback">
@@ -32,5 +30,6 @@
     
   </form>
 </div>
+
 
 {% endblock %}
