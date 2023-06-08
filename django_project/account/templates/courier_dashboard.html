@@ -1,20 +1,14 @@
 {% extends 'dashboard_base.html' %}
-
 {% load static %}
 
-{% block profile_image %} 
-    <img src="{% static '/img/team/team-3.jpg' %}" class="rounded mx-auto d-block" alt="..." width="80px" height="80px" >
+{% block profile_image %}
+<img src="{% static '/img/team/team-3.jpg' %}" class="rounded mx-auto d-block" alt="..." width="80px" height="80px">
 {% endblock %}
 
-
-
-
 {% block content %}
-
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
     <h1 class="h2">{{ greeting_message }}, {{ user.username }}</h1>
     <div class="btn-toolbar mb-2 mb-md-0">
-       
     </div>
 </div>
 
@@ -43,15 +37,47 @@
                     <td>{{ package.recipientAddress }}</td>
                     <td>{{ package.delivery_number }}</td>
                     <td>
-                        
                         {% if package.status == 'ongoing' %}
                         <form action="{% url 'notify_arrival' package_id=package.id %}" method="post">
-                        {% csrf_token %}
-                         <button type="submit" class="btn btn-sm btn-info text-white" >Notify Arrival</button>
-                         </form>
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-info text-white">Notify Arrival</button>
+                        </form>
+                        {% elif package.status == 'arrived' %}
+                        <form action="{% url 'confirm_delivery' package_id=package.id %}" method="post">
+                            {% csrf_token %}
+                            <div class="modal fade" id="staticBackdrop{{ package.id }}" data-bs-backdrop="static"
+                                data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel"
+                                aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h1 class="modal-title fs-5" id="staticBackdropLabel">Confirm package
+                                                delivery</h1>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <label for="inputField{{ package.id }}"><b>ENTER CODE:</b></label>
+                                            <input type="text" id="inputField{{ package.id }}" name="inputField"
+                                                class="form-control">
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="submit" class="btn btn-success">Send</button>
+                                            <button type="button" class="btn btn-danger"
+                                                data-bs-dismiss="modal">Close</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-warning text-white" data-bs-toggle="modal"
+                                data-bs-target="#staticBackdrop{{ package.id }}">Arrived</button>
+                        </form>
                         {% else %}
-                        <button type="button" class="btn btn-sm btn-warning text-white" data-bs-toggle="modal" data-bs-target="#staticBackdrop">Arrived</button>
-                         {% endif %}
+                        <form action="{% url 'notify_arrival' package_id=package.id %}" method="post">
+                            {% csrf_token %}
+                            <button type="button" class="btn btn-sm btn-success text-white">Completed</button>
+                        </form>
+                        {% endif %}
                     </td>
                 </tr>
                 {% endfor %}
@@ -59,25 +85,4 @@
         </table>
     </div>
 </div>
-
-<!-- Modal -->
-<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h1 class="modal-title fs-5" id="staticBackdropLabel">Confirm package delivery</h1>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-            <label for="inputField"><b>ENTER CODE:</b></label>
-            <input type="text" id="inputField" name="inputField" class="form-control">
-        </div>
-        <div class="modal-footer">
-        <button type="button" class="btn btn-success">Send</button>
-          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>      
-        </div>
-      </div>
-    </div>
-  </div>
-
 {% endblock %}

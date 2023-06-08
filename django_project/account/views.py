@@ -127,7 +127,7 @@ def recipient_dashboard(request):
     return render(request, 'recipient_dashboard.html', context)
 
 def courier_dashboard(request):
-    assigned_packages = Package.objects.filter(courier=request.user, status__in=['ongoing', 'arrived'])
+    assigned_packages = Package.objects.filter(courier=request.user, status__in=['ongoing', 'arrived','completed'])
     greeting_message = get_time_of_day()
     context = {
         'greeting_message': greeting_message,
@@ -224,13 +224,16 @@ def register_package(request):
 
     return render(request, 'register_package.html', {'form': form, 'error_message': error_message})
 
-
 def notify_arrival(request, package_id):
     # Retrieve the package object
     package = Package.objects.get(pk=package_id)
 
     # Generate OTP
     otp = random.randint(100000, 999999)
+
+    # Save the OTP in the package
+    package.otp = otp
+    package.save()
 
     # Send the email with OTP
     subject = "Package Arrival Notification"
@@ -248,5 +251,20 @@ def notify_arrival(request, package_id):
             package.save()
     except Exception as e:
         messages.error(request, "Failed to send email notification. Please try again later.")
+
+    return redirect('courier_dashboard')  # Replace with the appropriate URL
+
+ 
+def confirm_delivery(request, package_id):
+    if request.method == 'POST':
+        package = Package.objects.get(pk=package_id)
+        entered_code = request.POST.get('inputField')
+
+        if package.status == 'arrived' and package.otp == entered_code:
+            package.status = 'completed'
+            package.save()
+            messages.success(request, "Package delivery confirmed successfully.")
+        else:
+            messages.error(request, "Invalid OTP. Please try again.")
 
     return redirect('courier_dashboard')  # Replace with the appropriate URL

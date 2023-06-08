@@ -45,6 +45,8 @@ class Package(models.Model):
     delivery_number = models.CharField(max_length=7, unique=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES)
     assigned_at = models.DateTimeField(auto_now_add=True)
+    otp = models.CharField(max_length=6, null=True, blank=True)
+
 
     def __str__(self):
         return self.packageName
