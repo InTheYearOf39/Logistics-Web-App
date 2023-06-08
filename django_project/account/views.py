@@ -198,7 +198,6 @@ def generate_delivery_number():
     digits = ''.join(random.choices(string.digits, k=5))
     return f'{prefix}{digits}'
 
-@login_required
 def register_package(request):
     if request.method == 'POST':
         form = PackageForm(request.POST)
