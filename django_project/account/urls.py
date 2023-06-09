@@ -18,5 +18,6 @@ urlpatterns = [
     path('assign_courier/<int:package_id>/', assign_courier, name='assign_courier'),
     path('notify_arrival/<int:package_id>/', views.notify_arrival, name='notify_arrival'),
     path('confirm_delivery/<int:package_id>/',views.confirm_delivery, name='confirm_delivery'),
-    path('ride_history/', views.history, name='history'),
+    path('sender_history/', views.sender_history, name='sender_history'),
+    path('courier_history/', views.courier_history, name='courier_history'),
 ]

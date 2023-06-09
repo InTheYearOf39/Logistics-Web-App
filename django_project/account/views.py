@@ -32,34 +32,62 @@ def services(request):
 def contact(request):
     return render(request, 'contact.html', {})
 
-def history(request):
+def sender_history(request):
+    return render(request, 'sender_history.html', {})
+
+def courier_history(request):
     assigned_packages = Package.objects.filter(courier=request.user, status__in=['completed'])
     greeting_message = get_time_of_day()
     context = {
         'greeting_message': greeting_message,
         'assigned_packages': assigned_packages,
     }
-    return render(request, 'ride_history.html', context)
+    return render(request, 'courier_history.html', context)
+
+# def riders(request):
+#     couriers = User.objects.filter(role='courier')  # Retrieve only the couriers from the database
+    
+#     # Update the status of couriers based on their assigned packages
+#     for courier in couriers:
+#         if courier.assigned_packages.exists():
+#             latest_package = courier.assigned_packages.latest('id')
+#             if latest_package.status == 'completed':
+#                 courier.status = 'available'
+#             else:
+#                 courier.status = 'on-trip'
+#         else:
+#             courier.status = 'available'
+#         courier.save()
+    
+#     context = {
+#         'couriers': couriers
+#     }
+#     return render(request, 'admin/riders.html', context)
 
 def riders(request):
-    couriers = User.objects.filter(role='courier')  # Retrieve only the couriers from the database
+    couriers = User.objects.filter(role='courier')  
     
-    # Update the status of couriers based on their assigned packages
     for courier in couriers:
-        if courier.assigned_packages.exists():
-            latest_package = courier.assigned_packages.latest('id')
-            if latest_package.status == 'completed':
-                courier.status = 'available'
-            else:
+        assigned_packages = courier.assigned_packages.all()
+        
+        if assigned_packages.exists():
+   
+            if assigned_packages.filter(status__in=['ongoing', 'arrived']).exists():
                 courier.status = 'on-trip'
+            else:
+                courier.status = 'available'
         else:
             courier.status = 'available'
+        
         courier.save()
     
     context = {
         'couriers': couriers
     }
     return render(request, 'admin/riders.html', context)
+
+
+
 
 
 
@@ -122,13 +150,33 @@ def admin(request):
 
 
 @login_required
+# def sender_dashboard(request):
+#     greeting_message = get_time_of_day()
+#     packages = request.user.packages.all()
+#     context = {
+#         'greeting_message': greeting_message,
+#         'packages': packages
+#     }
+#     return render(request, 'sender_dashboard.html', context)
+
 def sender_dashboard(request):
+    packages = Package.objects.filter(
+        Q(status='ongoing') | Q(status='upcoming')
+    ).order_by(
+        Case(
+            When(status='upcoming', then=0),
+            When(status='ongoing', then=1),
+            default=2,
+            output_field=IntegerField()
+        ),
+        '-created_at'  # Sort by creation day in descending order
+    )
+
     greeting_message = get_time_of_day()
-    packages = request.user.packages.all()
     context = {
         'greeting_message': greeting_message,
         'packages': packages
-    }
+        }
     return render(request, 'sender_dashboard.html', context)
 
 def recipient_dashboard(request):

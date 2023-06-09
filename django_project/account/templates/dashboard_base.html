@@ -67,20 +67,38 @@
         </div>
 
         <ul class="nav flex-column mt-3">
-
+          {% if request.user.role == 'courier' %}
           <li class="nav-item">
             <a class="nav-link" aria-current="page" href="{% url 'courier_dashboard' %}">
               <span data-feather="home"></span>
               Packages
             </a>
           </li>
-
+          {% elif request.user.role == 'sender' %}
           <li class="nav-item">
-            <a class="nav-link" href="{% url 'history' %}">
-              <span data-feather="users"></span>
-              History
+            <a class="nav-link" aria-current="page" href="{% url 'sender_dashboard' %}">
+              <span data-feather="home"></span>
+              Packages
             </a>
           </li>
+          {% endif %}
+
+
+          {% if request.user.role == 'courier' %}
+              <li class="nav-item">
+                  <a class="nav-link" href="{% url 'courier_history' %}">
+                      <span data-feather="users"></span>
+                      History
+                  </a>
+              </li>
+          {% elif request.user.role == 'sender' %}
+              <li class="nav-item">
+                  <a class="nav-link" href="{% url 'sender_history' %}">
+                      <span data-feather="users"></span>
+                      History
+                  </a>
+              </li>
+          {% endif %}
           
           <li class="nav-item">
             <a class="nav-link" href="#">
