@@ -10,7 +10,6 @@ class User(AbstractUser):
         ('admin', 'admin'),
         ('courier', 'courier'),
         ('sender', 'sender'),
-        ('recipient', 'recipient'),
     )
     STATUS_CHOICES = (
         ('available', 'Available'),
@@ -27,7 +26,7 @@ class User(AbstractUser):
 class Package(models.Model):
     STATUS_CHOICES = (
         ('upcoming', 'upcoming'),
-        ('ongoing', 'Ongoing'),
+        ('ongoing', 'ongoing'),
         ('arrived', 'arrived'),
         ('completed', 'completed'),
     )

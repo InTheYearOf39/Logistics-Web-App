@@ -33,7 +33,7 @@ def contact(request):
     return render(request, 'contact.html', {})
 
 def sender_history(request):
-    return render(request, 'sender_history.html', {})
+    return render(request, 'sender/sender_history.html', {})
 
 def courier_history(request):
     assigned_packages = Package.objects.filter(courier=request.user, status__in=['completed'])
@@ -42,27 +42,7 @@ def courier_history(request):
         'greeting_message': greeting_message,
         'assigned_packages': assigned_packages,
     }
-    return render(request, 'courier_history.html', context)
-
-# def riders(request):
-#     couriers = User.objects.filter(role='courier')  # Retrieve only the couriers from the database
-    
-#     # Update the status of couriers based on their assigned packages
-#     for courier in couriers:
-#         if courier.assigned_packages.exists():
-#             latest_package = courier.assigned_packages.latest('id')
-#             if latest_package.status == 'completed':
-#                 courier.status = 'available'
-#             else:
-#                 courier.status = 'on-trip'
-#         else:
-#             courier.status = 'available'
-#         courier.save()
-    
-#     context = {
-#         'couriers': couriers
-#     }
-#     return render(request, 'admin/riders.html', context)
+    return render(request, 'courier/courier_history.html', context)
 
 def riders(request):
     couriers = User.objects.filter(role='courier')  
@@ -85,11 +65,6 @@ def riders(request):
         'couriers': couriers
     }
     return render(request, 'admin/riders.html', context)
-
-
-
-
-
 
 
 def users(request):
@@ -150,15 +125,6 @@ def admin(request):
 
 
 @login_required
-# def sender_dashboard(request):
-#     greeting_message = get_time_of_day()
-#     packages = request.user.packages.all()
-#     context = {
-#         'greeting_message': greeting_message,
-#         'packages': packages
-#     }
-#     return render(request, 'sender_dashboard.html', context)
-
 def sender_dashboard(request):
     packages = Package.objects.filter(
         Q(status='ongoing') | Q(status='upcoming')
@@ -177,14 +143,14 @@ def sender_dashboard(request):
         'greeting_message': greeting_message,
         'packages': packages
         }
-    return render(request, 'sender_dashboard.html', context)
+    return render(request, 'sender/sender_dashboard.html', context)
 
 def recipient_dashboard(request):
     greeting_message = get_time_of_day()
     context = {
         'greeting_message': greeting_message
     }
-    return render(request, 'recipient_dashboard.html', context)
+    return render(request, 'recipient/recipient_dashboard.html', context)
 
 def courier_dashboard(request):
     assigned_packages = Package.objects.filter(courier=request.user, status__in=['ongoing', 'arrived','completed'])
@@ -193,14 +159,14 @@ def courier_dashboard(request):
         'greeting_message': greeting_message,
         'assigned_packages': assigned_packages,
     }
-    return render(request, 'courier_dashboard.html', context)
+    return render(request, 'courier/courier_dashboard.html', context)
 
 
 
 
 def logout_user(request):
     logout(request)
-    return redirect('logout.html/')
+    return redirect('index.html/')
 
 def register(request):
     msg = None
@@ -225,7 +191,7 @@ def register(request):
             msg = 'form is not valid'
     else:
         form = SignUpForm()
-    return render(request,'register.html', {'form': form, 'msg': msg})
+    return render(request,'auth/register.html', {'form': form, 'msg': msg})
 
 
 def login_view(request):
@@ -251,7 +217,7 @@ def login_view(request):
                 msg= 'invalid credentials'
         else:
             msg = 'error validating form'
-    return render(request, 'login.html', {'form': form, 'msg': msg})
+    return render(request, 'auth/login.html', {'form': form, 'msg': msg})
 
 def generate_delivery_number():
     prefix = 'dn'
@@ -282,7 +248,7 @@ def register_package(request):
         form = PackageForm()
         error_message = None
 
-    return render(request, 'register_package.html', {'form': form, 'error_message': error_message})
+    return render(request, 'sender/register_package.html', {'form': form, 'error_message': error_message})
 
 def notify_arrival(request, package_id):
     # Retrieve the package object
