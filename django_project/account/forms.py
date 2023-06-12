@@ -91,12 +91,13 @@ class PackageForm(forms.ModelForm):
     
     class Meta:
         model = Package
-        fields = ['packageName', 'packageDescription', 'recipientName', 'recipientAddress', 'sendersAddress', 'recipientEmail']
+        fields = ['packageName', 'deliveryType', 'packageDescription', 'recipientName', 'recipientAddress', 'sendersAddress', 'recipientEmail', 'recipientTelephone']
         widgets = {
             'packageName': forms.TextInput(attrs={'class': 'form-control'}),
             'packageDescription': forms.TextInput(attrs={'class': 'form-control'}),
             'recipientName': forms.TextInput(attrs={'class': 'form-control'}),
             'recipientEmail': forms.TextInput(attrs={'class': 'form-control'}),
+            'recipientTelephone': forms.TextInput(attrs={'class': 'form-control'}),
             'recipientAddress': forms.TextInput(attrs={'class': 'form-control'}),
             'sendersAddress': forms.TextInput(attrs={'class': 'form-control'}),
         }
