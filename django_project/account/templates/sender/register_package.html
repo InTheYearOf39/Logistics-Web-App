@@ -23,6 +23,20 @@
               </div>
 
               <div class="col-12">
+                <label for="deliveryType" class="form-label">Delivery Type</label>
+                <select class="form-select" id="deliveryType" name="deliveryType" required>
+                  <option value="" selected disabled>-- Select Delivery Type --</option>
+                  <option value="standard">Standard</option>
+                  <option value="premium">Premium</option>
+                  <option value="express">Express</option>
+                </select>
+                <div class="invalid-feedback">
+                  Please select a delivery type.
+                </div>
+              </div>
+              
+
+              <div class="col-12">
                 <label for="packageDescripton" class="form-label">Package Description</label>
                 <div class="input-group has-validation">
                   <input type="text" class="form-control" id="packageDescription" name="packageDescription" placeholder="Enter Description" required>
@@ -51,6 +65,17 @@
                   </div>
                 </div>
               </div>
+
+              <div class="col-12">
+                <label for="recipientTelephone" class="form-label">Recipient Telephone</label>
+                <div class="input-group has-validation">
+                  <input type="tel" class="form-control" id="recipientTelephone" name="recipientTelephone" placeholder="Recipient Telephone" pattern="[0-9]{10}" required>
+                  <div class="invalid-feedback">
+                    Please enter a valid ten-digit telephone number.
+                  </div>
+                </div>
+              </div>
+              
   
               <div class="col-12">
                 <label for="recipientAddress" class="form-label">Recipient Address</label>

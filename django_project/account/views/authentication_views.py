@@ -18,6 +18,7 @@ def register(request):
                 'courier': 'courier_dashboard',
                 'sender': 'sender_dashboard',
                 'recipient': 'recipient_dashboard',
+                'drop_pick_zone': 'drop_pick_zone_dashboard',
             }
             dashboard_url = dashboard_mapping.get(user.role)
             login(request, user)
@@ -46,6 +47,7 @@ def login_view(request):
                         'courier': 'courier_dashboard',
                         'sender': 'sender_dashboard',
                         'recipient': 'recipient_dashboard',
+                        'drop_pick_zone': 'drop_pick_zone_dashboard',
                     }
                 dashboard_url = dashboard_mapping.get(user.role)
                 if dashboard_url:

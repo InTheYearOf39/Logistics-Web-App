@@ -10,13 +10,14 @@ class User(AbstractUser):
         ('admin', 'admin'),
         ('courier', 'courier'),
         ('sender', 'sender'),
+        ('drop_pick_zone', 'drop_pick_zone'),
     )
     STATUS_CHOICES = (
         ('available', 'Available'),
         ('on-trip', 'On Trip'),
     )
     name = models.CharField(max_length=20, null=False)
-    role = models.CharField(max_length=10, choices=ROLE_CHOICES, verbose_name='role', null=False)
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, verbose_name='role', null=False)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='available')
 
     def __str__(self):
@@ -30,15 +31,22 @@ class Package(models.Model):
         ('arrived', 'arrived'),
         ('completed', 'completed'),
     )
+    DELIVERY_CHOICES =(
+        ('standard', 'standard'),
+        ('premium', 'premium'),
+        ('express', 'express'),
+    )
 
     PACKAGE_PREFIX = 'dn'
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='packages', null=True)
     courier = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='assigned_packages', null=True, blank=True)
     packageName = models.CharField(max_length=100)
+    deliveryType = models.CharField(max_length=20, choices=DELIVERY_CHOICES)
     packageDescription = models.TextField()
     recipientName = models.CharField(max_length=100)
     recipientEmail = models.CharField(max_length=100)
+    recipientTelephone = models.CharField(max_length=100)
     recipientAddress = models.CharField(max_length=200)
     sendersAddress = models.CharField(max_length=200)
     delivery_number = models.CharField(max_length=7, unique=True)
