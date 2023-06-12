@@ -31,6 +31,7 @@
             <tr>
               <th scope="col">No.</th>
               <th scope="col">Package Title</th>
+              <th scope="col">Delivery Type</th>
               <th scope="col">Package Description</th>
               <th scope="col">Recipient</th>
               <th scope="col">Address From</th>
@@ -44,6 +45,7 @@
               <tr>
                 <td>{{ forloop.counter }}</td>
                 <td>{{ package.packageName }}</td>
+                <td>{{ package.deliveryType }}</td>
                 <td>{{ package.packageDescription }}</td>
                 <td>{{ package.recipientName }}</td>
                 <td>{{ package.sendersAddress }}</td>

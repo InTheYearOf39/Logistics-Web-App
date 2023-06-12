@@ -5,6 +5,7 @@ from .views import (
     sender_views,
     courier_views,
     admin_views,
+    drop_pick_zone_views,
     authentication_views
 )
 
@@ -42,4 +43,7 @@ urlpatterns = [
     path('notify_arrival/<int:package_id>/', courier_views.notify_arrival, name='notify_arrival'),
     path('confirm_delivery/<int:package_id>/', courier_views.confirm_delivery, name='confirm_delivery'),
     path('courier_history/', courier_views.courier_history, name='courier_history'),
+
+    # Drop off and Pick up routes
+    path('drop_pick_zone_dashboard/', drop_pick_zone_views.drop_pick_zone_dashboard, name='drop_pick_zone_dashboard'),
 ]
