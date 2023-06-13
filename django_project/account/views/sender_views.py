@@ -40,7 +40,7 @@ def register_package(request):
         if form.is_valid():
             package = form.save(commit=False)
             package.user = request.user
-            package.delivery_number = generate_delivery_number()
+            package.package_number = generate_package_number()
             
             # Check if the selected courier is already assigned to a package
             courier = package.courier
@@ -60,8 +60,8 @@ def register_package(request):
     return render(request, 'sender/register_package.html', {'form': form, 'error_message': error_message, 'drop_pick_zones': drop_pick_zones})
 
 
-def generate_delivery_number():
-    prefix = 'dn'
+def generate_package_number():
+    prefix = 'pn'
     digits = ''.join(random.choices(string.digits, k=5))
     return f'{prefix}{digits}'
 
