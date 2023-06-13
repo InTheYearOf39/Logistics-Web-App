@@ -81,6 +81,13 @@
               Packages
             </a>
           </li>
+          {% elif request.user.role == 'drop_pick_zone' %}
+          <li class="nav-item">
+            <a class="nav-link" aria-current="page" href="{% url 'drop_pick_zone_dashboard' %}">
+              <span data-feather="home"></span>
+              Packages
+            </a>
+          </li>
           {% endif %}
 
 
