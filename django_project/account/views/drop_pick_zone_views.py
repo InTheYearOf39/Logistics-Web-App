@@ -9,7 +9,7 @@ from django.core.mail import send_mail
 @login_required
 def drop_pick_zone_dashboard(request):
     drop_pick_zone = request.user
-    packages = Package.objects.filter(dropOffLocation=drop_pick_zone)
+    packages = Package.objects.filter(dropOffLocation=drop_pick_zone, status__in=['upcoming'])
     greeting_message = get_time_of_day()
     context = {
         'greeting_message': greeting_message,
@@ -33,12 +33,18 @@ def confirm_drop_off(request, package_id):
 
         send_mail(subject, message, sender_email, [recipient_email])
 
-        # return redirect('drop_pick_zone_dashboard')
+        return redirect('dpz_dispatch')
 
     return render(request, 'drop_pick_zone/drop_pick_dashboard.html', {'package': package})
 
-
-
+def dispatch(request):
+    drop_pick_zone = request.user
+    packages = Package.objects.filter(dropOffLocation=drop_pick_zone, status__in=['dropped_off'])
+    
+    context = {
+        'packages': packages,
+    }
+    return render(request, 'drop_pick_zone/dispatch.html', context)
 
 
 
