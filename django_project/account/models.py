@@ -46,7 +46,8 @@ class Package(models.Model):
     courier = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='assigned_packages', null=True, blank=True)
     packageName = models.CharField(max_length=100)
     deliveryType = models.CharField(max_length=20, choices=DELIVERY_CHOICES)
-    dropOffLocation = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, default=None)
+    # dropOffLocation = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, default=None)
+    dropOffLocation = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, default=None, related_name='packages_dropped_off')
     packageDescription = models.TextField()
     recipientName = models.CharField(max_length=100)
     recipientEmail = models.CharField(max_length=100)
@@ -58,6 +59,8 @@ class Package(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     assigned_at = models.DateTimeField(null=True, blank=True)
     otp = models.CharField(max_length=6, null=True, blank=True)
+
+
 
     def __str__(self):
         return self.packageName
