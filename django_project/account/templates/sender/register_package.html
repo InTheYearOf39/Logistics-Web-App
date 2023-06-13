@@ -35,13 +35,39 @@
                 </div>
               </div>
               
+              <div class="col-12" id="dropOffLocationContainer" style="display: none;">
+                <label for="dropOffLocation" class="form-label">Drop Off Location</label>
+                <select class="form-control" id="dropOffLocation" name="dropOffLocation" required>
+                  <option value="" selected disabled>-- Select Drop Off Location --</option>
+                  {% for drop_pick_zone in drop_pick_zones %}
+                    <option value="{{ drop_pick_zone.id }}">{{ drop_pick_zone.name }}</option>
+                  {% endfor %}
+                </select>
+                <div class="invalid-feedback">
+                  Please select a delivery location.
+                </div>
+              </div>
+              
+              <script>
+                const deliveryTypeSelect = document.getElementById("deliveryType");
+                const dropOffLocationContainer = document.getElementById("dropOffLocationContainer");
+              
+                deliveryTypeSelect.addEventListener("change", function() {
+                  if (this.value === "standard") {
+                    dropOffLocationContainer.style.display = "block";
+                  } else {
+                    dropOffLocationContainer.style.display = "none";
+                  }
+                });
+              </script>
+              
 
               <div class="col-12">
                 <label for="packageDescripton" class="form-label">Package Description</label>
                 <div class="input-group has-validation">
                   <input type="text" class="form-control" id="packageDescription" name="packageDescription" placeholder="Enter Description" required>
                 <div class="invalid-feedback">
-                    Recipient Name is required.
+                  Package Description is required.
                   </div>
                 </div>
               </div>

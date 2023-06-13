@@ -1,1 +1,50 @@
-<h1>Drop off and Pick up</h1>
+{% extends 'dashboard_base.html' %}
+{% load static %}
+
+{% block profile_image %}
+<img src="{% static '/img/team/team-3.jpg' %}" class="rounded mx-auto d-block" alt="..." width="80px" height="80px">
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">{{ greeting_message }}, {{ user.name }}</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+    </div>
+</div>
+
+<h2>Packages</h2>
+<div class="container">
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">No.</th>
+                    <th scope="col">Package Title</th>
+                    <th scope="col">Recipient</th>
+                    <th scope="col">Address From</th>
+                    <th scope="col">Address To</th>
+                    <th scope="col">Delivery Number</th>
+                    <th scope="col">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for package in packages %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ package.packageName }}</td>
+                        <td>{{ package.recipientName }}</td>
+                        <td>{{ package.sendersAddress }}</td>
+                        <td>{{ package.recipientAddress }}</td>
+                        <td>{{ package.delivery_number }}</td>
+                        <td>{{ package.status }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+        
+        
+
+{% endblock %}

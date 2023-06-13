@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, redirect
 from django.db.models import Q, Case, When, IntegerField
 from django.contrib.auth.decorators import login_required
 from account.forms import PackageForm
-from account.models import Package
+from account.models import Package, User
 import random
 import string
 from account.utils import get_time_of_day
@@ -33,6 +33,8 @@ def sender_dashboard(request):
     return render(request, 'sender/sender_dashboard.html', context)
 
 def register_package(request):
+    drop_pick_zones = User.objects.filter(role='drop_pick_zone')  # Retrieve users with the role of 'drop_pick_zone'
+
     if request.method == 'POST':
         form = PackageForm(request.POST)
         if form.is_valid():
@@ -55,7 +57,8 @@ def register_package(request):
         form = PackageForm()
         error_message = None
 
-    return render(request, 'sender/register_package.html', {'form': form, 'error_message': error_message})
+    return render(request, 'sender/register_package.html', {'form': form, 'error_message': error_message, 'drop_pick_zones': drop_pick_zones})
+
 
 def generate_delivery_number():
     prefix = 'dn'
