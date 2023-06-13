@@ -38,6 +38,8 @@
                 <td>
                     {% if package.status == 'upcoming' %}
                     <img src="{% static 'img/pending.png' %}" alt="" width="30px" height="30px">
+                    {% elif package.status == 'dropped_off' %}
+                    <img src="{% static 'img/dropped.png' %}" alt="" width="30px" height="30px">
                     {% elif package.status == 'ongoing' %}
                     <img src="{% static 'img/started.png' %}" alt="" width="30px" height="30px">
                     {% elif package.status == 'completed' %}
@@ -45,7 +47,7 @@
                     {% endif %}
                 </td>
                 <td>
-                    {% if package.status == 'upcoming' %}
+                    {% if package.status == 'upcoming' or package.status == 'dropped_off' %}
                     <a href="{% url 'assign_courier' package_id=package.id %}">
                         <button class="btn btn-sm btn-primary text-white w-75">Assign</button>
                     </a>
