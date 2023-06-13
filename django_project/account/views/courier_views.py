@@ -31,7 +31,7 @@ def notify_arrival(request, package_id):
 
     # Send the email with OTP
     subject = "Package Arrival Notification"
-    message = f"Dear {package.recipientName},\n\nYour package with delivery number {package.delivery_number} has arrived at its destination.\n\nOTP: Your One Time Password is: {otp}, please do not share this with anyone but your courier.\n\nThank you,\nThe Courier Service Team"
+    message = f"Dear {package.recipientName},\n\nYour package with delivery number {package.package_number} has arrived at its destination.\n\nOTP: Your One Time Password is: {otp}, please do not share this with anyone but your courier.\n\nThank you,\nThe Courier Service Team"
     sender = settings.EMAIL_HOST_USER
     receiver = package.recipientEmail
 

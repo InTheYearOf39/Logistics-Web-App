@@ -46,4 +46,5 @@ urlpatterns = [
 
     # Drop off and Pick up routes
     path('drop_pick_zone_dashboard/', drop_pick_zone_views.drop_pick_zone_dashboard, name='drop_pick_zone_dashboard'),
+    path('confirm-drop-off/<int:package_id>/', drop_pick_zone_views.confirm_drop_off, name='confirm_drop_off'),
 ]

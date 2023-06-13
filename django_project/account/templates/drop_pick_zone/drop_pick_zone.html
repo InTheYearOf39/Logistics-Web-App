@@ -23,8 +23,8 @@
                     <th scope="col">Recipient</th>
                     <th scope="col">Address From</th>
                     <th scope="col">Address To</th>
-                    <th scope="col">Delivery Number</th>
-                    <th scope="col">Status</th>
+                    <th scope="col">Package Number</th>
+                    <th scope="col">Drop-Off</th>
                 </tr>
             </thead>
             <tbody>
@@ -35,8 +35,21 @@
                         <td>{{ package.recipientName }}</td>
                         <td>{{ package.sendersAddress }}</td>
                         <td>{{ package.recipientAddress }}</td>
-                        <td>{{ package.delivery_number }}</td>
-                        <td>{{ package.status }}</td>
+                        <td>{{ package.package_number }}</td>
+                        <td>
+                            {% if package.status == 'upcoming' %}
+                            <form action="{% url 'confirm_drop_off' package_id=package.id %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-warning text-white">Confirm Drop-Off</button>
+                            </form>
+                            {% elif package.status == 'dropped_off' %}
+                            <form action="{% url 'confirm_drop_off' package_id=package.id %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-info text-white">Dropped Off</button>
+                            </form>
+                            {% else %}
+                            {% endif %}
+                    </td>
                     </tr>
                 {% endfor %}
             </tbody>

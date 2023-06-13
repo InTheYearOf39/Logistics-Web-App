@@ -16,7 +16,7 @@
                 <th scope="col">Recipient</th>
                 <th scope="col">Address From</th>
                 <th scope="col">Address To</th>
-                <th scope="col">Delivery Number</th>
+                <th scope="col">Package Number</th>
                 <th scope="col">Status</th>
                 <th scope="col">Courier</th>
             </tr>
@@ -29,7 +29,7 @@
                 <td>{{ package.recipientName }}</td>
                 <td>{{ package.sendersAddress }}</td>
                 <td>{{ package.recipientAddress }}</td>
-                <td>{{ package.delivery_number }}</td>
+                <td>{{ package.package_number }}</td>
                 <td>
                     {% if package.status == 'completed' %}
                     <img src="{% static 'img/success.png' %}" alt="" width="30px" height="30px">
