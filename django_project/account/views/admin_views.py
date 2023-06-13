@@ -9,12 +9,13 @@ from django.shortcuts import redirect, get_object_or_404
 
 def admin(request):
     packages = Package.objects.filter(
-        Q(status='ongoing') | Q(status='upcoming')
+        Q(status='ongoing') | Q(status='dropped_off') | Q(status='upcoming')
     ).order_by(
         Case(
             When(status='upcoming', then=0),
-            When(status='ongoing', then=1),
-            default=2,
+            When(status='dropped_off', then=1),
+            When(status='ongoing', then=2),
+            default=3,
             output_field=IntegerField()
         ),
         '-assigned_at'  # Sort by assignment day in descending order
@@ -92,4 +93,13 @@ def admin_history(request):
     return render(request, 'admin/admin_history.html', context)
 
 def dropoffs(request):
-    return render(request, 'admin/dropoffs.html', {})
+    packages = Package.objects.filter(
+        Q(status='dropped_off')
+    )
+    context = {
+        'packages': packages
+    }
+    return render(request, 'admin/dropoffs.html', context)
+
+def dispatch(request):
+    return render(request, 'admin/dispatch.html', {})

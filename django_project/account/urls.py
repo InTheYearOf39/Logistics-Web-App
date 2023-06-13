@@ -31,6 +31,7 @@ urlpatterns = [
     path('admin_history/', admin_views.admin_history, name='admin_history'),
     path('assign_courier/<int:package_id>/', admin_views.assign_courier, name='assign_courier'),
     path('dropoffs/', admin_views.dropoffs, name='dropoffs'),
+    path('dispatch/', admin_views.dispatch, name='dispatch'),
 
 
     # sender routes

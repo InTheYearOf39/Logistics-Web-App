@@ -5,7 +5,9 @@
 
 {% block content %}
 
-<h2 class="my-5">Dropped Off Items</h2>
+
+
+<h2 class="my-5">Dispatched Packages</h2>
 <div class="container">
     <div class="table-responsive">
       <table class="table table-striped table-sm">
@@ -17,13 +19,11 @@
                 <th scope="col">Address From</th>
                 <th scope="col">Address To</th>
                 <th scope="col">Package Number</th>
-                
-                
+                <th scope="col">Courier</th>
             </tr>
         </thead>
         <tbody>
             {% for package in packages %}
-            {% if package.status == "dropped_off" %}
             <tr>
                 <td>{{ forloop.counter }}</td>
                 <td>{{ package.packageName }}</td>
@@ -31,9 +31,13 @@
                 <td>{{ package.sendersAddress }}</td>
                 <td>{{ package.recipientAddress }}</td>
                 <td>{{ package.package_number }}</td>
-            
+                <td>
+                    {% if package.status == 'ongoing' %}
+                    <img src="{% static 'img/started.png' %}" alt="" width="30px" height="30px">
+                    {% endif %}
+
+                </td>
             </tr>
-            {% endif %}
             {% endfor %}
         </tbody>
     </table>
@@ -41,10 +45,5 @@
         
       </div>
 </div>
-
-
-
-
-
 
 {% endblock %}

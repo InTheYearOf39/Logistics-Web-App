@@ -26,7 +26,7 @@ class SignUpForm(UserCreationForm):
     admin = "admin"
     courier = "courier"
     sender = "sender"
-    recipient = "recipient"
+    # recipient = "recipient"
     drop_pick_zone = "drop_pick_zone"
     
 
@@ -34,7 +34,7 @@ class SignUpForm(UserCreationForm):
         (admin, "admin"),
         (courier, "courier"),
         (sender, "sender"),
-        (recipient, "recipient"),
+        # (recipient, "recipient"),
         (drop_pick_zone, "drop pick zone")
     ]
 

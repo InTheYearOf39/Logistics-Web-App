@@ -14,10 +14,10 @@ def register(request):
             msg = 'user created'
 
             dashboard_mapping = {
-                'admin': 'admin_dashboard',
+                # 'admin': 'admin_dashboard',
                 'courier': 'courier_dashboard',
                 'sender': 'sender_dashboard',
-                'recipient': 'recipient_dashboard',
+                # 'recipient': 'recipient_dashboard',
                 'drop_pick_zone': 'drop_pick_zone_dashboard',
             }
             dashboard_url = dashboard_mapping.get(user.role)
@@ -46,7 +46,7 @@ def login_view(request):
                         'admin': 'admin_dashboard',
                         'courier': 'courier_dashboard',
                         'sender': 'sender_dashboard',
-                        'recipient': 'recipient_dashboard',
+                        # 'recipient': 'recipient_dashboard',
                         'drop_pick_zone': 'drop_pick_zone_dashboard',
                     }
                 dashboard_url = dashboard_mapping.get(user.role)
