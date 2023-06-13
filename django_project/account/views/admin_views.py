@@ -31,7 +31,7 @@ def admin(request):
         if delivery_type == 'standard':
             package = get_object_or_404(Package, id=package_id, status='dropped_off')
             return redirect('assign_courier', package_id=package.id)
-        elif delivery_type == 'premium':
+        elif delivery_type == 'premium' or delivery_type == 'express':
             package = get_object_or_404(Package, id=package_id, status='upcoming')
             return redirect('assign_courier', package_id=package.id)
             

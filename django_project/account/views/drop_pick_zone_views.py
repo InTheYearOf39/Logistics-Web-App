@@ -15,7 +15,7 @@ def drop_pick_zone_dashboard(request):
         'greeting_message': greeting_message,
         'packages': packages,
     }
-    return render(request, 'drop_pick_zone/drop_pick_zone.html', context)
+    return render(request, 'drop_pick_zone/drop_pick_dashboard.html', context)
 
 def confirm_drop_off(request, package_id):
     package = get_object_or_404(Package, id=package_id)
