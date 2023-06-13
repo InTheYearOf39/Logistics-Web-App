@@ -27,6 +27,7 @@ class User(AbstractUser):
 class Package(models.Model):
     STATUS_CHOICES = (
         ('upcoming', 'upcoming'),
+        ('dropped_off', 'dropped_off'),
         ('ongoing', 'ongoing'),
         ('arrived', 'arrived'),
         ('completed', 'completed'),
@@ -37,7 +38,7 @@ class Package(models.Model):
         ('express', 'express'),
     )
 
-    PACKAGE_PREFIX = 'dn'
+    PACKAGE_PREFIX = 'pn'
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='packages', null=True)
     courier = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='assigned_packages', null=True, blank=True)
@@ -50,7 +51,7 @@ class Package(models.Model):
     recipientTelephone = models.CharField(max_length=100)
     recipientAddress = models.CharField(max_length=200)
     sendersAddress = models.CharField(max_length=200)
-    delivery_number = models.CharField(max_length=7, unique=True)
+    package_number = models.CharField(max_length=7, unique=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES)
     created_at = models.DateTimeField(auto_now_add=True)
     assigned_at = models.DateTimeField(null=True, blank=True)
@@ -63,13 +64,13 @@ class Package(models.Model):
     def save(self, *args, **kwargs):
         if self.courier is None and self.status == 'ongoing':
             raise ValueError("Courier must be assigned for packages with 'ongoing' status.")      
-        if not self.delivery_number:
-            self.delivery_number = self._generate_delivery_number()
+        if not self.package_number:
+            self.package_number = self._package_package_number()
         if self.courier:
                 self.assigned_at = timezone.now()
         super().save(*args, **kwargs)
 
-    def _generate_delivery_number(self):
+    def _package_package_number(self):
         digits = ''.join(random.choices(string.digits, k=5))
         return f'{self.PACKAGE_PREFIX}{digits}'
 
