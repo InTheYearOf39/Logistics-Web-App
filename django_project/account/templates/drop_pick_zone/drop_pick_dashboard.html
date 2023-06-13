@@ -24,7 +24,7 @@
                     <th scope="col">Address From</th>
                     <th scope="col">Address To</th>
                     <th scope="col">Package Number</th>
-                    <th scope="col">Drop-Off</th>
+                    <th scope="col">status</th>
                 </tr>
             </thead>
             <tbody>
@@ -43,10 +43,7 @@
                                 <button type="submit" class="btn btn-sm btn-warning text-white">Confirm Drop-Off</button>
                             </form>
                             {% elif package.status == 'dropped_off' %}
-                            <form action="{% url 'confirm_drop_off' package_id=package.id %}" method="post">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-sm btn-info text-white">Dropped Off</button>
-                            </form>
+                                <button type="button" class="btn btn-sm btn-info text-white">Dropped Off</button>
                             {% else %}
                             {% endif %}
                     </td>
