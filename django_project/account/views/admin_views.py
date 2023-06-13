@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, redirect, get_object_or_404
-from django.db.models import Q, Case, When, IntegerField
+from django.db.models import Q, Case, When, IntegerField, Count
 from account.utils import get_time_of_day
 from account.models import Package, User
 from account.utils import get_time_of_day
@@ -137,13 +137,28 @@ def admin_history(request):
     return render(request, 'admin/admin_history.html', context)
 
 def dropoffs(request):
-    packages = Package.objects.filter(
-        Q(status='dropped_off')
-    )
+    dropoff_locations = User.objects.filter(packages_dropped_off__status='dropped_off').distinct()
+    packages_by_location = {}
+
+    for dropoff_location in dropoff_locations:
+        packages = Package.objects.filter(dropOffLocation=dropoff_location, status='dropped_off')
+        packages_by_location[dropoff_location.name] = packages
+
     context = {
-        'packages': packages
+        'packages_by_location': packages_by_location,
     }
     return render(request, 'admin/dropoffs.html', context)
+
+
+
+# def dropoffs(request):
+#     packages = Package.objects.filter(
+#         Q(status='dropped_off')
+#     )
+#     context = {
+#         'packages': packages
+#     }
+#     return render(request, 'admin/dropoffs.html', context)
 
 def dispatch(request):
     return render(request, 'admin/dispatch.html', {})
