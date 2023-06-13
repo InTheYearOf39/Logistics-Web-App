@@ -39,7 +39,7 @@
                     <td>
                         {% if package.status == 'completed' %}
                         
-                        <form action="{% url 'notify_arrival' package_id=package.id %}" method="post">
+                        <form method="post">
                             {% csrf_token %}
                             <!-- <button type="button" class="btn btn-sm btn-secondary text-white">Completed</button> -->
                             <img src="{% static 'img/success.png' %}" alt="" width="30px" height="30px">

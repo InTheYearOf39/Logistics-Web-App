@@ -31,7 +31,7 @@ urlpatterns = [
     path('admin_history/', admin_views.admin_history, name='admin_history'),
     path('assign_courier/<int:package_id>/', admin_views.assign_courier, name='assign_courier'),
     path('dropoffs/', admin_views.dropoffs, name='dropoffs'),
-    path('dispatch/', admin_views.dispatch, name='dispatch'),
+    path('admin_dispatch/', admin_views.dispatch, name='admin_dispatch'),
 
 
     # sender routes
@@ -46,7 +46,9 @@ urlpatterns = [
     path('confirm_delivery/<int:package_id>/', courier_views.confirm_delivery, name='confirm_delivery'),
     path('courier_history/', courier_views.courier_history, name='courier_history'),
 
+
     # Drop off and Pick up routes
     path('drop_pick_zone_dashboard/', drop_pick_zone_views.drop_pick_zone_dashboard, name='drop_pick_zone_dashboard'),
     path('confirm-drop-off/<int:package_id>/', drop_pick_zone_views.confirm_drop_off, name='confirm_drop_off'),
+    path('drop_pick_zone_dispatch/', drop_pick_zone_views.dispatch, name='dpz_dispatch'),
 ]
