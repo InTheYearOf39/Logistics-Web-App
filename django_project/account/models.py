@@ -44,7 +44,7 @@ class Package(models.Model):
     courier = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='assigned_packages', null=True, blank=True)
     packageName = models.CharField(max_length=100)
     deliveryType = models.CharField(max_length=20, choices=DELIVERY_CHOICES)
-    dropOffLocation = models.ForeignKey(User, on_delete=models.CASCADE)
+    dropOffLocation = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, default=None)
     packageDescription = models.TextField()
     recipientName = models.CharField(max_length=100)
     recipientEmail = models.CharField(max_length=100)
