@@ -90,3 +90,6 @@ def admin_history(request):
         'packages': packages
     }
     return render(request, 'admin/admin_history.html', context)
+
+def dropoffs(request):
+    return render(request, 'admin/dropoffs.html', {})

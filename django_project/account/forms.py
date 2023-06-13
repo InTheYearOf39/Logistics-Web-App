@@ -23,7 +23,7 @@ class LoginForm(forms.Form):
 
 
 class SignUpForm(UserCreationForm):
-    # admin = "admin"
+    admin = "admin"
     courier = "courier"
     sender = "sender"
     recipient = "recipient"
@@ -31,7 +31,7 @@ class SignUpForm(UserCreationForm):
     
 
     ROLE_CHOICES = [
-        # (admin, "admin"),
+        (admin, "admin"),
         (courier, "courier"),
         (sender, "sender"),
         (recipient, "recipient"),

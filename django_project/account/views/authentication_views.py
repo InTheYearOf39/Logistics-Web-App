@@ -14,7 +14,7 @@ def register(request):
             msg = 'user created'
 
             dashboard_mapping = {
-                # 'admin': 'admin_dashboard',
+                'admin': 'admin_dashboard',
                 'courier': 'courier_dashboard',
                 'sender': 'sender_dashboard',
                 'recipient': 'recipient_dashboard',
