@@ -33,9 +33,9 @@ def confirm_drop_off(request, package_id):
 
         send_mail(subject, message, sender_email, [recipient_email])
 
-        return redirect('drop_pick_zone_dashboard')
+        # return redirect('drop_pick_zone_dashboard')
 
-    return render(request, 'drop_pick_zone/confirm_drop_off.html', {'package': package})
+    return render(request, 'drop_pick_zone/drop_pick_dashboard.html', {'package': package})
 
 
 
