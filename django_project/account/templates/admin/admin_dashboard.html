@@ -47,7 +47,11 @@
                     {% endif %}
                 </td>
                 <td>
-                    {% if package.status == 'upcoming' or package.status == 'dropped_off' %}
+                    {% if package.status == 'upcoming' and package.deliveryType == 'premium' or package.deliveryType == 'express' %}
+                    <a href="{% url 'assign_courier' package_id=package.id %}">
+                        <button class="btn btn-sm btn-primary text-white w-75">Assign</button>
+                    </a>
+                    {% elif package.status == 'dropped_off'%}
                     <a href="{% url 'assign_courier' package_id=package.id %}">
                         <button class="btn btn-sm btn-primary text-white w-75">Assign</button>
                     </a>
@@ -55,7 +59,7 @@
                     {% if package.courier %}
                     {{ package.courier.name }}
                     {% else %}
-                    Not Assigned
+                    Not Accepted yet
                     {% endif %}
                     {% endif %}
                 </td>

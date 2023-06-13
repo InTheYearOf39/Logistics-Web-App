@@ -41,7 +41,7 @@ class SignUpForm(UserCreationForm):
     role = forms.ChoiceField(
         required=True,
         choices=ROLE_CHOICES,
-        widget=forms.RadioSelect,
+        widget=forms.RadioSelect(attrs={'id': 'id_role'}),
     )
 
     name = forms.CharField(
@@ -86,9 +86,21 @@ class SignUpForm(UserCreationForm):
         )
     )
 
+    tag = forms.CharField(
+        required=False,
+        widget=forms.TextInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": "tag"
+            }
+        )
+    )
+
+
+
     class Meta:
         model = User
-        fields = ('name', 'username', 'email', 'password1', 'password2', 'role')
+        fields = ('name', 'username', 'email', 'password1', 'password2', 'role', 'tag')
 
 class PackageForm(forms.ModelForm):
     
