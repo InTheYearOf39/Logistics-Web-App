@@ -32,6 +32,10 @@ urlpatterns = [
     path('assign_courier/<int:package_id>/', admin_views.assign_courier, name='assign_courier'),
     path('dropoffs/', admin_views.dropoffs, name='dropoffs'),
     path('admin_dispatch/', admin_views.dispatch, name='admin_dispatch'),
+    path('create_warehouse/', admin_views.create_warehouse, name='create_warehouse'),
+    path('create_drop_pick/', admin_views.create_drop_pick, name='create_drop_pick'),
+    path('warehouses/', admin_views.warehouses, name='warehouses'),
+    path('drop_pick_zones/', admin_views.drop_pick_zones, name='drop_pick_zones'),
 
 
     # sender routes
