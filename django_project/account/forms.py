@@ -119,3 +119,12 @@ class PackageForm(forms.ModelForm):
             'sendersAddress': forms.TextInput(attrs={'class': 'form-control'}),
         }
 
+class WarehouseForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['name', 'username', 'phone', 'address', 'tag']
+
+class DropPickForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['name', 'username', 'phone', 'address', 'tag', 'warehouse']

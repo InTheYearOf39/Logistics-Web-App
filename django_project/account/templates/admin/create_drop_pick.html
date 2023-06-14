@@ -10,6 +10,7 @@
   <div class="row justify-content-center ml-5">
     <div class="col-md-12">
     <form class="well form-horizontal" action=" " method="post"  id="contact_form">
+      {% csrf_token %}
 <fieldset>
 
 <!-- Form Name -->
@@ -22,7 +23,7 @@
   <div class="col-md-8 inputGroupContainer">
   <div class="input-group">
   <span class="input-group-text">👤</span>
-  <input  name="first_name" placeholder="First Name" class="form-control"  type="text">
+  <input  name="name" placeholder="Name" class="form-control"  type="text">
     </div>
   </div>
 </div>
@@ -34,7 +35,7 @@
     <div class="col-md-8 inputGroupContainer">
     <div class="input-group">
   <span class="input-group-text">👤</span>
-  <input name="last_name" placeholder="Username" class="form-control"  type="text">
+  <input name="username" placeholder="Username" class="form-control"  type="text">
     </div>
   </div>
 </div>
@@ -66,6 +67,17 @@
 
 <!-- Text input-->
 
+<!-- Text input-->
+<div class="form-group mt-2">
+    <label class="col-md-8 control-label">Tag</label>  
+      <div class="col-md-8 inputGroupContainer">
+      <div class="input-group">
+          <span class="input-group-text">🏷️</span>
+    <input name="tag" placeholder="Tag alias" class="form-control" type="text">
+      </div>
+    </div>
+  </div>
+
 <!-- Select Basic -->
    
 <div class="form-group mt-2"> 
@@ -73,17 +85,12 @@
     <div class="col-md-8 selectContainer">
     <div class="input-group">
         <span class="input-group-addon"><i class="glyphicon glyphicon-list"></i></span>
-    <select name="warehouse" class="form-control selectpicker" >
-      <option value=" " >Please select warehouse</option>
-      <option >Masaka</option>
-      <option>Mpigi</option>
-      <option>Kampala</option>
-      <option>Mityana</option>
-      <option>Mbarara</option>
-      <option>Gulu</option>
-      <option>Mbale</option>
-      
-    </select>
+        <select name="warehouse" class="form-control selectpicker">
+          <option value="">Please select warehouse</option>  
+          {% for warehouse in warehouses %}
+            <option value="{{ warehouse.id }}">{{ warehouse.name }}</option>
+          {% endfor %}
+        </select>
   </div>
 </div>
 </div>
