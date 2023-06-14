@@ -11,6 +11,7 @@ class User(AbstractUser):
         ('courier', 'courier'),
         ('sender', 'sender'),
         ('drop_pick_zone', 'drop_pick_zone'),
+        ('warehouse', 'warehouse'),  # Add 'warehouse' role
     )
     STATUS_CHOICES = (
         ('available', 'Available'),
@@ -20,6 +21,11 @@ class User(AbstractUser):
     tag = models.CharField(max_length=20, null=True)
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, verbose_name='role', null=False)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='available')
+    
+    # Add warehouse-specific fields
+    phone = models.CharField(max_length=20, null=True)
+    address = models.CharField(max_length=200, null=True)
+    warehouse = models.CharField(max_length=20, null=True)
 
     def __str__(self):
         return self.username

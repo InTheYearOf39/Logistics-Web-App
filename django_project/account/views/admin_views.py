@@ -4,6 +4,7 @@ from account.utils import get_time_of_day
 from account.models import Package, User
 from account.utils import get_time_of_day
 from django.shortcuts import redirect, get_object_or_404
+from account.forms import WarehouseForm, DropPickForm
 
 
 
@@ -164,13 +165,46 @@ def dispatch(request):
     return render(request, 'admin/dispatch.html', {})
 
 def create_warehouse(request):
-    return render(request, 'admin/create_warehouse.html', {})
+    if request.method == 'POST':
+        form = WarehouseForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.role = 'warehouse'
+            form.save()
+            # Optionally, redirect to a success page
+            return redirect('warehouses')
+    else:
+        form = WarehouseForm()
+    return render(request, 'admin/create_warehouse.html', {'form': form})
 
 def warehouses(request):
-    return render(request, 'admin/warehouses.html', {})
+    warehouses = User.objects.filter(role='warehouse')
+    context = {
+        'warehouses': warehouses
+    }
+    return render(request, 'admin/warehouses.html', context)
 
 def create_drop_pick(request):
-    return render(request, 'admin/create_drop_pick.html', {})
+    warehouses = User.objects.filter(role='warehouse')
+    if request.method == 'POST':
+        form = DropPickForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.role = 'drop_pick_zone'
+            warehouse_id = form.cleaned_data.get('warehouse')
+            warehouse = User.objects.filter(id=warehouse_id, role='warehouse').first()
+            user.warehouse = warehouse.name if warehouse else None
+            form.save()
+            return redirect('drop_pick_zones')
+    else:
+        form = DropPickForm()
+    return render(request, 'admin/create_drop_pick.html', {'form': form, 'warehouses': warehouses})
+
+
 
 def drop_pick_zones(request):
-    return render(request, 'admin/drop_pick_zones.html', {})
+    drop_pick_zones = User.objects.filter(role='drop_pick_zone')
+    context = {
+        'drop_pick_zones': drop_pick_zones
+    }
+    return render(request, 'admin/drop_pick_zones.html', context)
