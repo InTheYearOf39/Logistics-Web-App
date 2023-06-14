@@ -162,3 +162,15 @@ def dropoffs(request):
 
 def dispatch(request):
     return render(request, 'admin/dispatch.html', {})
+
+def create_warehouse(request):
+    return render(request, 'admin/create_warehouse.html', {})
+
+def warehouses(request):
+    return render(request, 'admin/warehouses.html', {})
+
+def create_drop_pick(request):
+    return render(request, 'admin/create_drop_pick.html', {})
+
+def drop_pick_zones(request):
+    return render(request, 'admin/drop_pick_zones.html', {})
