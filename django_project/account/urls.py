@@ -5,6 +5,7 @@ from .views import (
     sender_views,
     courier_views,
     admin_views,
+    warehouse_views,
     drop_pick_zone_views,
     authentication_views
 )
@@ -29,7 +30,7 @@ urlpatterns = [
     path('users/', admin_views.users, name='users'),
     path('riders/', admin_views.riders, name='riders'),
     path('admin_history/', admin_views.admin_history, name='admin_history'),
-    path('assign_courier/<int:package_id>/', admin_views.assign_courier, name='assign_courier'),
+    # path('assign_courier/<int:package_id>/', admin_views.assign_courier, name='assign_courier'),
     path('dropoffs/', admin_views.dropoffs, name='dropoffs'),
     path('admin_dispatch/', admin_views.dispatch, name='admin_dispatch'),
     path('create_warehouse/', admin_views.create_warehouse, name='create_warehouse'),
@@ -49,6 +50,11 @@ urlpatterns = [
     path('notify_arrival/<int:package_id>/', courier_views.notify_arrival, name='notify_arrival'),
     path('confirm_delivery/<int:package_id>/', courier_views.confirm_delivery, name='confirm_delivery'),
     path('courier_history/', courier_views.courier_history, name='courier_history'),
+
+
+    # Warehouse routes
+    path('warehouse_dashboard/', warehouse_views.warehouse_dashboard, name='warehouse_dashboard'),
+    path('assign_courier/<int:package_id>/', warehouse_views.assign_courier, name='assign_courier'),
 
 
     # Drop off and Pick up routes

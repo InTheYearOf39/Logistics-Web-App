@@ -1,3 +1,5 @@
+from account.utils import get_time_of_day
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, redirect, get_object_or_404
 from account.models import Package, User
 from django.shortcuts import redirect, get_object_or_404
@@ -5,8 +7,13 @@ from account.forms import WarehouseForm, DropPickForm
 from django.contrib.auth.decorators import user_passes_test
 
 
-
-
+@login_required
+def warehouse_dashboard(request):
+    greeting_message = get_time_of_day()
+    context = {
+        'greeting_message': greeting_message,
+    }
+    return render(request, 'warehouse/warehouse_dashboard.html', context)
 
 @user_passes_test(lambda u: u.is_authenticated and u.role == 'warehouse')
 def assign_courier(request, package_id):
@@ -38,3 +45,7 @@ def assign_courier(request, package_id):
     couriers = User.objects.filter(role='courier', status='available')  # Filter couriers by status='available'
 
     return render(request, 'warehouse/assign_courier.html', {'package_id': package_id, 'couriers': couriers})
+
+
+
+

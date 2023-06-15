@@ -5,6 +5,7 @@ from account.models import Package, User
 from account.utils import get_time_of_day
 from django.shortcuts import redirect, get_object_or_404
 from account.forms import WarehouseForm, DropPickForm
+from django.contrib.auth.hashers import make_password
 
 
 
@@ -170,6 +171,8 @@ def create_warehouse(request):
         if form.is_valid():
             user = form.save(commit=False)
             user.role = 'warehouse'
+            # Set default password for the warehouse user
+            user.password = make_password('warehouse@warehouse')
             form.save()
             # Optionally, redirect to a success page
             return redirect('warehouses')
@@ -189,12 +192,16 @@ def create_drop_pick(request):
     if request.method == 'POST':
         form = DropPickForm(request.POST)
         if form.is_valid():
-            user = form.save(commit=False)
-            user.role = 'drop_pick_zone'
-            warehouse_id = form.cleaned_data.get('warehouse')
-            warehouse = User.objects.filter(id=warehouse_id, role='warehouse').first()
-            user.warehouse = warehouse.name if warehouse else None
-            form.save()
+            drop_pick = form.save(commit=False)
+            drop_pick.role = 'drop_pick_zone'
+
+            # Retrieve the selected warehouse ID from the form
+            warehouse_id = request.POST.get('warehouse')
+            if warehouse_id:
+                warehouse = User.objects.get(id=warehouse_id)
+                drop_pick.warehouse = warehouse
+
+            drop_pick.save()
             return redirect('drop_pick_zones')
     else:
         form = DropPickForm()

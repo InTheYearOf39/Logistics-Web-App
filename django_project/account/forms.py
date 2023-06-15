@@ -126,3 +126,11 @@ class DropPickForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ['name', 'username', 'phone', 'address', 'tag', 'warehouse']
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'username': forms.TextInput(attrs={'class': 'form-control'}),
+            'phone': forms.TextInput(attrs={'class': 'form-control'}),
+            'address': forms.TextInput(attrs={'class': 'form-control'}),
+            'tag': forms.TextInput(attrs={'class': 'form-control'}),
+            'warehouse': forms.Select(attrs={'class': 'form-control selectpicker'}),
+        }

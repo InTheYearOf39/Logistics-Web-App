@@ -25,6 +25,8 @@ class User(AbstractUser):
     # Add warehouse-specific fields
     phone = models.CharField(max_length=20, null=True)
     address = models.CharField(max_length=200, null=True)
+
+    # Add drop_pick_zone-specific fields
     warehouse = models.CharField(max_length=20, null=True)
 
     def __str__(self):

@@ -48,6 +48,7 @@ def login_view(request):
                         'sender': 'sender_dashboard',
                         # 'recipient': 'recipient_dashboard',
                         'drop_pick_zone': 'drop_pick_zone_dashboard',
+                        'warehouse': 'warehouse_dashboard',
                     }
                 dashboard_url = dashboard_mapping.get(user.role)
                 if dashboard_url:
