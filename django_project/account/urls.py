@@ -54,8 +54,6 @@ urlpatterns = [
 
     # Warehouse routes
     path('warehouse_dashboard/', warehouse_views.warehouse_dashboard, name='warehouse_dashboard'),
-    path('assign_courier/<int:package_id>/', warehouse_views.assign_courier, name='assign_courier'),
-
 
     # Drop off and Pick up routes
     path('drop_pick_zone_dashboard/', drop_pick_zone_views.drop_pick_zone_dashboard, name='drop_pick_zone_dashboard'),

@@ -38,6 +38,7 @@ class Package(models.Model):
     STATUS_CHOICES = (
         ('upcoming', 'Upcoming'),
         ('dropped_off', 'Dropped Off'),
+        ('dispatched', 'Dispatched'),
         ('ongoing', 'Ongoing'),
         ('arrived', 'Arrived'),
         ('completed', 'Completed'),
