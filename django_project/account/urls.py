@@ -31,7 +31,7 @@ urlpatterns = [
     path('users/', admin_views.users, name='users'),
     path('riders/', admin_views.riders, name='riders'),
     path('admin_history/', admin_views.admin_history, name='admin_history'),
-    path('assign_courier/<int:package_id>/', admin_views.assign_courier, name='assign_courier'),
+    # path('assign_courier/<int:package_id>/', admin_views.assign_courier, name='assign_courier'),
     path('dropoffs/', admin_views.dropoffs, name='dropoffs'),
     path('admin_dispatch/', admin_views.dispatch, name='admin_dispatch'),
     path('create_warehouse/', admin_views.create_warehouse, name='create_warehouse'),
@@ -55,8 +55,6 @@ urlpatterns = [
 
     # Warehouse routes
     path('warehouse_dashboard/', warehouse_views.warehouse_dashboard, name='warehouse_dashboard'),
-
-
 
     # Drop off and Pick up routes
     path('drop_pick_zone_dashboard/', drop_pick_zone_views.drop_pick_zone_dashboard, name='drop_pick_zone_dashboard'),
