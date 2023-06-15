@@ -12,70 +12,56 @@
     </div>
 </div>
 
-<h2 class="my-5">Dropped Off Items</h2>
+<form action="" method="POST">
+  {% csrf_token %}
+  <h2 class="my-5">Dropped Off Items</h2>
 
-{% for dropoff_location, packages in packages_by_location.items %}
-<div class="container">
-    <h2>Drop Off Location: {{ dropoff_location}}</h2>
-    <div class="table-responsive">
-        <table class="table table-striped table-sm">
-            <thead>
-                <tr>
-                    <th scope="col">No.</th>
-                    <th scope="col">Package Title</th>
-                    <th scope="col">Recipient</th>
-                    <th scope="col">Address From</th>
-                    <th scope="col">Address To</th>
-                    <th scope="col">Package Number</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for package in packages %}
-                    <tr>
-                        <td>{{ forloop.counter }}</td>
-                        <td>{{ package.packageName }}</td>
-                        <td>{{ package.recipientName }}</td>
-                        <td>{{ package.sendersAddress }}</td>
-                        <td>{{ package.recipientAddress }}</td>
-                        <td>{{ package.package_number }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+  <div class="container">
+    <h2>Select a Courier</h2>
+    <select name="courier" class="form-control">
+      {% for courier in available_couriers %}
+        <option value="{{ courier.id }}">{{ courier.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  {% for dropoff_location, packages in packages_by_location.items %}
+    <div class="container">
+      <h2>Drop Off Location: {{ dropoff_location }}</h2>
+      <div class="table-responsive">
+          <table class="table table-striped table-sm">
+              <thead>
+                  <tr>
+                      <th scope="col">No.</th>
+                      <th scope="col">Package Title</th>
+                      <th scope="col">Recipient</th>
+                      <th scope="col">Address From</th>
+                      <th scope="col">Address To</th>
+                      <th scope="col">Package Number</th>
+                      <th scope="col">Select</th>
+                  </tr>
+              </thead>
+              <tbody>
+                  {% for package in packages %}
+                  <tr>
+                      <td>{{ forloop.counter }}</td>
+                      <td>{{ package.packageName }}</td>
+                      <td>{{ package.recipientName }}</td>
+                      <td>{{ package.sendersAddress }}</td>
+                      <td>{{ package.recipientAddress }}</td>
+                      <td>{{ package.package_number }}</td>
+                      <td>
+                          <input type="checkbox" name="selected_packages" value="{{ package.id }}">
+                      </td>
+                  </tr>
+                  {% endfor %}
+              </tbody>
+          </table>
+      </div>
     </div>
-</div>
-{% endfor %}
+  {% endfor %}
 
-<!-- <h1>Warehouse Dashboard</h1>
-
-{% for drop_pick_zone in drop_pick_zones %}
-    <h2>{{ drop_pick_zone.name }} Packages</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Package ID</th>
-                <th>Sender</th>
-                <th>Recipient</th>
-                <!-- Add other package fields as needed -->
-            </tr>
-        </thead>
-        <tbody>
-            {% for package in drop_pick_zone.packages.all %}
-                <tr>
-                    <td>{{ package.id }}</td>
-                    <td>{{ package.sender }}</td>
-                    <td>{{ package.recipient }}</td>
-                    <!-- Add other package fields as needed -->
-                </tr>
-            {% empty %}
-                <tr>
-                    <td colspan="3">No packages found.</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-{% empty %}
-    <p>No drop_pick_zones found.</p>
-{% endfor %} -->
+  <button type="submit" class="btn btn-primary">Assign Courier</button>
+</form>
 
 {% endblock %}
