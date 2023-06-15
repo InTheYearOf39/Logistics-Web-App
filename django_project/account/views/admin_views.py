@@ -83,30 +83,6 @@ def assign_courier(request, package_id):
     return render(request, 'admin/assign_courier.html', {'package_id': package_id, 'couriers': couriers})
 
 
-""" def assign_courier(request, package_id):
-    package = get_object_or_404(Package, id=package_id)
-    
-    if request.method == 'POST':
-        courier_id = request.POST.get('courier')
-        courier = get_object_or_404(User, id=courier_id, role='courier')
-        
-        previous_courier_status = courier.status  # Save the previous status
-        
-        package.courier = courier
-        package.status = 'ongoing'
-        package.save()
-        
-        # Update the courier status to "on-trip" only if they were not already on-trip
-        if previous_courier_status != 'on-trip':
-            courier.status = 'on-trip'
-            courier.save()
-        
-        return redirect('admin_dashboard')  
-    
-    couriers = User.objects.filter(role='courier', status='available')  # Filter couriers by status='available'
-    
-    return render(request, 'admin/assign_courier.html', {'package_id': package_id, 'couriers': couriers})
- """
 def riders(request):
     couriers = User.objects.filter(role='courier')  
     
@@ -153,14 +129,7 @@ def dropoffs(request):
 
 
 
-# def dropoffs(request):
-#     packages = Package.objects.filter(
-#         Q(status='dropped_off')
-#     )
-#     context = {
-#         'packages': packages
-#     }
-#     return render(request, 'admin/dropoffs.html', context)
+
 
 def dispatch(request):
     return render(request, 'admin/dispatch.html', {})
@@ -194,7 +163,10 @@ def create_drop_pick(request):
         if form.is_valid():
             drop_pick = form.save(commit=False)
             drop_pick.role = 'drop_pick_zone'
-
+            
+            # Set default password for the drop_pick_zone user
+            drop_pick.password = make_password('droppick@droppick')
+            
             # Retrieve the selected warehouse ID from the form
             warehouse_id = request.POST.get('warehouse')
             if warehouse_id:
@@ -205,6 +177,7 @@ def create_drop_pick(request):
             return redirect('drop_pick_zones')
     else:
         form = DropPickForm()
+    
     return render(request, 'admin/create_drop_pick.html', {'form': form, 'warehouses': warehouses})
 
 
