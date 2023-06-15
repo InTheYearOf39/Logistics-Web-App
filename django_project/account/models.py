@@ -17,7 +17,7 @@ class User(AbstractUser):
         ('available', 'Available'),
         ('on-trip', 'On Trip'),
     )
-    name = models.CharField(max_length=20, null=False)
+    name = models.CharField(max_length=40, null=False)
     tag = models.CharField(max_length=20, null=True)
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, verbose_name='role', null=False)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='available')
