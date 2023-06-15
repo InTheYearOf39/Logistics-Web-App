@@ -52,8 +52,9 @@ urlpatterns = [
     path('courier_history/', courier_views.courier_history, name='courier_history'),
 
 
-    # Drop off and Pick up routes
+    # Warehouse routes
     path('warehouse_dashboard/', warehouse_views.warehouse_dashboard, name='warehouse_dashboard'),
+    path('warehouse_dashboard/<int:warehouse_id>/', warehouse_views.warehouse_dashboard, name='warehouse_dashboard'),
 
 
     # Drop off and Pick up routes
