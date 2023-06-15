@@ -133,6 +133,35 @@
               Profile
             </a>
           </li>
+          {% if request.user.role == 'warehouse' %}
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'change_password' %}">
+              <span data-feather="users"></span>
+              Change Passowrd
+            </a>
+          </li>
+          {% elif request.user.role == 'drop_pick_zone' %}
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'change_password' %}">
+              <span data-feather="users"></span>
+              Change Passowrd
+            </a>
+          </li>
+          {% elif request.user.role == 'courier' %}
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'change_password' %}">
+              <span data-feather="users"></span>
+              Change Passowrd
+            </a>
+          </li>
+          {% elif request.user.role == 'sender' %}
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'change_password' %}">
+              <span data-feather="users"></span>
+              Change Passowrd
+            </a>
+          </li>
+          {% endif %}
 
         </ul>
 

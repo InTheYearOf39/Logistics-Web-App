@@ -134,6 +134,21 @@ def dropoffs(request):
 def dispatch(request):
     return render(request, 'admin/dispatch.html', {})
 
+# def create_warehouse(request):
+#     if request.method == 'POST':
+#         form = WarehouseForm(request.POST)
+#         if form.is_valid():
+#             user = form.save(commit=False)
+#             user.role = 'warehouse'
+#             # Set default password for the warehouse user
+#             user.password = make_password('warehouse@warehouse')
+#             form.save()
+#             # Optionally, redirect to a success page
+#             return redirect('warehouses')
+#     else:
+#         form = WarehouseForm()
+#     return render(request, 'admin/create_warehouse.html', {'form': form})
+
 def create_warehouse(request):
     if request.method == 'POST':
         form = WarehouseForm(request.POST)
@@ -141,7 +156,7 @@ def create_warehouse(request):
             user = form.save(commit=False)
             user.role = 'warehouse'
             # Set default password for the warehouse user
-            user.password = make_password('warehouse@warehouse')
+            user.set_password('warehouse@warehouse')
             form.save()
             # Optionally, redirect to a success page
             return redirect('warehouses')
@@ -156,6 +171,30 @@ def warehouses(request):
     }
     return render(request, 'admin/warehouses.html', context)
 
+# def create_drop_pick(request):
+#     warehouses = User.objects.filter(role='warehouse')
+#     if request.method == 'POST':
+#         form = DropPickForm(request.POST)
+#         if form.is_valid():
+#             drop_pick = form.save(commit=False)
+#             drop_pick.role = 'drop_pick_zone'
+            
+#             # Set default password for the drop_pick_zone user
+#             drop_pick.password = make_password('droppick@droppick')
+            
+#             # Retrieve the selected warehouse ID from the form
+#             warehouse_id = request.POST.get('warehouse')
+#             if warehouse_id:
+#                 warehouse = User.objects.get(id=warehouse_id)
+#                 drop_pick.warehouse = warehouse
+
+#             drop_pick.save()
+#             return redirect('drop_pick_zones')
+#     else:
+#         form = DropPickForm()
+    
+#     return render(request, 'admin/create_drop_pick.html', {'form': form, 'warehouses': warehouses})
+
 def create_drop_pick(request):
     warehouses = User.objects.filter(role='warehouse')
     if request.method == 'POST':
@@ -165,7 +204,7 @@ def create_drop_pick(request):
             drop_pick.role = 'drop_pick_zone'
             
             # Set default password for the drop_pick_zone user
-            drop_pick.password = make_password('droppick@droppick')
+            drop_pick.set_password('droppick@droppick')
             
             # Retrieve the selected warehouse ID from the form
             warehouse_id = request.POST.get('warehouse')

@@ -2,6 +2,9 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from .models import User
 from .models import Package
+from django.contrib.auth import password_validation
+from django.contrib.auth.forms import SetPasswordForm
+from django.utils.translation import gettext_lazy as _
 
 class LoginForm(forms.Form):
     username = forms.CharField(
@@ -136,3 +139,42 @@ class DropPickForm(forms.ModelForm):
             'tag': forms.TextInput(attrs={'class': 'form-control'}),
             'warehouse': forms.Select(attrs={'class': 'form-control selectpicker'}),
         }
+
+class ChangePasswordForm(SetPasswordForm):
+    error_messages = {
+        'password_mismatch': _("The two password fields didn't match."),
+        'password_entirely_numeric': _("Your password can't be entirely numeric."),
+        'password_too_short': _("This password is too short. It must contain at least %(min_length)d characters."),
+        'password_too_common': _("This password is too common."),
+        'password_similar_to_username': _("The password is too similar to the username."),
+    }
+
+    old_password = forms.CharField(
+        label=_("Old Password"),
+        strip=False,
+        widget=forms.PasswordInput(attrs={'autocomplete': 'current-password', 'class': 'form-control'}),
+    )
+    new_password1 = forms.CharField(
+        label=_("New Password"),
+        strip=False,
+        widget=forms.PasswordInput(attrs={'autocomplete': 'new-password', 'class': 'form-control'}),
+        help_text=password_validation.password_validators_help_text_html(),
+    )
+    new_password2 = forms.CharField(
+        label=_("Confirm New Password"),
+        strip=False,
+        widget=forms.PasswordInput(attrs={'autocomplete': 'new-password', 'class': 'form-control'}),
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['new_password1'].validators.append(self.validate_password)
+
+    def clean_old_password(self):
+        old_password = self.cleaned_data.get('old_password')
+        if not self.user.check_password(old_password):
+            raise forms.ValidationError(_("The old password is incorrect."))
+        return old_password
+
+    def validate_password(self, password):
+        password_validation.validate_password(password, self.user)

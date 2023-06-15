@@ -1,7 +1,9 @@
 from django.shortcuts import render, redirect, redirect
 from django.contrib.auth import authenticate, login, logout
 from account.forms import SignUpForm, LoginForm
-from django.shortcuts import redirect
+from django.contrib import messages
+from account.forms import ChangePasswordForm
+from django.contrib.auth import update_session_auth_hash
 
 
 
@@ -62,3 +64,35 @@ def login_view(request):
 def logout_user(request):
     logout(request)
     return redirect('index.html/')
+
+
+def change_password(request):
+    # Mapping of user roles to dashboard URLs
+    dashboard_urls = {
+        'warehouse': 'warehouse_dashboard',
+        'admin': 'admin_dashboard',
+        'courier': 'courier_dashboard',
+        'sender': 'sender_dashboard',
+        'drop_pick_zone': 'drop_pick_zone_dashboard',
+    }
+    
+    if request.method == 'POST':
+        form = ChangePasswordForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)  # Important to update the session
+            messages.success(request, 'Your password has been successfully changed.')
+            
+            # Redirect to the user type dashboard based on the user's role
+            user_role = user.role
+            if user_role in dashboard_urls:
+                dashboard_url = dashboard_urls[user_role]
+                return redirect(dashboard_url)
+            else:
+                # Handle the case when the user's role is not in the mapping object
+                return redirect('home')
+        else:
+            messages.error(request, 'Please correct the error below.')
+    else:
+        form = ChangePasswordForm(request.user)
+    return render(request, 'change_password.html', {'form': form})

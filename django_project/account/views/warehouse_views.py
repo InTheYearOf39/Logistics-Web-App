@@ -2,10 +2,12 @@ from django.shortcuts import render, redirect
 from account.utils import get_time_of_day
 from django.contrib.auth.decorators import login_required
 from account.models import Package, User
-
+from django.contrib import messages
+from django.shortcuts import render, redirect
+from account.forms import ChangePasswordForm
+from django.contrib.auth import update_session_auth_hash
 
 @login_required
-
 def warehouse_dashboard(request):
     greeting_message = get_time_of_day()
     # Retrieve the current warehouse user
@@ -31,4 +33,31 @@ def warehouse_dashboard(request):
     }
     return render(request, 'warehouse/warehouse_dashboard.html', context)
 
+@login_required
+# def change_password(request):
+#     if request.method == 'POST':
+#         form = ChangePasswordForm(request.user, request.POST)
+#         if form.is_valid():
+#             user = form.save()
+#             update_session_auth_hash(request, user)  # Important to update the session
+#             messages.success(request, 'Your password has been successfully changed.')
+#             return redirect('warehouse_dashboard')
+#         else:
+#             messages.error(request, 'Please correct the error below.')
+#     else:
+#         form = ChangePasswordForm(request.user)
+#     return render(request, 'warehouse/change_password.html', {'form': form})
 
+def change_password(request):
+    if request.method == 'POST':
+        form = ChangePasswordForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)  # Important to update the session
+            messages.success(request, 'Your password has been successfully changed.')
+            return redirect('warehouse_dashboard')
+        else:
+            messages.error(request, 'Please correct the error below.')
+    else:
+        form = ChangePasswordForm(request.user)
+    return render(request, 'warehouse/change_password.html', {'form': form})

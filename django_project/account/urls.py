@@ -23,6 +23,7 @@ urlpatterns = [
     path('login/', authentication_views.login_view, name='login_view'),
     path('register/', authentication_views.register, name='register'),
     path('logout/', auth_views.LogoutView.as_view(template_name='index.html'), name='logout_user'),
+    path('change_password/', authentication_views.change_password, name='change_password'),
 
 
     # admin routes
@@ -54,7 +55,7 @@ urlpatterns = [
 
     # Warehouse routes
     path('warehouse_dashboard/', warehouse_views.warehouse_dashboard, name='warehouse_dashboard'),
-    path('warehouse_dashboard/<int:warehouse_id>/', warehouse_views.warehouse_dashboard, name='warehouse_dashboard'),
+
 
 
     # Drop off and Pick up routes
