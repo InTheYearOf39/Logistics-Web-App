@@ -36,17 +36,20 @@ class User(AbstractUser):
 
 class Package(models.Model):
     STATUS_CHOICES = (
-        ('upcoming', 'Upcoming'),
-        ('dropped_off', 'Dropped Off'),
-        ('dispatched', 'Dispatched'),
-        ('ongoing', 'Ongoing'),
-        ('arrived', 'Arrived'),
-        ('completed', 'Completed'),
+        ('upcoming', 'upcoming'),
+        ('dropped_off', 'dropped Off'),
+        ('dispatched', 'dispatched'),
+        ('en_route', 'en_route'),
+        ('warehouse_arrival', 'warehouse_arrival'),
+        ('ready_for_pickup', 'ready_for_pickup'),
+        ('ongoing', 'ongoing'),
+        ('arrived', 'arrived'),
+        ('completed', 'completed'),
     )
     DELIVERY_CHOICES = (
-        ('standard', 'Standard'),
-        ('premium', 'Premium'),
-        ('express', 'Express'),
+        ('standard', 'standard'),
+        ('premium', 'premium'),
+        ('express', 'express'),
     )
 
     PACKAGE_PREFIX = 'pn'
