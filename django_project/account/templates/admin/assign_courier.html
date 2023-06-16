@@ -3,7 +3,7 @@
 {% block content %}
 <div class="container mt-5">
   <h1 class="mb-4">Assign Courier</h1>
-  <form method="post" action="{% url 'assign_courier' package_id=package_id %}">
+  <form method="post" action="{% url 'admin_assign_courier' package_id=package_id %}">
     {% csrf_token %}
     
     <div class="form-group">
