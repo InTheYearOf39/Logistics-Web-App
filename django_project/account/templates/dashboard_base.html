@@ -111,6 +111,7 @@
             </a>
           </li>
 
+
           <li class="nav-item">
             <a class="nav-link" aria-current="page" href="{% url 'assign_courier' %}">
               <span data-feather="home"></span>
@@ -118,6 +119,15 @@
             </a>
           </li>
 
+          {% endif %}
+
+          {% if request.user.role == 'warehouse' %}
+          <li class="nav-item">
+            <a class="nav-link" aria-current="page" href="{% url 'ready_packages' %}">
+              <span data-feather="home"></span>
+                Pending
+            </a>
+          </li>
           {% endif %}
 
 

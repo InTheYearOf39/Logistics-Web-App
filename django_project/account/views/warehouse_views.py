@@ -82,5 +82,21 @@ def change_password(request):
         form = ChangePasswordForm(request.user)
     return render(request, 'warehouse/change_password.html', {'form': form})
 
-    return render(request, 'warehouse/warehouse_dashboard.html', context)
 
+def confirm_arrival(request, package_id):
+    if request.method == 'POST':
+        package = Package.objects.get(pk=package_id)
+        package.status = 'ready_for_pickup'
+        package.save()
+        messages.success(request, "Package arrival confirmed successfully.")
+    else:
+        messages.error(request, "Invalid request.")
+
+    return redirect('warehouse_dashboard')  # Replace with the appropriate URL for the warehouse dashboard
+
+def ready_packages(request):
+    ready_packages = Package.objects.filter(status__in=['warehouse_arrival', 'ready_for_pickup'])
+    context = {
+        'ready_packages': ready_packages,
+    }
+    return render(request, 'warehouse/ready_packages.html', context)
