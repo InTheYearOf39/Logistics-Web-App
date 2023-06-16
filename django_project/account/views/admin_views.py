@@ -64,23 +64,27 @@ def assign_courier(request, package_id):
         package.courier = courier
 
         # Update the package status based on the delivery type
-        if package.deliveryType == 'standard' and package.status == 'dropped_off':
+        if (package.deliveryType == 'premium' and package.status == 'upcoming') or (package.deliveryType == 'express' and package.status == 'upcoming'):
             package.status = 'ongoing'
-        elif package.deliveryType == 'premium' and package.status == 'upcoming':
-            package.status = 'ongoing'
+        # elif package.deliveryType == 'premium' and package.status == 'upcoming':
+        #     package.status = 'ongoing'
 
         package.save()
 
         # Update the courier status to "on-trip" only if they were not already on-trip
-        if previous_courier_status != 'on-trip':
+        if previous_courier_status != 'on-trip' and package.status == 'ongoing':
             courier.status = 'on-trip'
             courier.save()
 
         return redirect('admin_dashboard')
 
     couriers = User.objects.filter(role='courier', status='available')  # Filter couriers by status='available'
-
-    return render(request, 'admin/assign_courier.html', {'package_id': package_id, 'couriers': couriers})
+    context = {
+        'package_id': package_id,
+        'couriers': couriers
+        }
+    
+    return render(request, 'admin/assign_courier.html', context)
 
 
 def riders(request):

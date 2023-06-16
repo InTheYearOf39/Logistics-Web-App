@@ -10,7 +10,7 @@ from django.conf import settings
 
 
 def courier_dashboard(request):
-    assigned_packages = Package.objects.filter(courier=request.user, status__in=['ongoing', 'arrived','completed'])
+    assigned_packages = Package.objects.filter(courier=request.user, status__in=['dispatched', 'ongoing', 'arrived','completed'])
     greeting_message = get_time_of_day()
     context = {
         'greeting_message': greeting_message,
