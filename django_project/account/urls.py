@@ -23,6 +23,7 @@ urlpatterns = [
     path('login/', authentication_views.login_view, name='login_view'),
     path('register/', authentication_views.register, name='register'),
     path('logout/', auth_views.LogoutView.as_view(template_name='index.html'), name='logout_user'),
+    path('change_password/', authentication_views.change_password, name='change_password'),
 
 
     # admin routes
@@ -30,7 +31,7 @@ urlpatterns = [
     path('users/', admin_views.users, name='users'),
     path('riders/', admin_views.riders, name='riders'),
     path('admin_history/', admin_views.admin_history, name='admin_history'),
-    # path('assign_courier/<int:package_id>/', admin_views.assign_courier, name='assign_courier'),
+    path('admin_dashboard/assign_courier/<int:package_id>/', admin_views.assign_courier, name='admin_assign_courier'),
     path('dropoffs/', admin_views.dropoffs, name='dropoffs'),
     path('admin_dispatch/', admin_views.dispatch, name='admin_dispatch'),
     path('create_warehouse/', admin_views.create_warehouse, name='create_warehouse'),
@@ -54,9 +55,14 @@ urlpatterns = [
 
     # Warehouse routes
     path('warehouse_dashboard/', warehouse_views.warehouse_dashboard, name='warehouse_dashboard'),
+    path('confirm_arrival/<int:package_id>/', warehouse_views.confirm_arrival, name='confirm_arrival'),
+    path('ready_packages/', warehouse_views.ready_packages, name='ready_packages'),
 
     # Drop off and Pick up routes
     path('drop_pick_zone_dashboard/', drop_pick_zone_views.drop_pick_zone_dashboard, name='drop_pick_zone_dashboard'),
     path('confirm-drop-off/<int:package_id>/', drop_pick_zone_views.confirm_drop_off, name='confirm_drop_off'),
     path('drop_pick_zone_dispatch/', drop_pick_zone_views.dispatch, name='dpz_dispatch'),
+    path('dispatched_packages/', drop_pick_zone_views.dispatched_packages, name='dispatched_packages'),
+    path('confirm_pickup/<int:package_id>/', drop_pick_zone_views.confirm_pickup, name='confirm_pickup'),
+
 ]

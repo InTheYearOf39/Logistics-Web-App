@@ -2,8 +2,13 @@ from account.utils import get_time_of_day
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, redirect, get_object_or_404
 from account.models import Package, User
+from django.contrib import messages
+from django.shortcuts import render, redirect
+from account.forms import ChangePasswordForm
+from django.contrib.auth import update_session_auth_hash
 from django.shortcuts import redirect, get_object_or_404
 from django.contrib import messages
+
 
 @login_required
 def warehouse_dashboard(request):
@@ -45,4 +50,53 @@ def warehouse_dashboard(request):
         'greeting_message': greeting_message,
         'available_couriers': User.objects.filter(role='courier')
     }
+
     return render(request, 'warehouse/warehouse_dashboard.html', context)
+
+@login_required
+# def change_password(request):
+#     if request.method == 'POST':
+#         form = ChangePasswordForm(request.user, request.POST)
+#         if form.is_valid():
+#             user = form.save()
+#             update_session_auth_hash(request, user)  # Important to update the session
+#             messages.success(request, 'Your password has been successfully changed.')
+#             return redirect('warehouse_dashboard')
+#         else:
+#             messages.error(request, 'Please correct the error below.')
+#     else:
+#         form = ChangePasswordForm(request.user)
+#     return render(request, 'warehouse/change_password.html', {'form': form})
+
+def change_password(request):
+    if request.method == 'POST':
+        form = ChangePasswordForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)  # Important to update the session
+            messages.success(request, 'Your password has been successfully changed.')
+            return redirect('warehouse_dashboard')
+        else:
+            messages.error(request, 'Please correct the error below.')
+    else:
+        form = ChangePasswordForm(request.user)
+    return render(request, 'warehouse/change_password.html', {'form': form})
+
+
+def confirm_arrival(request, package_id):
+    if request.method == 'POST':
+        package = Package.objects.get(pk=package_id)
+        package.status = 'ready_for_pickup'
+        package.save()
+        messages.success(request, "Package arrival confirmed successfully.")
+    else:
+        messages.error(request, "Invalid request.")
+
+    return redirect('warehouse_dashboard')  # Replace with the appropriate URL for the warehouse dashboard
+
+def ready_packages(request):
+    ready_packages = Package.objects.filter(status__in=['warehouse_arrival', 'ready_for_pickup'])
+    context = {
+        'ready_packages': ready_packages,
+    }
+    return render(request, 'warehouse/ready_packages.html', context)

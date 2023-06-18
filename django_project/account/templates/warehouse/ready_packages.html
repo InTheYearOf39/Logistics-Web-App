@@ -1,0 +1,53 @@
+{% extends 'dashboard_base.html' %}
+{% load static %}
+
+{% block content %}
+
+
+<h2>Ready Packages</h2>
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">No.</th>
+                <th scope="col">Package Title</th>
+                <th scope="col">Package Description</th>
+                <th scope="col">Recipient</th>
+                <th scope="col">Address From</th>
+                <th scope="col">Address To</th>
+                <th scope="col">Package Number</th>
+                <th scope="col">Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for package in ready_packages %}
+            {% if package.status in 'warehouse_arrival, ready_for_pickup' %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ package.packageName }}</td>
+                <td>{{ package.packageDescription }}</td>
+                <td>{{ package.recipientName }}</td>
+                <td>{{ package.sendersAddress }}</td>
+                <td>{{ package.recipientAddress }}</td>
+                <td>{{ package.package_number }}</td>
+                <!-- <td>{{ package.status }}</td> -->
+                <td>
+                    {% if package.status == 'warehouse_arrival' %}
+                    <form action="{% url 'confirm_arrival' package_id=package.id %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-success">Confirm</button>
+                    </form>
+                    {% elif package.status == 'ready_for_pickup' %}
+                    <form method="post">
+                        {% csrf_token %}
+                        <img src="{% static 'img/box.png' %}" alt="" width="25px" height="25px">
+                    </form>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
