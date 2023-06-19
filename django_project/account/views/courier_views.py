@@ -10,7 +10,7 @@ from django.conf import settings
 
 
 def courier_dashboard(request):
-    assigned_packages = Package.objects.filter(courier=request.user, status__in=['dispatched', 'ongoing', 'arrived','completed', 'en_route', 'warehouse_arrival', 'in_transit'])
+    assigned_packages = Package.objects.filter(courier=request.user, status__in=['dispatched', 'ongoing', 'arrived','completed', 'en_route', 'warehouse_arrival', 'in_transit', 'at_pickup'])
     greeting_message = get_time_of_day()
     context = {
         'greeting_message': greeting_message,
@@ -44,7 +44,7 @@ def notify_arrival(request, package_id):
 def notify_pick_up(request, package_id):
     if request.method == 'POST':
         package = Package.objects.get(pk=package_id)
-        package.status = 'at_pick_up'
+        package.status = 'at_pickup'
         package.save()
 
         # Send email to sender

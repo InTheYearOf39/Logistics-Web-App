@@ -67,5 +67,6 @@ urlpatterns = [
     path('drop_pick_zone_dispatch/', drop_pick_zone_views.dispatch, name='dpz_dispatch'),
     path('dispatched_packages/', drop_pick_zone_views.dispatched_packages, name='dispatched_packages'),
     path('confirm_pickup/<int:package_id>/', drop_pick_zone_views.confirm_pickup, name='confirm_pickup'),
+    path('confirm_at_pickup/<int:package_id>/', drop_pick_zone_views.confirm_at_pickup, name='confirm_at_pickup'),
 
 ]

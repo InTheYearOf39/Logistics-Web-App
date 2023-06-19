@@ -5,13 +5,15 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, get_object_or_404
 from django.core.mail import send_mail
 from django.contrib.auth import get_user_model
+from django.contrib import messages
+
 
 User = get_user_model()
 
 @login_required
 def drop_pick_zone_dashboard(request):
     drop_pick_zone = request.user
-    packages = Package.objects.filter(dropOffLocation=drop_pick_zone, status__in=['upcoming'])
+    packages = Package.objects.filter(dropOffLocation=drop_pick_zone, status__in=['upcoming', 'in_transit', 'at_pickup', 'pending_delivery'])
     greeting_message = get_time_of_day()
     context = {
         'greeting_message': greeting_message,
@@ -39,6 +41,23 @@ def confirm_drop_off(request, package_id):
         return redirect('dpz_dispatch')
 
     return render(request, 'drop_pick_zone/drop_pick_dashboard.html', {'package': package})
+
+def confirm_at_pickup(request, package_id):
+    if request.method == 'POST':
+        package = Package.objects.get(pk=package_id)
+        package.status = 'pending_delivery'
+        package.save()
+    
+        sender_email = package.recipientEmail
+        sender_message = f"Your package with ID {package.package_number} has arrived at the warehouse."
+        send_mail('Package Arrival Notification', sender_message, 'garynkuraiji@gmail.com', [sender_email])
+
+        messages.success(request, "Package arrival notified successfully.")
+    else:
+        messages.error(request, "Invalid request.")
+
+    return redirect('drop_pick_zone_dashboard')  # Replace with the appropriate URL for the warehouse dashboard
+
 
 def dispatch(request):
     drop_pick_zone = request.user

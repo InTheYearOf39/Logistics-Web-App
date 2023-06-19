@@ -44,6 +44,8 @@ class Package(models.Model):
         ('in_house', 'in house'),
         ('ready_for_pickup', 'ready_for_pickup'),
         ('in_transit', 'in transit'),
+        ('at_pickup', 'at pickup'),
+        ('pending_delivery', 'pending delivery'),
         ('ongoing', 'ongoing'),
         ('arrived', 'arrived'),
         ('completed', 'completed'),

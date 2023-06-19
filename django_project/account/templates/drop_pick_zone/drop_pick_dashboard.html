@@ -44,6 +44,15 @@
                             </form>
                             {% elif package.status == 'dropped_off' %}
                                 <button type="button" class="btn btn-sm btn-info text-white">Dropped Off</button>
+                            {% elif package.status == 'in_transit' %}
+                                <img src="{% static 'img/transit.png'%}" alt="" width="25px" height="25px">
+                            {% elif package.status == 'at_pickup'%}
+                            <form action="{% url 'confirm_at_pickup' package_id=package.id %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-primary">Confirm</button>
+                            </form>
+                            {% elif package.status == 'pending_delivery' %}
+                            <img src="{%static 'img/pickup.png'%}" alt="" width="25px" height="25px">
                             {% else %}
                             {% endif %}
                     </td>
