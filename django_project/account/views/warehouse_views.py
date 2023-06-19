@@ -86,7 +86,7 @@ def change_password(request):
 def confirm_arrival(request, package_id):
     if request.method == 'POST':
         package = Package.objects.get(pk=package_id)
-        package.status = 'ready_for_pickup'
+        package.status = 'in_house'
         package.save()
         messages.success(request, "Package arrival confirmed successfully.")
     else:
@@ -95,8 +95,59 @@ def confirm_arrival(request, package_id):
     return redirect('warehouse_dashboard')  # Replace with the appropriate URL for the warehouse dashboard
 
 def ready_packages(request):
-    ready_packages = Package.objects.filter(status__in=['warehouse_arrival', 'ready_for_pickup'])
+    ready_packages = Package.objects.filter(status__in=['warehouse_arrival', 'ready_for_pickup', 'in_house'])
+    if request.method == 'POST':
+        selected_packages = request.POST.getlist('selected_packages')
+        courier_id = request.POST.get('courier')
+
+        if selected_packages and courier_id:
+            courier = get_object_or_404(User, id=courier_id, role='courier')
+
+            # Update the packages with the assigned courier and change their status
+            packages = Package.objects.filter(id__in=selected_packages)
+            packages.update(courier=courier, status='ready_for_pickup')
+
+            messages.success(request, 'Packages successfully assigned to courier.')
+
+            return redirect('ready_packages')
+
+
     context = {
         'ready_packages': ready_packages,
+        'available_couriers': User.objects.filter(role='courier')
     }
     return render(request, 'warehouse/ready_packages.html', context)
+
+def reassign_courier(request, package_id):
+    package = get_object_or_404(Package, id=package_id)
+
+    if request.method == 'POST':
+        courier_id = request.POST.get('courier')
+        new_courier = get_object_or_404(User, id=courier_id, role='courier')
+
+        if package.courier:          
+            package.courier = new_courier
+            print(new_courier)
+            package.status = 'ready_for_pickup'
+            print(package.status)
+            package.save()
+
+        else:
+            package.courier = new_courier
+            print(new_courier)
+            package.status = 'ready_for_pickup'
+            print(package.status)
+            package.save()
+            
+        new_courier.status = 'on-trip'
+        new_courier.save()
+        
+        return redirect('ready_packages')
+
+    couriers = User.objects.filter(role='courier', status='available')
+    context = {
+        'package_id': package_id,
+        'couriers': couriers
+    }
+
+    return render(request, 'warehouse/reassign_courier.html', context)
