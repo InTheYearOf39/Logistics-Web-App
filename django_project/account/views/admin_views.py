@@ -11,7 +11,7 @@ from django.contrib.auth.hashers import make_password
 
 def admin(request):
     packages = Package.objects.filter(
-        Q(status='ongoing') | Q(status='dropped_off') | Q(status='dropped_off') | Q(status='upcoming') 
+        Q(status='ongoing') | Q(status='dropped_off') | Q(status='ready_for_pickup') | Q(status='upcoming') 
     ).order_by(
         Case(
             When(status='upcoming', then=0),
