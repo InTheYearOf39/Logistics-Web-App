@@ -45,6 +45,8 @@
         </tbody>
     </table>
 </div>
+<form method="post">
+    {% csrf_token %}
 <h2>In House</h2>
 <div class="table-responsive">
     <table class="table table-striped">
@@ -58,6 +60,7 @@
                 <th scope="col">Address To</th>
                 <th scope="col">Package Number</th>
                 <th scope="col">Status</th>
+                <th scope="col">Select</th>
             </tr>
         </thead>
         <tbody>
@@ -81,12 +84,7 @@
                     {% endif %}
                 </td>
                 <td>
-                    {% if package.status == 'in_house' %}
-                    <form action="{% url 'reassign_courier' package_id=package.id %}" method="post">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-sm btn-primary">Assign</button>
-                    </form>
-                    {% endif %}
+                    <input type="checkbox" name="selected_packages" value="{{ package.id }}">
                 </td>
             </tr>
             {% endif %}
@@ -94,6 +92,16 @@
         </tbody>
     </table>
 </div>
+<div class="container">
+    <h2>Select a Courier</h2>
+    <select name="courier" class="form-control">
+      {% for courier in available_couriers %}
+        <option value="{{ courier.id }}">{{ courier.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <button type="submit" class="btn btn-primary">Assign Courier</button>
+</form>
 <h2>Ready For Pick-Up</h2>
 <div class="table-responsive">
     <table class="table table-striped">
