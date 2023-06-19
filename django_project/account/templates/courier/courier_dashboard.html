@@ -29,7 +29,7 @@
             </thead>
             <tbody>
                 {% for package in assigned_packages %}
-                {% if package.status in 'dispatched, upcoming, ongoing, arrived, en_route, warehouse_arrival' %}
+                {% if package.status in 'dispatched, upcoming, ongoing, arrived, en_route, warehouse_arrival, in_transit' %}
                 <tr>
                     <th scope="row">{{ forloop.counter }}</th>
                     <td>{{ package.packageName }}</td>
@@ -48,8 +48,18 @@
                             {% csrf_token%}
                             <img src="{% static 'img/loading.png' %}" alt="" width="25px" height="25px">
                         </form>
-                        {% else %}
-                        {{ package.status }}
+                        {% elif package.status == 'in_transit' %}
+                            {% csrf_token %}
+                        <img src="{% static 'img/transit.png' %}" alt="" width="25px" height="25px">
+                        <!-- {{ package.status }} -->
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if package.status == 'in_transit'%}
+                        <form action="{% url 'notify_pick_up' package_id=package.id %}" method="post">
+                            {%csrf_token%}
+                            <button type="submit" class="btn btn-sm btn-primary">Notify Pick-Up</button>
+                        </form>
                         {% endif %}
                     </td>
                 </tr>

@@ -10,7 +10,7 @@ from django.conf import settings
 
 
 def courier_dashboard(request):
-    assigned_packages = Package.objects.filter(courier=request.user, status__in=['dispatched', 'ongoing', 'arrived','completed', 'en_route', 'warehouse_arrival'])
+    assigned_packages = Package.objects.filter(courier=request.user, status__in=['dispatched', 'ongoing', 'arrived','completed', 'en_route', 'warehouse_arrival', 'in_transit'])
     greeting_message = get_time_of_day()
     context = {
         'greeting_message': greeting_message,
@@ -40,6 +40,29 @@ def notify_arrival(request, package_id):
         messages.error(request, "Invalid request.")
 
     return redirect('courier_dashboard')  # Replace with the appropriate URL
+
+def notify_pick_up(request, package_id):
+    if request.method == 'POST':
+        package = Package.objects.get(pk=package_id)
+        package.status = 'at_pick_up'
+        package.save()
+
+        # Send email to sender
+        sender_email = package.recipientEmail
+        sender_message = f"Your package with ID {package.package_number} has arrived at the warehouse."
+        send_mail('Package Arrival Notification', sender_message, 'garynkuraiji@gmail.com', [sender_email])
+
+        # Send email to warehouse
+        warehouse_email = 'warehouse@example.com'  # Replace with actual warehouse email
+        warehouse_message = f"A package with ID {package.package_number} has arrived at the warehouse."
+        send_mail('Package Arrival Notification', warehouse_message, 'sender@example.com', [warehouse_email])
+
+        messages.success(request, "Package arrival notified successfully.")
+    else:
+        messages.error(request, "Invalid request.")
+
+    return redirect('courier_dashboard')  # Replace with the appropriate URL
+
 
 
 """ def notify_arrival(request, package_id):

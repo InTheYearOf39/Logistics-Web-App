@@ -8,6 +8,8 @@ from account.forms import ChangePasswordForm
 from django.contrib.auth import update_session_auth_hash
 from django.shortcuts import redirect, get_object_or_404
 from django.contrib import messages
+from django.core.mail import send_mail
+
 
 
 @login_required
@@ -88,7 +90,17 @@ def confirm_arrival(request, package_id):
         package = Package.objects.get(pk=package_id)
         package.status = 'in_house'
         package.save()
-        messages.success(request, "Package arrival confirmed successfully.")
+    
+        sender_email = package.recipientEmail
+        sender_message = f"Your package with ID {package.package_number} has arrived at the warehouse."
+        send_mail('Package Arrival Notification', sender_message, 'garynkuraiji@gmail.com', [sender_email])
+
+        # Send email to warehouse
+        warehouse_email = 'warehouse@example.com'  # Replace with actual warehouse email
+        warehouse_message = f"A package with ID {package.package_number} has arrived at the warehouse."
+        send_mail('Package Arrival Notification', warehouse_message, 'sender@example.com', [warehouse_email])
+
+        messages.success(request, "Package arrival notified successfully.")
     else:
         messages.error(request, "Invalid request.")
 
@@ -99,9 +111,11 @@ def ready_packages(request):
     if request.method == 'POST':
         selected_packages = request.POST.getlist('selected_packages')
         courier_id = request.POST.get('courier')
+        drop_pick_zone_id = request.POST.get('drop_pick_zone')
 
-        if selected_packages and courier_id:
+        if selected_packages and courier_id and drop_pick_zone_id:
             courier = get_object_or_404(User, id=courier_id, role='courier')
+            drop_pick_zone = get_object_or_404(User, id=drop_pick_zone_id, role='drop_pick_zone')
 
             # Update the packages with the assigned courier and change their status
             packages = Package.objects.filter(id__in=selected_packages)
@@ -113,7 +127,8 @@ def ready_packages(request):
         
     context = {
         'ready_packages': ready_packages,
-        'available_couriers': User.objects.filter(role='courier')
+        'available_couriers': User.objects.filter(role='courier'),
+        'available_drop_pick_zones': User.objects.filter(role='drop_pick_zone')
     }
     return render(request, 'warehouse/ready_packages.html', context)
 
@@ -184,3 +199,11 @@ def ready_packages(request):
 #         }
     
 #     return render(request, 'admin/assign_courier.html', context)
+
+def to_pickup(request, package_id):
+    if request.method == 'POST':
+        package = Package.objects.get(pk=package_id)
+        package.status = 'in_transit'
+        package.save()
+
+    return redirect('ready_packages')  # Replace with the appropriate URL for the warehouse dashboard
