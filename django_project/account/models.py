@@ -41,6 +41,7 @@ class Package(models.Model):
         ('dispatched', 'dispatched'),
         ('en_route', 'en_route'),
         ('warehouse_arrival', 'warehouse_arrival'),
+        ('in_house', 'in house'),
         ('ready_for_pickup', 'ready_for_pickup'),
         ('ongoing', 'ongoing'),
         ('arrived', 'arrived'),
