@@ -13,7 +13,7 @@ User = get_user_model()
 @login_required
 def drop_pick_zone_dashboard(request):
     drop_pick_zone = request.user
-    packages = Package.objects.filter(dropOffLocation=drop_pick_zone, status__in=['upcoming', 'in_transit', 'at_pickup', 'pending_delivery'])
+    packages = Package.objects.filter(dropOffLocation=drop_pick_zone, status__in=['upcoming', 'in_transit', 'at_pickup', 'pending_delivery', 'out_for_delivery'])
     greeting_message = get_time_of_day()
     context = {
         'greeting_message': greeting_message,
@@ -96,3 +96,46 @@ def confirm_pickup(request, package_id):
         return redirect('dispatched_packages')
 
     return render(request, 'drop_pick_zone/drop_pick_dashboard.html', {'package': package})
+
+def delivery_courier(request, package_id):
+    package = get_object_or_404(Package, id=package_id)
+
+    if request.method == 'POST':
+        courier_id = request.POST.get('courier')
+        courier = get_object_or_404(User, id=courier_id, role='courier')
+
+        previous_courier_status = courier.status  # Save the previous status
+
+        package.courier = courier
+
+        # Update the package status based on the delivery type
+        if (package.status == 'pending_delivery'):
+            package.status = 'out_for_delivery'
+        # elif package.deliveryType == 'premium' and package.status == 'upcoming':
+        #     package.status = 'ongoing'
+
+        package.save()
+
+        # Update the courier status to "on-trip" only if they were not already on-trip
+        if previous_courier_status != 'on-trip' and package.status == 'out_for_delivery':
+            courier.status = 'on-trip'
+            courier.save()
+
+        return redirect('admin_dashboard')
+
+    couriers = User.objects.filter(role='courier', status='available')  # Filter couriers by status='available'
+    context = {
+        'package_id': package_id,
+        'couriers': couriers
+        }
+    
+    return render(request, 'drop_pick_zone/assign_courier.html', context)
+
+
+def confirm_delivery (request, package_id):
+    if request.method == 'POST':
+        package = Package.objects.get(pk=package_id)
+        package.status = 'ongoing'
+        package.save()
+    
+    return redirect('drop_pick_dashboard')  # Replace with the appropriate URL for the warehouse dashboard

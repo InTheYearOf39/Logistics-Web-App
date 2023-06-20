@@ -64,6 +64,14 @@
                         <img src="{% static 'img/loading.png' %}" alt="" width="25px" height="25px">
                         {% endif %}
                     </td>
+                    <td>
+                        {% if package.status == 'ongoing'%}
+                        <form action="{% url 'notify_recipient' package_id=package.id %}" method="post">
+                            {% csrf_token%}
+                            <button class="btn btn-sm btn-info">Notify Arrival</button>
+                        </form>
+                        {% endif %}
+                    </td>
                 </tr>
                 {% endif %}
                 {% endfor %}

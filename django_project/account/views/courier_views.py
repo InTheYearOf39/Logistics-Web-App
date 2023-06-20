@@ -65,7 +65,7 @@ def notify_pick_up(request, package_id):
 
 
 
-""" def notify_arrival(request, package_id):
+def notify_recipient(request, package_id):
     # Retrieve the package object
     package = Package.objects.get(pk=package_id)
 
@@ -94,7 +94,7 @@ def notify_pick_up(request, package_id):
         messages.error(request, "Failed to send email notification. Please try again later.")
 
     return redirect('courier_dashboard')  # Replace with the appropriate URL
- """
+
 def confirm_delivery(request, package_id):
     if request.method == 'POST':
         package = Package.objects.get(pk=package_id)

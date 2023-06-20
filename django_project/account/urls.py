@@ -48,7 +48,7 @@ urlpatterns = [
 
     # courier routes
     path('courier_dashboard/', courier_views.courier_dashboard, name='courier_dashboard'),
-    path('notify_arrival/<int:package_id>/', courier_views.notify_arrival, name='notify_arrival'),
+    path('notify_recipient/<int:package_id>/', courier_views.notify_recipient, name='notify_recipient'),
     path('confirm_delivery/<int:package_id>/', courier_views.confirm_delivery, name='confirm_delivery'),
     path('courier_history/', courier_views.courier_history, name='courier_history'),
     path('notify_pick_up/<int:package_id>/', courier_views.notify_pick_up, name='notify_pick_up'),
@@ -68,5 +68,6 @@ urlpatterns = [
     path('dispatched_packages/', drop_pick_zone_views.dispatched_packages, name='dispatched_packages'),
     path('confirm_pickup/<int:package_id>/', drop_pick_zone_views.confirm_pickup, name='confirm_pickup'),
     path('confirm_at_pickup/<int:package_id>/', drop_pick_zone_views.confirm_at_pickup, name='confirm_at_pickup'),
-
+    path('delivery_courier/<int:package_id>/', drop_pick_zone_views.delivery_courier, name='delivery_courier'),
+    path('confirm_delivery/<int:package_id>/', drop_pick_zone_views.confirm_delivery, name='confirm_delivery'),
 ]

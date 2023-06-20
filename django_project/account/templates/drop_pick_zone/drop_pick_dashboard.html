@@ -53,9 +53,25 @@
                             </form>
                             {% elif package.status == 'pending_delivery' %}
                             <img src="{%static 'img/pickup.png'%}" alt="" width="25px" height="25px">
+                            {% elif package.status == 'out_for_delivery' %}
+                            <img src="{% static 'img/.png' %}" alt="" width="25px" height="25px">
                             {% else %}
                             {% endif %}
-                    </td>
+                        </td>
+                        <td>
+                            {% if package.status == 'pending_delivery' %}
+                            <a href="{% url 'delivery_courier' package_id=package.id %}">
+                                <button type="submit" class="btn btn-sm btn-info">Assign</button>
+                            </a>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if package.status == 'out_for_delivery' %}
+                            <form action="{% url 'confirm_delivery' package_id=package.id %}">
+                                <button type="submit" class="btn btn-sm btn-primary">Confirm</button>
+                            </form>
+                            {% endif %}
+                        </td>
                     </tr>
                 {% endfor %}
             </tbody>
