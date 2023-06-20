@@ -63,12 +63,12 @@ urlpatterns = [
     # path('reassign_courier/<int:package_id>/', warehouse_views.reassign_courier, name='reassign_courier'),
 
     # Drop off and Pick up routes
-    path('drop_pick_zone_dashboard/', drop_pick_zone_views.drop_pick_zone_dashboard, name='drop_pick_zone_dashboard'),
+    path('drop_pick_dashboard/', drop_pick_zone_views.drop_pick_dashboard, name='drop_pick_dashboard'),
     path('confirm-drop-off/<int:package_id>/', drop_pick_zone_views.confirm_drop_off, name='confirm_drop_off'),
     path('drop_pick_zone_dispatch/', drop_pick_zone_views.dispatch, name='dpz_dispatch'),
     path('dispatched_packages/', drop_pick_zone_views.dispatched_packages, name='dispatched_packages'),
     path('confirm_pickup/<int:package_id>/', drop_pick_zone_views.confirm_pickup, name='confirm_pickup'),
     path('confirm_at_pickup/<int:package_id>/', drop_pick_zone_views.confirm_at_pickup, name='confirm_at_pickup'),
     path('delivery_courier/<int:package_id>/', drop_pick_zone_views.delivery_courier, name='delivery_courier'),
-    path('confirm_delivery/<int:package_id>/', drop_pick_zone_views.confirm_delivery, name='confirm_delivery'),
+    path('confirm_pickedup/<int:package_id>/', drop_pick_zone_views.confirm_pickedup, name='confirm_pickedup'),
 ]

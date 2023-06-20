@@ -54,7 +54,7 @@
                             {% elif package.status == 'pending_delivery' %}
                             <img src="{%static 'img/pickup.png'%}" alt="" width="25px" height="25px">
                             {% elif package.status == 'out_for_delivery' %}
-                            <img src="{% static 'img/.png' %}" alt="" width="25px" height="25px">
+                            <img src="{% static 'img/delivering.png' %}" alt="" width="25px" height="25px">
                             {% else %}
                             {% endif %}
                         </td>
@@ -67,7 +67,8 @@
                         </td>
                         <td>
                             {% if package.status == 'out_for_delivery' %}
-                            <form action="{% url 'confirm_delivery' package_id=package.id %}">
+                            <form action="{% url 'confirm_pickedup' package_id=package.id %}" method="post">
+                                {% csrf_token %}
                                 <button type="submit" class="btn btn-sm btn-primary">Confirm</button>
                             </form>
                             {% endif %}

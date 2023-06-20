@@ -11,7 +11,7 @@ from django.contrib import messages
 User = get_user_model()
 
 @login_required
-def drop_pick_zone_dashboard(request):
+def drop_pick_dashboard(request):
     drop_pick_zone = request.user
     packages = Package.objects.filter(dropOffLocation=drop_pick_zone, status__in=['upcoming', 'in_transit', 'at_pickup', 'pending_delivery', 'out_for_delivery'])
     greeting_message = get_time_of_day()
@@ -121,7 +121,7 @@ def delivery_courier(request, package_id):
             courier.status = 'on-trip'
             courier.save()
 
-        return redirect('admin_dashboard')
+        return redirect('drop_pick_dashboard')
 
     couriers = User.objects.filter(role='courier', status='available')  # Filter couriers by status='available'
     context = {
@@ -132,7 +132,7 @@ def delivery_courier(request, package_id):
     return render(request, 'drop_pick_zone/delivery_courier.html', context)
 
 
-def confirm_delivery (request, package_id):
+def confirm_pickedup(request, package_id):
     if request.method == 'POST':
         package = Package.objects.get(pk=package_id)
         package.status = 'ongoing'
