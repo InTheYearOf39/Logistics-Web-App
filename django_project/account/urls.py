@@ -48,6 +48,7 @@ urlpatterns = [
 
     # courier routes
     path('courier_dashboard/', courier_views.courier_dashboard, name='courier_dashboard'),
+    path('notify_arrival/<int:package_id>/', courier_views.notify_arrival, name='notify_arrival'),
     path('notify_recipient/<int:package_id>/', courier_views.notify_recipient, name='notify_recipient'),
     path('confirm_delivery/<int:package_id>/', courier_views.confirm_delivery, name='confirm_delivery'),
     path('courier_history/', courier_views.courier_history, name='courier_history'),

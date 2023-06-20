@@ -29,7 +29,7 @@
             </thead>
             <tbody>
                 {% for package in assigned_packages %}
-                {% if package.status in 'dispatched, upcoming, ongoing, arrived, en_route, warehouse_arrival, in_transit, at_pickup' %}
+                {% if package.status in 'dispatched, upcoming, ongoing, arrived, en_route, warehouse_arrival, in_transit, at_pickup, ready_for_pickup' %}
                 <tr>
                     <th scope="row">{{ forloop.counter }}</th>
                     <td>{{ package.packageName }}</td>
