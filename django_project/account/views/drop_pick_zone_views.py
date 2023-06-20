@@ -129,7 +129,7 @@ def delivery_courier(request, package_id):
         'couriers': couriers
         }
     
-    return render(request, 'drop_pick_zone/assign_courier.html', context)
+    return render(request, 'drop_pick_zone/delivery_courier.html', context)
 
 
 def confirm_delivery (request, package_id):
