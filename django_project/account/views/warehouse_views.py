@@ -42,6 +42,15 @@ def warehouse_dashboard(request):
             # Update the packages with the assigned courier and change their status
             packages = Package.objects.filter(id__in=selected_packages)
             packages.update(courier=courier, status='dispatched')
+            
+            courier_status = Package.objects.filter(courier=courier, status__in=['dispatched', 'upcoming', 'ongoing', 'arrived', 'en_route', 'warehouse_arrival', 'in_transit', 'at_pickup', 'ready_for_pickup']).exists()
+
+            if courier_status:
+                courier.status = 'on-trip'
+            else:
+                courier.status = 'available'
+            
+            courier.save()
 
             messages.success(request, 'Packages successfully assigned to courier.')
 
@@ -120,6 +129,9 @@ def ready_packages(request):
             # Update the packages with the assigned courier and change their status
             packages = Package.objects.filter(id__in=selected_packages)
             packages.update(courier=courier, dropOffLocation=drop_pick_zone, status='ready_for_pickup')
+            
+            courier.status = 'on-trip'
+            courier.save()
 
             messages.success(request, 'Packages successfully assigned to courier.')
 
@@ -127,7 +139,7 @@ def ready_packages(request):
         
     context = {
         'ready_packages': ready_packages,
-        'available_couriers': User.objects.filter(role='courier'),
+        'available_couriers': User.objects.filter(role='courier', status='available'),
         'available_drop_pick_zones': User.objects.filter(role='drop_pick_zone')
     }
     return render(request, 'warehouse/ready_packages.html', context)
