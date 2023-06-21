@@ -47,6 +47,12 @@ def confirm_at_pickup(request, package_id):
         package = Package.objects.get(pk=package_id)
         package.status = 'pending_delivery'
         package.save()
+        
+        courier = package.courier
+        if courier:
+            courier.status = 'available'
+            courier.save()
+
     
         sender_email = package.recipientEmail
         sender_message = f"Your package with ID {package.package_number} has arrived at the pick-up zone."
@@ -83,6 +89,8 @@ def confirm_pickup(request, package_id):
         # Update the package status to 'en_route'
         package.status = 'en_route'
         package.save()
+        
+
 
         # Send an email notification to the sender
         subject = 'Package Update: En Route to Warehouse'
