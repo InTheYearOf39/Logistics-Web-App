@@ -11,7 +11,7 @@ from django.contrib import messages
 User = get_user_model()
 
 @login_required
-def drop_pick_dashboard(request):
+def drop_pick_zone_dashboard(request):
     drop_pick_zone = request.user
     packages = Package.objects.filter(dropOffLocation=drop_pick_zone, status__in=['upcoming', 'in_transit', 'at_pickup', 'pending_delivery', 'out_for_delivery'])
     greeting_message = get_time_of_day()
@@ -19,7 +19,7 @@ def drop_pick_dashboard(request):
         'greeting_message': greeting_message,
         'packages': packages,
     }
-    return render(request, 'drop_pick_zone/drop_pick_dashboard.html', context)
+    return render(request, 'drop_pick_zone/drop_pick_zone_dashboard.html', context)
 
 def confirm_drop_off(request, package_id):
     package = get_object_or_404(Package, id=package_id)
@@ -47,9 +47,15 @@ def confirm_at_pickup(request, package_id):
         package = Package.objects.get(pk=package_id)
         package.status = 'pending_delivery'
         package.save()
+        
+        courier = package.courier
+        if courier:
+            courier.status = 'available'
+            courier.save()
+
     
         sender_email = package.recipientEmail
-        sender_message = f"Your package with ID {package.package_number} has arrived at the warehouse."
+        sender_message = f"Your package with ID {package.package_number} has arrived at the pick-up zone."
         send_mail('Package Arrival Notification', sender_message, 'garynkuraiji@gmail.com', [sender_email])
 
         messages.success(request, "Package arrival notified successfully.")
@@ -83,6 +89,8 @@ def confirm_pickup(request, package_id):
         # Update the package status to 'en_route'
         package.status = 'en_route'
         package.save()
+        
+
 
         # Send an email notification to the sender
         subject = 'Package Update: En Route to Warehouse'
@@ -115,13 +123,20 @@ def delivery_courier(request, package_id):
         #     package.status = 'ongoing'
 
         package.save()
+        
+        # Check if the courier has any packages assigned
+        has_packages = Package.objects.filter(courier=courier).exists()
 
-        # Update the courier status to "on-trip" only if they were not already on-trip
-        if previous_courier_status != 'on-trip' and package.status == 'out_for_delivery':
+        # Update the courier status
+        if has_packages:
             courier.status = 'on-trip'
-            courier.save()
+        else:
+            courier.status = 'available'
+        
+        courier.save()
 
-        return redirect('drop_pick_dashboard')
+
+        return redirect('drop_pick_zone_dashboard')
 
     couriers = User.objects.filter(role='courier', status='available')  # Filter couriers by status='available'
     context = {
@@ -138,4 +153,4 @@ def confirm_pickedup(request, package_id):
         package.status = 'ongoing'
         package.save()
     
-    return redirect('drop_pick_dashboard')  # Replace with the appropriate URL for the warehouse dashboard
+    return redirect('drop_pick_zone_dashboard')  # Replace with the appropriate URL for the warehouse dashboard
