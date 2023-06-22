@@ -64,7 +64,7 @@ urlpatterns = [
     # path('reassign_courier/<int:package_id>/', warehouse_views.reassign_courier, name='reassign_courier'),
 
     # Drop off and Pick up routes
-    path('drop_pick_dashboard/', drop_pick_zone_views.drop_pick_dashboard, name='drop_pick_dashboard'),
+    path('drop_pick_zone_dashboard/', drop_pick_zone_views.drop_pick_zone_dashboard, name='drop_pick_zone_dashboard'),
     path('confirm-drop-off/<int:package_id>/', drop_pick_zone_views.confirm_drop_off, name='confirm_drop_off'),
     path('drop_pick_zone_dispatch/', drop_pick_zone_views.dispatch, name='dpz_dispatch'),
     path('dispatched_packages/', drop_pick_zone_views.dispatched_packages, name='dispatched_packages'),

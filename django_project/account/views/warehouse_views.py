@@ -37,20 +37,31 @@ def warehouse_dashboard(request):
         courier_id = request.POST.get('courier')
 
         if selected_packages and courier_id:
-            courier = get_object_or_404(User, id=courier_id, role='courier')
+            courier = get_object_or_404(User, id=courier_id, role='courier', status='available')
 
             # Update the packages with the assigned courier and change their status
             packages = Package.objects.filter(id__in=selected_packages)
             packages.update(courier=courier, status='dispatched')
+            
+            # courier_status = Package.objects.filter(courier=courier, status__in=['dispatched', 'upcoming', 'ongoing', 'arrived', 'en_route', 'warehouse_arrival', 'in_transit', 'at_pickup', 'ready_for_pickup']).exists()
+            courier_status = Package.objects.filter(courier=courier, status='dispatched').exists()
+
+            if courier_status:
+                courier.status = 'on-trip'
+            # else:
+            #     courier.status = 'available'
+            
+            courier.save()
 
             messages.success(request, 'Packages successfully assigned to courier.')
 
             return redirect('warehouse_dashboard')
 
+    available_couriers=User.objects.filter(role='courier', status='available')
     context = {
         'packages_by_location': packages_by_location,
         'greeting_message': greeting_message,
-        'available_couriers': User.objects.filter(role='courier')
+        'available_couriers': available_couriers
     }
 
     return render(request, 'warehouse/warehouse_dashboard.html', context)
@@ -90,6 +101,11 @@ def confirm_arrival(request, package_id):
         package = Package.objects.get(pk=package_id)
         package.status = 'in_house'
         package.save()
+
+        courier = package.courier
+        if courier:
+            courier.status = 'available'
+            courier.save()
     
         sender_email = package.recipientEmail
         sender_message = f"Your package with ID {package.package_number} has arrived at the warehouse."
@@ -120,6 +136,9 @@ def ready_packages(request):
             # Update the packages with the assigned courier and change their status
             packages = Package.objects.filter(id__in=selected_packages)
             packages.update(courier=courier, dropOffLocation=drop_pick_zone, status='ready_for_pickup')
+            
+            courier.status = 'on-trip'
+            courier.save()
 
             messages.success(request, 'Packages successfully assigned to courier.')
 
@@ -127,7 +146,7 @@ def ready_packages(request):
         
     context = {
         'ready_packages': ready_packages,
-        'available_couriers': User.objects.filter(role='courier'),
+        'available_couriers': User.objects.filter(role='courier', status='available'),
         'available_drop_pick_zones': User.objects.filter(role='drop_pick_zone')
     }
     return render(request, 'warehouse/ready_packages.html', context)

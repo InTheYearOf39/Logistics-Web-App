@@ -106,6 +106,12 @@ def confirm_delivery(request, package_id):
             messages.success(request, "Package delivery confirmed successfully.")
         else:
             messages.error(request, "Invalid OTP. Please try again.")
+            
+        courier = package.courier
+        if courier:
+            courier.status = 'available'
+            courier.save()
+
 
     return redirect('courier_dashboard')  # Replace with the appropriate URL
 
