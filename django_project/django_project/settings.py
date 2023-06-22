@@ -40,12 +40,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'lmsapp',
     'django.contrib.sites',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+    'lmsapp',
  
 ]
 
@@ -58,6 +58,8 @@ SOCIALACCOUNT_PROVIDERS = {
         "AUTH_PARAMS": {"access_type": "online"}
     }
 }
+
+SOCIALACCOUNT_ADAPTER = 'lmsapp.adapter.CustomSocialAccountAdapter'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
