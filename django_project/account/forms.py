@@ -138,6 +138,23 @@ class DropPickForm(forms.ModelForm):
             'warehouse': forms.Select(attrs={'class': 'form-control selectpicker'}),
         }
 
+class CourierForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['name', 'username', 'phone', 'address']
+
+# class CourierForm(forms.ModelForm):
+#     class Meta:
+#         model = User
+#         fields = ['name', 'username', 'phone', 'address']
+
+#     def save(self, commit=True):
+#         user = super().save(commit=False)
+#         user.role = 'courier'  # Set the role here
+#         if commit:
+#             user.save()
+#         return user
+
 class ChangePasswordForm(SetPasswordForm):
     error_messages = {
         'password_mismatch': _("The two password fields didn't match."),

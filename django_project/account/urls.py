@@ -36,6 +36,7 @@ urlpatterns = [
     path('admin_dispatch/', admin_views.dispatch, name='admin_dispatch'),
     path('create_warehouse/', admin_views.create_warehouse, name='create_warehouse'),
     path('create_drop_pick/', admin_views.create_drop_pick, name='create_drop_pick'),
+    path('create_courier/', admin_views.create_courier, name='create_courier'),
     path('warehouses/', admin_views.warehouses, name='warehouses'),
     path('drop_pick_zones/', admin_views.drop_pick_zones, name='drop_pick_zones'),
 
