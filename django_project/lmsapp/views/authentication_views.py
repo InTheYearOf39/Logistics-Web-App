@@ -23,6 +23,8 @@ def register(request):
                 'drop_pick_zone': 'drop_pick_zone_dashboard',
             }
             dashboard_url = dashboard_mapping.get(user.role)
+            user.backend = 'django.contrib.auth.backends.ModelBackend'
+
             login(request, user)
             
             return redirect(dashboard_url)
