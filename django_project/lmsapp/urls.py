@@ -24,6 +24,7 @@ urlpatterns = [
     path('register/', authentication_views.register, name='register'),
     path('logout/', auth_views.LogoutView.as_view(template_name='index.html'), name='logout_user'),
     path('change_password/', authentication_views.change_password, name='change_password'),
+    # path('change_password/', authentication_views.change_password, name='change_password'),
 
 
     # admin routes

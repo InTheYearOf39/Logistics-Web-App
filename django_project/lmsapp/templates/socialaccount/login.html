@@ -1,0 +1,31 @@
+{% extends "socialaccount/base.html" %}
+{% load i18n %}
+
+{% block head_title %}{% trans "Sign In" %}{% endblock %}
+
+{% block content %}
+
+
+<div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
+  <header class="mb-auto mt-5">
+    <div>
+      <h1 class="float-md-start mb-4">{% blocktrans with provider.name as provider %}Sign In Via {{ provider }}{% endblocktrans %}</h1>
+      
+    </div>
+  </header>
+
+  <main class="px-3">
+    
+    <p class="lead">{% blocktrans with provider.name as provider %}You are about to sign in using a third party account from {{ provider }}.{% endblocktrans %}</p>
+
+  
+    <form method="post">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-lg btn-outline btn-info fw-bold text-white">{% trans "Continue" %}</button>
+    </form>
+  </main>
+
+  
+</div>
+
+{% endblock %}
