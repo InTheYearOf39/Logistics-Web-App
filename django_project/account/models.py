@@ -3,8 +3,6 @@ from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
 import random
 import string
-from django.core.exceptions import ValidationError
-
 
 
 class User(AbstractUser):
@@ -20,37 +18,20 @@ class User(AbstractUser):
         ('on-trip', 'On Trip'),
     )
     name = models.CharField(max_length=40, null=False)
+    tag = models.CharField(max_length=20, null=True)
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, verbose_name='role', null=False)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='available')
     
     # Add warehouse-specific fields
-    tag = models.CharField(max_length=20, null=True, blank=True)
-    phone = models.CharField(max_length=20, null=True, blank=True)
-    address = models.CharField(max_length=200, null=True, blank=True)
+    phone = models.CharField(max_length=20, null=True)
+    address = models.CharField(max_length=200, null=True)
 
     # Add drop_pick_zone-specific fields
-    warehouse = models.CharField(max_length=20, null=True, blank=True)
+    warehouse = models.CharField(max_length=20, null=True)
 
     def __str__(self):
         return self.username
-    
-    def save(self, *args, **kwargs):
-        if self.role == 'courier':
-            self.tag = ''
-            self.phone = ''
-            self.address = ''
-            self.warehouse = ''
-        else:
-            if not self.tag:
-                raise ValidationError({'tag': 'Tag field is required for non-courier users.'})
-            if not self.phone:
-                raise ValidationError({'phone': 'Phone field is required for non-courier users.'})
-            if not self.address:
-                raise ValidationError({'address': 'Address field is required for non-courier users.'})
-            if not self.warehouse:
-                raise ValidationError({'warehouse': 'Warehouse field is required for non-courier users.'}) 
-               
-        super().save(*args, **kwargs)
+
 
 
 class Package(models.Model):
@@ -84,6 +65,7 @@ class Package(models.Model):
     deliveryType = models.CharField(max_length=20, choices=DELIVERY_CHOICES)
     # dropOffLocation = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, default=None)
     dropOffLocation = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, default=None, related_name='packages_dropped_off')
+    warehouse = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='packages_in_house')
     packageDescription = models.TextField()
     recipientName = models.CharField(max_length=100)
     recipientEmail = models.CharField(max_length=100)
@@ -107,13 +89,12 @@ class Package(models.Model):
 
         if not self.package_number:
             self.package_number = self._generate_package_number()
-        if self.status in ['dropped_off', 'in_house', 'pending_delivery']:
-            if self.status == 'dropped_off':
-                self.package_number = f"{self.dropOffLocation.tag}-{self.package_number}"
-                                
-            if self.status == 'pending_delivery':
-                self.package_number = f"{self.dropOffLocation.tag}-{self.package_number}"
 
+        if self.status == 'dropped_off':
+            self.package_number = f"{self.dropOffLocation.tag}-{self.package_number}"
+
+        if self.status == 'in_house' and self.warehouse:
+            self.package_number = f"{self.warehouse.tag}-{self.package_number}"
 
         if self.courier:
             self.assigned_at = timezone.now()
