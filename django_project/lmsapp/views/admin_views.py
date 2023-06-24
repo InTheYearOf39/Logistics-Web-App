@@ -6,6 +6,7 @@ from lmsapp.utils import get_time_of_day
 from django.shortcuts import redirect, get_object_or_404
 from lmsapp.forms import WarehouseForm, DropPickForm
 from django.contrib.auth.hashers import make_password
+from lmsapp.forms import CourierForm
 
 
 
@@ -231,3 +232,30 @@ def drop_pick_zones(request):
         'drop_pick_zones': drop_pick_zones
     }
     return render(request, 'admin/drop_pick_zones.html', context)
+
+# def create_courier(request):
+#     if request.method == 'POST':
+#         form = CourierForm(request.POST)
+#         if form.is_valid():
+#             form.save()
+#             return redirect('riders')  # Redirect to the courier list page
+#     else:
+#         form = CourierForm()
+
+#     context = {'form': form}
+#     return render(request, 'admin/create_courier.html', context)
+
+def create_courier(request):
+    if request.method == 'POST':
+        form = CourierForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.role = 'courier'
+            # Set default password for the warehouse user
+            user.set_password('courier@courier')
+            form.save()
+            # Optionally, redirect to a success page
+            return redirect('riders')
+    else:
+        form = CourierForm()
+    return render(request, 'admin/create_courier.html', {'form': form})
