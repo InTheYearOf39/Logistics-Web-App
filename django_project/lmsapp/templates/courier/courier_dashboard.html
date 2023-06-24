@@ -13,10 +13,9 @@
 </div>
 
 <h2>Packages</h2>
-
-    <div class="package-table">
-        <div class="table-responsive">
-            <table class="table">
+<div class="container">
+    <div class="table-responsive">
+        <table class="table">
             <thead>
                 <tr>
                     <th scope="col">No.</th>
@@ -101,93 +100,77 @@
                 {% endfor %}
             </tbody>
             
+
+            <!-- <tbody>
+                {% for package in assigned_packages %}
+                {% if package.status in 'upcoming,ongoing,arrived,en_route,warehouse_arrival' %}
+                <tr>
+                    <th scope="row">{{ forloop.counter }}</th>
+                    <td>{{ package.packageName }}</td>
+                    <td>{{ package.recipientName }}</td>
+                    <td>{{ package.sendersAddress }}</td>
+                    <td>{{ package.recipientAddress }}</td>
+                    <td>{{ package.delivery_number }}</td>
+                    <td>
+
+                        {% if package.status == 'en_route' %}
+                        <form action="{% url 'notify_arrival' package_id=package.id %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-info text-white">Notify Arrival</button>
+                        </form>
+                        {% elif package.status == 'warehouse_arrival' %}
+                        <form method="post">
+                            {% csrf_token%}
+                            <img src="{% static 'img/loading.png' %}" alt="" width="25px" height="25px">
+                        </form>
+
+                        {% elif package.status == 'ongoing' %}
+                        <form action="{% url 'notify_arrival' package_id=package.id %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-info text-white">Notify Arrival</button>
+                        </form>
+                        {% elif package.status == 'arrived' %}
+                        <form action="{% url 'confirm_delivery' package_id=package.id %}" method="post">
+                            {% csrf_token %}
+                            <div class="modal fade" id="staticBackdrop{{ package.id }}" data-bs-backdrop="static"
+                                data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel"
+                                aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h1 class="modal-title fs-5" id="staticBackdropLabel">Confirm package
+                                                delivery</h1>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <label for="inputField{{ package.id }}"><b>ENTER CODE:</b></label>
+                                            <input type="text" id="inputField{{ package.id }}" name="inputField"
+                                                class="form-control">
+                                        </div>
+                                        <div class="modal-footer">
+
+                                            <button type="button" class="btn btn-danger"
+                                                data-bs-dismiss="modal">Close</button>
+                                            <button type="submit" class="btn btn-success">Send</button>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-warning text-white" data-bs-toggle="modal"
+                                data-bs-target="#staticBackdrop{{ package.id }}">Arrived</button>
+                        </form>
+                        {% else %}
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+            </tbody> -->
+
+
         </table>
-        </div>
     </div>
-
-    <div class="row package-card">
-        {% for package in assigned_packages %}
-            {% if package.status in 'dispatched, upcoming, ongoing, arrived, en_route, warehouse_arrival, in_transit, at_pickup, ready_for_pickup' %}
-                <div class="col-sm-12 col-md-6 col-lg-4 mb-3">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">Package {{ forloop.counter }}</h5>
-                            <table class="table">
-                                <tbody>
-                                    <tr>
-                                        <th scope="row">Package Title:</th>
-                                        <td>{{ package.packageName }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row">Recipient:</th>
-                                        <td>{{ package.recipientName }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row">Address From:</th>
-                                        <td>{{ package.sendersAddress }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row">Address To:</th>
-                                        <td>{{ package.recipientAddress }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row">Package Number:</th>
-                                        <td>{{ package.package_number }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row">Status:</th>
-                                        <td>
-                                            {% if package.status == 'en_route' %}
-                                                <form action="{% url 'notify_arrival' package_id=package.id %}" method="post">
-                                                    {% csrf_token %}
-                                                    <button type="submit" class="btn btn-sm btn-info text-white">Notify Arrival</button>
-                                                </form>
-                                            {% elif package.status == 'warehouse_arrival' %}
-                                                <form method="post">
-                                                    {% csrf_token %}
-                                                    <img src="{% static 'img/loading.png' %}" alt="" width="25px" height="25px">
-                                                </form>
-                                            {% elif package.status == 'in_transit' %}
-                                                <img src="{% static 'img/transit.png' %}" alt="" width="25px" height="25px">
-                                            {% endif %}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row"></th>
-                                        <td>
-                                            {% if package.status == 'in_transit' %}
-                                                <form action="{% url 'notify_pick_up' package_id=package.id %}" method="post">
-                                                    {% csrf_token %}
-                                                    <button type="submit" class="btn btn-sm btn-primary">Notify Pick-Up</button>
-                                                </form>
-                                            {% elif package.status == 'at_pickup' %}
-                                                <img src="{% static 'img/loading.png' %}" alt="" width="25px" height="25px">
-                                            {% endif %}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row"></th>
-                                        <td>
-                                            {% if package.status == 'ready_for_pickup' %}
-                                                <form action="{% url 'complete_delivery' package_id=package.id %}" method="post">
-                                                    {% csrf_token %}
-                                                    <button type="submit" class="btn btn-sm btn-success">Complete Delivery</button>
-                                                </form>
-                                            {% elif package.status == 'delivered' %}
-                                                <img src="{% static 'img/check.png' %}" alt="" width="25px" height="25px">
-                                            {% endif %}
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            {% endif %}
-        {% endfor %}
-    </div>
-
+</div>
 {% endblock %}
-
-
-

@@ -1,19 +1,10 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser, UserManager
+from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
 import random
 import string
 
 
-class CustomUserManager(UserManager):
-    def create_admin(self, username, password):
-        admin = self.create_user(username=username, password=password)
-        admin.is_staff = True
-        admin.is_superuser = True
-        admin.role = 'admin'
-        admin.save()
-        return admin
-    
 class User(AbstractUser):
     ROLE_CHOICES = (
         ('admin', 'admin'),
@@ -30,8 +21,7 @@ class User(AbstractUser):
     tag = models.CharField(max_length=20, null=True)
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, verbose_name='role', null=False)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='available')
-    objects = CustomUserManager()
-
+    
     # Add warehouse-specific fields
     phone = models.CharField(max_length=20, null=True)
     address = models.CharField(max_length=200, null=True)

@@ -14,7 +14,7 @@
     <!-- Bootstrap core CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
 
-    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
     <style>
       .bd-placeholder-img {
@@ -36,46 +36,6 @@
           font-size: 3.5rem;
         }
       }
-
-      /* Styles for large screens */
-      @media (min-width: 992px) {
-          .package-table {
-              display: block;
-          }
-          
-          .package-card {
-              display: none;
-          }
-      }
-
-      /* Styles for medium screens (such as tablets) */
-      @media (min-width: 768px) and (max-width: 991px) {
-          .package-table {
-              display: block;
-          }
-          
-          .package-card {
-              display: none;
-          }
-      }
-
-      /* Styles for small screens */
-      @media (max-width: 767px) {
-          .package-table {
-              display: none;
-          }
-
-          .package-card {
-              display: block;
-          }
-      }
-
-      @media (min-width: 576px) {
-        .btn-25-on-lg {
-          width: 25% !important;
-        }
-      }
-
     </style>
 
     
@@ -187,35 +147,12 @@
               </li>
           {% endif %}
           
-          {% if request.user.role == 'warehouse' %}
           <li class="nav-item">
             <a class="nav-link" href="#">
               <span data-feather="users"></span>
               Reports
             </a>
           </li>
-          {% endif %}
-
-         
-
-          {% if request.user.role == 'drop_pick_zone' %}
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'dpz_dispatch' %}">
-              <span data-feather="users"></span>
-              Received Packages
-            </a>
-          </li>
-
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'dispatched_packages' %}">
-              <span data-feather="users"></span>
-              Dispatched Packages
-            </a>
-          </li>
-
-          
-          {% endif %}
-
           <li class="nav-item">
             <a class="nav-link" href="#">
               <span data-feather="users"></span>
@@ -223,32 +160,40 @@
             </a>
           </li>
 
+          {% if request.user.role == 'drop_pick_zone' %}
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'dispatched_packages' %}">
+              <span data-feather="users"></span>
+              Dispatched Packages
+            </a>
+          </li>
+          {% endif %}
           {% if request.user.role == 'warehouse' %}
           <li class="nav-item">
             <a class="nav-link" href="{% url 'change_password' %}">
               <span data-feather="users"></span>
-              Change Password
+              Change Passowrd
             </a>
           </li>
           {% elif request.user.role == 'drop_pick_zone' %}
           <li class="nav-item">
             <a class="nav-link" href="{% url 'change_password' %}">
               <span data-feather="users"></span>
-              Change Password
+              Change Passowrd
             </a>
           </li>
           {% elif request.user.role == 'courier' %}
           <li class="nav-item">
             <a class="nav-link" href="{% url 'change_password' %}">
               <span data-feather="users"></span>
-              Change Password
+              Change Passowrd
             </a>
           </li>
           {% elif request.user.role == 'sender' %}
           <li class="nav-item">
             <a class="nav-link" href="{% url 'change_password' %}">
               <span data-feather="users"></span>
-              Change Password
+              Change Passowrd
             </a>
           </li>
           {% endif %}
