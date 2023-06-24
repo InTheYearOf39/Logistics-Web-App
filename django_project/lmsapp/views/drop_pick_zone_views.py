@@ -67,7 +67,7 @@ def confirm_at_pickup(request, package_id):
 
 def dispatch(request):
     drop_pick_zone = request.user
-    packages = Package.objects.filter(dropOffLocation=drop_pick_zone, status__in=['dropped_off'])
+    packages = Package.objects.filter(dropOffLocation=drop_pick_zone, status='dropped_off')
     
     context = {
         'packages': packages,

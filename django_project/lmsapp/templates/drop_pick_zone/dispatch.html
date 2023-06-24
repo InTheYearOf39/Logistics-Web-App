@@ -8,47 +8,102 @@
 {% block content %}
 
 
-<h2 class="my-5">Dispatch Ready Packages</h2>
-<div class="container">
-    <div class="table-responsive">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th scope="col">No.</th>
-                    <th scope="col">Package Title</th>
-                    <th scope="col">Recipient</th>
-                    <th scope="col">Address From</th>
-                    <th scope="col">Address To</th>
-                    <th scope="col">Package Number</th>
-                    <th scope="col">status</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for package in packages %}
+<h2 class="my-5">Received Packages</h2>
+
+    <div class="package-table">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
                     <tr>
-                        <td>{{ forloop.counter }}</td>
-                        <td>{{ package.packageName }}</td>
-                        <td>{{ package.recipientName }}</td>
-                        <td>{{ package.sendersAddress }}</td>
-                        <td>{{ package.recipientAddress }}</td>
-                        <td>{{ package.package_number }}</td>
-                        <td>
-                            {% if package.status == 'upcoming' %}
-                            <form action="{% url 'confirm_drop_off' package_id=package.id %}" method="post">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-sm btn-warning text-white">Confirm Drop-Off</button>
-                            </form>
-                            {% elif package.status == 'dropped_off' %}
-                                <button type="button" class="btn btn-sm btn-info text-white">Dropped Off</button>
-                            {% else %}
-                            {% endif %}
-                    </td>
+                        <th scope="col">No.</th>
+                        <th scope="col">Package Title</th>
+                        <th scope="col">Recipient</th>
+                        <th scope="col">Address From</th>
+                        <th scope="col">Address To</th>
+                        <th scope="col">Package Number</th>
+                        <th scope="col">status</th>
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    {% for package in packages %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ package.packageName }}</td>
+                            <td>{{ package.recipientName }}</td>
+                            <td>{{ package.sendersAddress }}</td>
+                            <td>{{ package.recipientAddress }}</td>
+                            <td>{{ package.package_number }}</td>
+                            <td>
+                                {% if package.status == 'upcoming' %}
+                                <form action="{% url 'confirm_drop_off' package_id=package.id %}" method="post">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-warning text-white">Confirm Drop-Off</button>
+                                </form>
+                                {% elif package.status == 'dropped_off' %}
+                                    <button type="button" class="btn btn-sm btn-info text-white">Dropped Off</button>
+                                {% else %}
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
-</div>
+
+
+    <div class="row package-card">
+        {% for package in packages %}
+                <div class="col-sm-12 col-md-6 col-lg-4 mb-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Package {{ forloop.counter }}</h5>
+                            <table class="table">
+                                <tbody>
+                                    <tr>
+                                        <th scope="row">Package Title:</th>
+                                        <td>{{ package.packageName }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Recipient:</th>
+                                        <td>{{ package.recipientName }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Address From:</th>
+                                        <td>{{ package.sendersAddress }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Address To:</th>
+                                        <td>{{ package.recipientAddress }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Package Number:</th>
+                                        <td>{{ package.package_number }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Status:</th>
+                                        <td>
+                                            {% if package.status == 'upcoming' %}
+                                            <form action="{% url 'confirm_drop_off' package_id=package.id %}" method="post">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-sm btn-warning text-white">Confirm Drop-Off</button>
+                                            </form>
+                                            {% elif package.status == 'dropped_off' %}
+                                                <button type="button" class="btn btn-sm btn-info text-white">Dropped Off</button>
+                                            {% else %}
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                   
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+        {% endfor %}
+    </div>
+
+
 
         
         
