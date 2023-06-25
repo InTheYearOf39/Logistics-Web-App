@@ -44,23 +44,23 @@ class User(AbstractUser):
     def __str__(self):
         return self.username
     
-    def save(self, *args, **kwargs):
-        if self.role == 'courier':
-            self.tag = ''
-            self.phone = ''
-            self.address = ''
-            self.warehouse = ''
-        else:
-            if not self.tag:
-                raise ValidationError({'tag': 'Tag field is required for non-courier users.'})
-            if not self.phone:
-                raise ValidationError({'phone': 'Phone field is required for non-courier users.'})
-            if not self.address:
-                raise ValidationError({'address': 'Address field is required for non-courier users.'})
-            if not self.warehouse:
-                raise ValidationError({'warehouse': 'Warehouse field is required for non-courier users.'}) 
+    # def save(self, *args, **kwargs):
+    #     if self.role == 'courier':
+    #         self.tag = ''
+    #         self.phone = ''
+    #         self.address = ''
+    #         self.warehouse = ''
+    #     else:
+    #         if not self.tag:
+    #             raise ValidationError({'tag': 'Tag field is required for non-courier users.'})
+    #         if not self.phone:
+    #             raise ValidationError({'phone': 'Phone field is required for non-courier users.'})
+    #         if not self.address:
+    #             raise ValidationError({'address': 'Address field is required for non-courier users.'})
+    #         if not self.warehouse:
+    #             raise ValidationError({'warehouse': 'Warehouse field is required for non-courier users.'}) 
                
-        super().save(*args, **kwargs)
+    #     super().save(*args, **kwargs)
 
 
 class Package(models.Model):
