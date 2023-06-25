@@ -50,7 +50,7 @@
                         {% elif package.status == 'at_pickup'%}
                         <form action="{% url 'confirm_at_pickup' package_id=package.id %}" method="post">
                             {% csrf_token %}
-                            <button type="submit" class="btn btn-sm btn-primary">Confirm</button>
+                            <button type="submit" class="btn btn-sm btn-primary text-white">Confirm</button>
                         </form>
                         {% elif package.status == 'pending_delivery' %}
                         <img src="{%static 'img/pickup.png'%}" alt="" width="25px" height="25px">
@@ -61,7 +61,7 @@
                     <td>
                         {% if package.status == 'pending_delivery' %}
                         <a href="{% url 'delivery_courier' package_id=package.id %}">
-                            <button type="submit" class="btn btn-sm btn-info">Assign</button>
+                            <button type="submit" class="btn btn-sm btn-info text-white">Assign</button>
                         </a>
                         {% endif %}
                     </td>
@@ -69,7 +69,7 @@
                         {% if package.status == 'out_for_delivery' %}
                         <form action="{% url 'confirm_pickedup' package_id=package.id %}" method="post">
                             {% csrf_token %}
-                            <button type="submit" class="btn btn-sm btn-primary">Confirm</button>
+                            <button type="submit" class="btn btn-sm btn-primary text-white">Confirm</button>
                         </form>
                         {% endif %}
                     </td>
@@ -124,7 +124,7 @@
                                         {% elif package.status == 'at_pickup'%}
                                         <form action="{% url 'confirm_at_pickup' package_id=package.id %}" method="post">
                                             {% csrf_token %}
-                                            <button type="submit" class="btn btn-sm btn-primary">Confirm</button>
+                                            <button type="submit" class="btn btn-sm btn-primary text-white">Confirm</button>
                                         </form>
                                         {% elif package.status == 'pending_delivery' %}
                                         <img src="{%static 'img/pickup.png'%}" alt="" width="25px" height="25px">
@@ -140,7 +140,7 @@
                                     <td>
                                         {% if package.status == 'pending_delivery' %}
                                         <a href="{% url 'delivery_courier' package_id=package.id %}">
-                                            <button type="submit" class="btn btn-sm btn-info">Assign</button>
+                                            <button type="submit" class="btn btn-sm btn-info text-white">Assign</button>
                                         </a>
                                         {% endif %}
                                     </td>

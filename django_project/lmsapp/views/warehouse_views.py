@@ -142,7 +142,7 @@ def ready_packages(request):
 
             messages.success(request, 'Packages successfully assigned to courier.')
 
-            return redirect('ready_packages')
+            return redirect('ready_for_pickup')
         
     context = {
         'ready_packages': ready_packages,
@@ -159,3 +159,35 @@ def to_pickup(request, package_id):
         package.save()
 
     return redirect('ready_packages')  # Replace with the appropriate URL for the warehouse dashboard
+
+def ready_for_pickup(request):
+    if request.method == 'POST':
+        selected_packages = request.POST.getlist('selected_packages')
+        courier_id = request.POST.get('courier')
+        drop_pick_zone_id = request.POST.get('drop_pick_zone')
+
+        if selected_packages and courier_id and drop_pick_zone_id:
+            courier = get_object_or_404(User, id=courier_id, role='courier')
+            drop_pick_zone = get_object_or_404(User, id=drop_pick_zone_id, role='drop_pick_zone')
+
+            # Update the packages with the assigned courier and change their status
+            packages = Package.objects.filter(id__in=selected_packages)
+            packages.update(courier=courier, dropOffLocation=drop_pick_zone, status='ready_for_pickup')
+            
+            courier.status = 'on-trip'
+            courier.save()
+
+            messages.success(request, 'Packages successfully assigned to courier.')
+
+            return redirect('warehouse_dashboard')
+
+    ready_packages = Package.objects.filter(status='ready_for_pickup')
+    available_couriers = User.objects.filter(role='courier', status='available')
+    available_drop_pick_zones = User.objects.filter(role='drop_pick_zone')
+
+    context = {
+        'ready_packages': ready_packages,
+        'available_couriers': available_couriers,
+        'available_drop_pick_zones': available_drop_pick_zones
+    }
+    return render(request, 'warehouse/ready_for_pickup.html', context)

@@ -61,6 +61,7 @@ urlpatterns = [
     path('warehouse_dashboard/', warehouse_views.warehouse_dashboard, name='warehouse_dashboard'),
     path('confirm_arrival/<int:package_id>/', warehouse_views.confirm_arrival, name='confirm_arrival'),
     path('ready_packages/', warehouse_views.ready_packages, name='ready_packages'),
+    path('ready_for_pickup/', warehouse_views.ready_for_pickup, name='ready_for_pickup'),
     path('to_pickup/<int:package_id>/', warehouse_views.to_pickup, name='to_pickup'),
     # path('reassign_courier/<int:package_id>/', warehouse_views.reassign_courier, name='reassign_courier'),
 

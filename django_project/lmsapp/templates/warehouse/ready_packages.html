@@ -1,10 +1,15 @@
 {% extends 'dashboard_base.html' %}
 {% load static %}
 
+{% block profile_image %}
+<img src="{% static '/img/team/team-3.jpg' %}" class="rounded mx-auto d-block" alt="..." width="80px" height="80px">
+{% endblock %}
+
+
 {% block content %}
 
 
-<h2>Warehouse Arrivals</h2>
+<h2 class="mt-3">Warehouse Arrivals</h2>
 <div class="table-responsive">
     <table class="table table-striped">
         <thead>
@@ -47,7 +52,7 @@
 </div>
 <form method="post">
     {% csrf_token %}
-    <h2>In House</h2>
+    <h2 class="mt-3">In House</h2>
     <div class="table-responsive">
         <table class="table table-striped">
             <thead>
@@ -89,25 +94,25 @@
             </tbody>
         </table>
     </div>
-    <div class="container">
-        <h2>Select a Courier</h2>
-        <select name="courier" class="form-control">
+    <div>
+        <h4 class="mt-3">Select Courier</h4>
+        <select name="courier" class="form-control mb-2">
             {% for courier in available_couriers %}
             <option value="{{ courier.id }}">{{ courier.name }}</option>
             {% endfor %}
         </select>
     </div>
-    <div class="col">
-        <label for="drop_pick_zone" class="mb-2">Select Drop-Pick Zone</label>
+    <div>
+        <h4 class="mt-3 mb-2">Select Drop-Pick Zone</h4>
         <select class="form-control" name="drop_pick_zone">
             {% for drop_pick_zone in available_drop_pick_zones %}
             <option value="{{ drop_pick_zone.id }}">{{ drop_pick_zone.username }}</option>
             {% endfor %}
         </select>
     </div>
-    <button type="submit" class="btn btn-primary">Assign</button>
+    <a href="{% url 'ready_for_pickup' %}"><button class="btn btn-primary text-white mt-3"> Assign</button></a>
 </form>
-<h2>Ready For Pick-Up</h2>
+<!-- <h2 class="mt-3">Ready For Pick-Up</h2>
 <div class="table-responsive">
     <table class="table table-striped">
         <thead>
@@ -133,7 +138,7 @@
                 <td>{{ package.sendersAddress }}</td>
                 <td>{{ package.recipientAddress }}</td>
                 <td>{{ package.package_number }}</td>
-                <!-- <td>{{ package.status }}</td> -->
+                <td>{{ package.status }}</td>
                 <td>
                     {% if package.status == 'ready_for_pickup' %}
                     <img src="{% static 'img/box.png' %}" alt="" width="25px" height="25px">
@@ -152,6 +157,6 @@
             {% endfor %}
         </tbody>
     </table>
-</div>
+</div> -->
 
 {% endblock %}

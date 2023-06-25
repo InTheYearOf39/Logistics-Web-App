@@ -51,23 +51,12 @@
                                     </form>
                                 {% elif package.status == 'in_transit' %}
                                     <img src="{% static 'img/transit.png' %}" alt="" width="25px" height="25px">
-                                {% endif %}
-                            </td>
-                            <td>
-                                {% if package.status == 'in_transit' %}
-                                    <form action="{% url 'notify_pick_up' package_id=package.id %}" method="post">
-                                        {% csrf_token %}
-                                        <button type="submit" class="btn btn-sm btn-primary">Notify Pick-Up</button>
-                                    </form>
                                 {% elif package.status == 'at_pickup' %}
                                     <img src="{% static 'img/loading.png' %}" alt="" width="25px" height="25px">
-                                {% endif %}
-                            </td>
-                            <td>
-                                {% if package.status == 'ongoing' %}
+                                {% elif package.status == 'ongoing' %}
                                     <form action="{% url 'notify_recipient' package_id=package.id %}" method="post">
                                         {% csrf_token %}
-                                        <button class="btn btn-sm btn-info">Notify Arrival</button>
+                                        <button class="btn btn-sm btn-info text-white">Notify Arrival</button>
                                     </form>
                                 {% elif package.status == 'arrived' %}
                                     <form action="{% url 'confirm_delivery' package_id=package.id %}" method="post">
@@ -86,16 +75,27 @@
                                                         <input type="text" id="inputField{{ package.id }}" name="inputField" class="form-control">
                                                     </div>
                                                     <div class="modal-footer">
-                                                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
-                                                        <button type="submit" class="btn btn-success">Send</button>
+                                                        <button type="button" class="btn btn-danger text-white" data-bs-dismiss="modal">Close</button>
+                                                        <button type="submit" class="btn btn-success text-white">Send</button>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                         <button type="button" class="btn btn-sm btn-warning text-white" data-bs-toggle="modal" data-bs-target="#staticBackdrop{{ package.id }}">Arrived</button>
                                     </form>
+                                
                                 {% endif %}
                             </td>
+                            <td>
+                                {% if package.status == 'in_transit' %}
+                                    <form action="{% url 'notify_pick_up' package_id=package.id %}" method="post">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-primary text-white">Notify Pick-Up</button>
+                                    </form>                            
+                                {% endif %}
+
+                            </td>
+                            
                         </tr>
                     {% endif %}
                 {% endfor %}
@@ -149,7 +149,36 @@
                                                 </form>
                                             {% elif package.status == 'in_transit' %}
                                                 <img src="{% static 'img/transit.png' %}" alt="" width="25px" height="25px">
+                                            {% elif package.status == 'at_pickup' %}
+                                                <img src="{% static 'img/loading.png' %}" alt="" width="25px" height="25px">
+                                            {% elif package.status == 'ongoing' %}
+                                                <form action="{% url 'notify_recipient' package_id=package.id %}" method="post">
+                                                    {% csrf_token %}
+                                                    <button class="btn btn-sm btn-info text-white">Notify Arrival</button>
+                                                </form>
+                                            {% elif package.status == 'arrived' %}
+                                                <form action="{% url 'confirm_delivery' package_id=package.id %}" method="post">
+                                                    {% csrf_token %}
+                                                    <button type="button" class="btn btn-sm btn-warning text-white custom-modal-trigger" data-target="#customModal{{ package.id }}">Arrived</button>
+                                                    <div class="custom-modal" id="customModal{{ package.id }}">
+                                                        <div class="custom-modal-content">
+                                                            <div class="custom-modal-header">
+                                                                <h1 class="custom-modal-title fs-5">Confirm package delivery</h1>
+                                                                <button type="button" class="custom-modal-close" data-target="#customModal{{ package.id }}">&times;</button>
+                                                            </div>
+                                                            <div class="custom-modal-body">
+                                                                <label for="inputField{{ package.id }}"><b>ENTER CODE:</b></label>
+                                                                <input type="text" id="inputField{{ package.id }}" name="inputField" class="form-control">
+                                                            </div>
+                                                            <div class="custom-modal-footer">
+                                                                <button type="button" class="btn btn-danger text-white custom-modal-close" data-target="#customModal{{ package.id }}">Close</button>
+                                                                <button type="submit" class="btn btn-success text-white ml-2">Send</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </form>
                                             {% endif %}
+                                            
                                         </td>
                                     </tr>
                                     <tr>
@@ -158,20 +187,12 @@
                                             {% if package.status == 'in_transit' %}
                                                 <form action="{% url 'notify_pick_up' package_id=package.id %}" method="post">
                                                     {% csrf_token %}
-                                                    <button type="submit" class="btn btn-sm btn-primary">Notify Pick-Up</button>
+                                                    <button type="submit" class="btn btn-sm btn-primary text-white">Notify Pick-Up</button>
                                                 </form>
-                                            {% elif package.status == 'at_pickup' %}
-                                                <img src="{% static 'img/loading.png' %}" alt="" width="25px" height="25px">
-                                            {% endif %}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row"></th>
-                                        <td>
-                                            {% if package.status == 'ready_for_pickup' %}
+                                                {% elif package.status == 'ready_for_pickup' %}
                                                 <form action="{% url 'complete_delivery' package_id=package.id %}" method="post">
                                                     {% csrf_token %}
-                                                    <button type="submit" class="btn btn-sm btn-success">Complete Delivery</button>
+                                                    <button type="submit" class="btn btn-sm btn-success text-white">Complete Delivery</button>
                                                 </form>
                                             {% elif package.status == 'delivered' %}
                                                 <img src="{% static 'img/check.png' %}" alt="" width="25px" height="25px">
