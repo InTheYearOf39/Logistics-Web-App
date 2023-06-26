@@ -71,9 +71,9 @@ class Package(models.Model):
         ('en_route', 'en_route'),
         ('warehouse_arrival', 'warehouse_arrival'),
         ('in_house', 'in house'),
-        ('ready_for_pickup', 'ready_for_pickup'),
         ('in_transit', 'in transit'),
         ('at_pickup', 'at pickup'),
+        ('ready_for_pickup', 'ready_for_pickup'),
         ('pending_delivery', 'pending delivery'),
         ('out_for_delivery', 'out for delivery'),
         ('ongoing', 'ongoing'),
@@ -118,14 +118,14 @@ class Package(models.Model):
 
         if not self.package_number:
             self.package_number = self._generate_package_number()
-        if self.status in ['dropped_off', 'in_house', 'pending_delivery']:
+        if self.status in ['dropped_off', 'in_house', 'ready_for_pickup']:
             if self.status == 'dropped_off':
                 self.package_number = f"{self.dropOffLocation.tag}-{self.package_number}"
             
             if self.status == 'in_house' and self.warehouse:
                 self.package_number = f"{self.warehouse.tag}-{self.package_number}"
                                 
-            if self.status == 'pending_delivery':
+            if self.status == 'ready_for_pickup':
                 self.package_number = f"{self.dropOffLocation.tag}-{self.package_number}"
 
 

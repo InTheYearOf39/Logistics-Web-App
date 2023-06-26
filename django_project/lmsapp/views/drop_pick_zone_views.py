@@ -6,6 +6,7 @@ from django.shortcuts import redirect, get_object_or_404
 from django.core.mail import send_mail
 from django.contrib.auth import get_user_model
 from django.contrib import messages
+import random
 
 
 User = get_user_model()
@@ -13,7 +14,7 @@ User = get_user_model()
 @login_required
 def drop_pick_zone_dashboard(request):
     drop_pick_zone = request.user
-    packages = Package.objects.filter(dropOffLocation=drop_pick_zone, status__in=['upcoming', 'in_transit', 'at_pickup', 'pending_delivery', 'out_for_delivery'])
+    packages = Package.objects.filter(dropOffLocation=drop_pick_zone, status__in=['upcoming', 'in_transit', 'at_pickup', 'ready_for_pickup'])
     greeting_message = get_time_of_day()
     context = {
         'greeting_message': greeting_message,
@@ -43,26 +44,23 @@ def confirm_drop_off(request, package_id):
     return render(request, 'drop_pick_zone/drop_pick_dashboard.html', {'package': package})
 
 def confirm_at_pickup(request, package_id):
-    if request.method == 'POST':
-        package = Package.objects.get(pk=package_id)
-        package.status = 'pending_delivery'
-        package.save()
-        
-        courier = package.courier
-        if courier:
-            courier.status = 'available'
-            courier.save()
+    package = get_object_or_404(Package, id=package_id)
+    package.status = 'ready_for_pickup'
+    package.save()
 
-    
-        sender_email = package.recipientEmail
-        sender_message = f"Your package with ID {package.package_number} has arrived at the pick-up zone."
-        send_mail('Package Arrival Notification', sender_message, 'garynkuraiji@gmail.com', [sender_email])
+    # Generate a 3-digit OTP
+    otp = str(random.randint(100, 999))
 
-        messages.success(request, "Package arrival notified successfully.")
-    else:
-        messages.error(request, "Invalid request.")
+    # Send email to recipient
+    subject = 'Package Ready for Pickup'
+    message = f'Dear recipient, your package with delivery number {package.package_number} is ready for pickup at {package.dropOffLocation}.\n\n' \
+              f'Please provide the following OTP when picking up the package: {otp}.\n\n' \
+              f'Thank you.'
+    recipient_email = package.recipientEmail
+    send_mail(subject, message, 'sender@example.com', [recipient_email])
 
-    return redirect('drop_pick_zone_dashboard')  # Replace with the appropriate URL for the warehouse dashboard
+    # Redirect to the desired page after confirming the pickup
+    return redirect('drop_pick_zone_dashboard')
 
 
 def dispatch(request):

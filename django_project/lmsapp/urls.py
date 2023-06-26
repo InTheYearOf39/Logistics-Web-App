@@ -54,7 +54,7 @@ urlpatterns = [
     path('notify_recipient/<int:package_id>/', courier_views.notify_recipient, name='notify_recipient'),
     path('confirm_delivery/<int:package_id>/', courier_views.confirm_delivery, name='confirm_delivery'),
     path('courier_history/', courier_views.courier_history, name='courier_history'),
-    path('notify_pick_up/<int:package_id>/', courier_views.notify_pick_up, name='notify_pick_up'),
+    path('notify_dropoff/<int:package_id>/', courier_views.notify_dropoff, name='notify_dropoff'),
 
 
     # Warehouse routes
