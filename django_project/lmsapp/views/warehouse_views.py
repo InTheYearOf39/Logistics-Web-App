@@ -195,11 +195,36 @@ def ready_for_pickup(request):
 
 
 
+# def new_arrivals(request):
+#     arrived_packages = Package.objects.filter(status='warehouse_arrival')
+
+#     if request.method == 'POST':
+
+#         return redirect('ready_packages')
+            
+#     context = {
+#         'arrived_packages': arrived_packages,
+#     }
+#     return render(request, 'warehouse/new_arrivals.html', context)
+
+
+
+
 def new_arrivals(request):
     arrived_packages = Package.objects.filter(status='warehouse_arrival')
-    print(arrived_packages)
+    
     if request.method == 'POST':
- 
+        package_id = request.POST.get('package_id')
+        package = get_object_or_404(Package, id=package_id)
+        courier = package.courier
+        
+        if courier:
+            courier.status = 'available'
+            courier.save()
+        
+        package.status = 'ready_for_pickup'
+        package.save()
+
         return redirect('ready_packages')
             
     context = {
