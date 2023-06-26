@@ -2,10 +2,11 @@ from django.shortcuts import render, redirect, redirect
 from lmsapp.models import Package, User
 import random
 from lmsapp.utils import get_time_of_day
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 from django.contrib import messages
 from django.core.mail import send_mail
 from django.conf import settings
+
 
 
 
@@ -41,27 +42,22 @@ def notify_arrival(request, package_id):
 
     return redirect('courier_dashboard')  # Replace with the appropriate URL
 
-def notify_pick_up(request, package_id):
+
+def notify_dropoff(request, package_id):
+    package = get_object_or_404(Package, id=package_id)
+
     if request.method == 'POST':
-        package = Package.objects.get(pk=package_id)
+        # Update the package status to 'at_pickup'
         package.status = 'at_pickup'
         package.save()
 
-        # Send email to sender
-        sender_email = package.recipientEmail
-        sender_message = f"Your package with ID {package.package_number} has arrived at the warehouse."
-        send_mail('Package Arrival Notification', sender_message, 'garynkuraiji@gmail.com', [sender_email])
+        # Add any additional functionality or notifications here
 
-        # Send email to warehouse
-        warehouse_email = 'warehouse@example.com'  # Replace with actual warehouse email
-        warehouse_message = f"A package with ID {package.package_number} has arrived at the warehouse."
-        send_mail('Package Arrival Notification', warehouse_message, 'sender@example.com', [warehouse_email])
+        messages.success(request, "Package drop-off notified successfully.")
+        return redirect('ready_packages')
 
-        messages.success(request, "Package arrival notified successfully.")
-    else:
-        messages.error(request, "Invalid request.")
+    return render(request, 'notify_dropoff.html', {'package': package})
 
-    return redirect('courier_dashboard')  # Replace with the appropriate URL
 
 
 

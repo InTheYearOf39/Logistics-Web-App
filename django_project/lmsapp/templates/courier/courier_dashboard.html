@@ -85,9 +85,9 @@
                             </td>
                             <td>
                                 {% if package.status == 'in_transit' %}
-                                    <form action="{% url 'notify_pick_up' package_id=package.id %}" method="post">
+                                    <form action="{% url 'notify_dropoff' package_id=package.id %}" method="post">
                                         {% csrf_token %}
-                                        <button type="submit" class="btn btn-sm btn-primary text-white">Notify Pick-Up</button>
+                                        <button type="submit" class="btn btn-sm btn-primary text-white">Notify Drop-off</button>
                                     </form>                            
                                 {% endif %}
 
@@ -181,9 +181,9 @@
                                         <th scope="row"></th>
                                         <td>
                                             {% if package.status == 'in_transit' %}
-                                                <form action="{% url 'notify_pick_up' package_id=package.id %}" method="post">
+                                                <form action="{% url 'notify_dropoff' package_id=package.id %}" method="post">
                                                     {% csrf_token %}
-                                                    <button type="submit" class="btn btn-sm btn-primary text-white">Notify Pick-Up</button>
+                                                    <button type="submit" class="btn btn-sm btn-primary text-white">Notify Drop-off</button>
                                                 </form>
                                             {% elif package.status == 'delivered' %}
                                                 <img src="{% static 'img/check.png' %}" alt="" width="25px" height="25px">

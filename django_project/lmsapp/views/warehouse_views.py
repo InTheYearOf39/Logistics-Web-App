@@ -136,7 +136,7 @@ def ready_packages(request):
 
             # Update the packages with the assigned courier and change their status
             packages = Package.objects.filter(id__in=selected_packages)
-            packages.update(courier=courier, dropOffLocation=drop_pick_zone, status='ready_for_pickup')
+            packages.update(courier=courier, dropOffLocation=drop_pick_zone, status='in_transit')
             
             courier.status = 'on-trip'
             courier.save()
@@ -173,7 +173,7 @@ def ready_for_pickup(request):
 
             # Update the packages with the assigned courier and change their status
             packages = Package.objects.filter(id__in=selected_packages)
-            packages.update(courier=courier, dropOffLocation=drop_pick_zone, status='ready_for_pickup')
+            packages.update(courier=courier, dropOffLocation=drop_pick_zone, status='in_transit')
             
             courier.status = 'on-trip'
             courier.save()
@@ -182,7 +182,7 @@ def ready_for_pickup(request):
 
             return redirect('warehouse_dashboard')
 
-    ready_packages = Package.objects.filter(status='ready_for_pickup')
+    ready_packages = Package.objects.filter(status='in_transit')
     available_couriers = User.objects.filter(role='courier', status='available')
     available_drop_pick_zones = User.objects.filter(role='drop_pick_zone')
 
