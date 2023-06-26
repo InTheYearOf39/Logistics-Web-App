@@ -120,7 +120,7 @@ def confirm_arrival(request, package_id):
     else:
         messages.error(request, "Invalid request.")
 
-    return redirect('warehouse_dashboard')  # Replace with the appropriate URL for the warehouse dashboard
+    return redirect('ready_packages')
 
 def ready_packages(request):
     ready_packages = Package.objects.filter(status__in=['warehouse_arrival', 'ready_for_pickup', 'in_house'])
