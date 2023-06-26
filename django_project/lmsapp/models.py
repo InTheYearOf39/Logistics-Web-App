@@ -94,6 +94,7 @@ class Package(models.Model):
     deliveryType = models.CharField(max_length=20, choices=DELIVERY_CHOICES)
     # dropOffLocation = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, default=None)
     dropOffLocation = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, default=None, related_name='packages_dropped_off')
+    warehouse = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='packages_in_house')
     packageDescription = models.TextField()
     recipientName = models.CharField(max_length=100)
     recipientEmail = models.CharField(max_length=100)
@@ -120,6 +121,9 @@ class Package(models.Model):
         if self.status in ['dropped_off', 'in_house', 'pending_delivery']:
             if self.status == 'dropped_off':
                 self.package_number = f"{self.dropOffLocation.tag}-{self.package_number}"
+            
+            if self.status == 'in_house' and self.warehouse:
+                self.package_number = f"{self.warehouse.tag}-{self.package_number}"
                                 
             if self.status == 'pending_delivery':
                 self.package_number = f"{self.dropOffLocation.tag}-{self.package_number}"
