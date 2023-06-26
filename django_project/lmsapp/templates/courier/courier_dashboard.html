@@ -151,6 +151,8 @@
                                                 <img src="{% static 'img/transit.png' %}" alt="" width="25px" height="25px">
                                             {% elif package.status == 'at_pickup' %}
                                                 <img src="{% static 'img/loading.png' %}" alt="" width="25px" height="25px">
+                                            {% elif package.status == 'ready_for_pickup' %}
+                                                <img src="{% static 'img/transit.png' %}" alt="" width="25px" height="25px">
                                             {% elif package.status == 'ongoing' %}
                                                 <form action="{% url 'notify_recipient' package_id=package.id %}" method="post">
                                                     {% csrf_token %}
@@ -188,11 +190,6 @@
                                                 <form action="{% url 'notify_pick_up' package_id=package.id %}" method="post">
                                                     {% csrf_token %}
                                                     <button type="submit" class="btn btn-sm btn-primary text-white">Notify Pick-Up</button>
-                                                </form>
-                                                {% elif package.status == 'ready_for_pickup' %}
-                                                <form action="{% url 'complete_delivery' package_id=package.id %}" method="post">
-                                                    {% csrf_token %}
-                                                    <button type="submit" class="btn btn-sm btn-success text-white">Complete Delivery</button>
                                                 </form>
                                             {% elif package.status == 'delivered' %}
                                                 <img src="{% static 'img/check.png' %}" alt="" width="25px" height="25px">
