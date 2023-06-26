@@ -9,47 +9,6 @@
 {% block content %}
 
 
-<h2 class="mt-3">Warehouse Arrivals</h2>
-<div class="table-responsive">
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th scope="col">No.</th>
-                <th scope="col">Package Title</th>
-                <th scope="col">Package Description</th>
-                <th scope="col">Recipient</th>
-                <th scope="col">Address From</th>
-                <th scope="col">Address To</th>
-                <th scope="col">Package Number</th>
-                <th scope="col">Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for package in ready_packages %}
-            {% if package.status == 'warehouse_arrival' %}
-            <tr>
-                <td>{{ forloop.counter }}</td>
-                <td>{{ package.packageName }}</td>
-                <td>{{ package.packageDescription }}</td>
-                <td>{{ package.recipientName }}</td>
-                <td>{{ package.sendersAddress }}</td>
-                <td>{{ package.recipientAddress }}</td>
-                <td>{{ package.package_number }}</td>
-                <!-- <td>{{ package.status }}</td> -->
-                <td>
-                    {% if package.status == 'warehouse_arrival' %}
-                    <form action="{% url 'confirm_arrival' package_id=package.id %}" method="post">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-sm btn-primary text-white">Confirm</button>
-                    </form>
-                    {% endif %}
-                </td>
-            </tr>
-            {% endif %}
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
 <form method="post">
     {% csrf_token %}
     <h2 class="mt-3">In House</h2>
@@ -112,51 +71,5 @@
     </div>
     <a href="{% url 'ready_for_pickup' %}"><button class="btn btn-primary text-white mt-3"> Assign</button></a>
 </form>
-<!-- <h2 class="mt-3">Ready For Pick-Up</h2>
-<div class="table-responsive">
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th scope="col">No.</th>
-                <th scope="col">Package Title</th>
-                <th scope="col">Package Description</th>
-                <th scope="col">Recipient</th>
-                <th scope="col">Address From</th>
-                <th scope="col">Address To</th>
-                <th scope="col">Package Number</th>
-                <th scope="col">Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for package in ready_packages %}
-            {% if package.status == 'ready_for_pickup' %}
-            <tr>
-                <td>{{ forloop.counter }}</td>
-                <td>{{ package.packageName }}</td>
-                <td>{{ package.packageDescription }}</td>
-                <td>{{ package.recipientName }}</td>
-                <td>{{ package.sendersAddress }}</td>
-                <td>{{ package.recipientAddress }}</td>
-                <td>{{ package.package_number }}</td>
-                <td>{{ package.status }}</td>
-                <td>
-                    {% if package.status == 'ready_for_pickup' %}
-                    <img src="{% static 'img/box.png' %}" alt="" width="25px" height="25px">
-                    {% endif %}
-                </td>
-                <td>
-                    {% if package.status == 'ready_for_pickup' %}
-                    <form action="{% url 'to_pickup' package_id=package.id %}" method="post">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-sm btn-primary">Confirm</button>
-                    </form>
-                    {% endif %}
-                </td>
-            </tr>
-            {% endif %}
-            {% endfor %}
-        </tbody>
-    </table>
-</div> -->
 
 {% endblock %}

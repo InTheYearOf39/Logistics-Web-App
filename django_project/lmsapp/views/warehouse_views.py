@@ -192,3 +192,17 @@ def ready_for_pickup(request):
         'available_drop_pick_zones': available_drop_pick_zones
     }
     return render(request, 'warehouse/ready_for_pickup.html', context)
+
+
+
+def new_arrivals(request):
+    arrived_packages = Package.objects.filter(status='warehouse_arrival')
+    print(arrived_packages)
+    if request.method == 'POST':
+ 
+        return redirect('ready_packages')
+            
+    context = {
+        'arrived_packages': arrived_packages,
+    }
+    return render(request, 'warehouse/new_arrivals.html', context)
