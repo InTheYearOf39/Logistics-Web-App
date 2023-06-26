@@ -100,27 +100,28 @@ def confirm_arrival(request, package_id):
     if request.method == 'POST':
         package = Package.objects.get(pk=package_id)
         package.status = 'in_house'
+        
+        # Assign the warehouse to the package
+        warehouse = User.objects.get(role='warehouse')
+        package.warehouse = warehouse
+        
+        # Save the package
         package.save()
 
-        courier = package.courier
-        if courier:
-            courier.status = 'available'
-            courier.save()
-    
-        sender_email = package.recipientEmail
-        sender_message = f"Your package with ID {package.package_number} has arrived at the warehouse."
-        send_mail('Package Arrival Notification', sender_message, 'garynkuraiji@gmail.com', [sender_email])
+        # Send email to sender
+        subject = 'Package Dropped Off at Warehouse'
+        message = f'Dear sender, your package with delivery number {package.package_number} has been dropped off at the warehouse.'
 
-        # # Send email to warehouse
-        # warehouse_email = 'warehouse@example.com'  # Replace with actual warehouse email
-        # warehouse_message = f"A package with ID {package.package_number} has arrived at the warehouse."
-        # send_mail('Package Arrival Notification', warehouse_message, 'sender@example.com', [warehouse_email])
+        sender_user = User.objects.get(username=package.user.username)
+        sender_email = sender_user.email
+
+        send_mail(subject, message, sender_email, [sender_email])   
 
         messages.success(request, "Package arrival notified successfully.")
     else:
         messages.error(request, "Invalid request.")
 
-    return redirect('ready_packages')
+    return redirect('ready_packages')  # Replace with the appropriate URL for the warehouse dashboard
 
 def ready_packages(request):
     ready_packages = Package.objects.filter(status__in=['warehouse_arrival', 'ready_for_pickup', 'in_house'])
