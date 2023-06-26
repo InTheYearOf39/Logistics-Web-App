@@ -98,15 +98,22 @@ def change_password(request):
 
 def confirm_arrival(request, package_id):
     if request.method == 'POST':
+        warehouse = request.user
         package = Package.objects.get(pk=package_id)
         package.status = 'in_house'
+        courier = package.courier
+        if courier:
+            courier.status = 'available'
+            courier.save()
         
         # Assign the warehouse to the package
-        warehouse = User.objects.get(role='warehouse')
+        # warehouse = User.objects.get(role='warehouse')
         package.warehouse = warehouse
         
         # Save the package
         package.save()
+        
+        
 
         # Send email to sender
         subject = 'Package Dropped Off at Warehouse'
