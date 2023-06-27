@@ -54,7 +54,7 @@ def notify_dropoff(request, package_id):
         # Add any additional functionality or notifications here
 
         messages.success(request, "Package drop-off notified successfully.")
-        return redirect('ready_packages')
+        return redirect('courier_dashboard')
 
     return render(request, 'notify_dropoff.html', {'package': package})
 
