@@ -22,7 +22,7 @@ class User(AbstractUser):
         ('courier', 'courier'),
         ('sender', 'sender'),
         ('drop_pick_zone', 'drop_pick_zone'),
-        ('warehouse', 'warehouse'),  # Add 'warehouse' role
+        ('warehouse', 'warehouse'),
     )
     STATUS_CHOICES = (
         ('available', 'Available'),

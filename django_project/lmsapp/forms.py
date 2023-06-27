@@ -26,24 +26,24 @@ class LoginForm(forms.Form):
 
 
 class SignUpForm(UserCreationForm):
-    admin = "admin"
-    courier = "courier"
-    sender = "sender"
-    drop_pick_zone = "drop_pick_zone"
+    # admin = "admin"
+    # courier = "courier"
+    # sender = "sender"
+    # drop_pick_zone = "drop_pick_zone"
     
 
-    ROLE_CHOICES = [
-        (admin, "admin"),
-        (courier, "courier"),
-        (sender, "sender"),
-        (drop_pick_zone, "drop pick zone")
-    ]
+    # ROLE_CHOICES = [
+    #     (admin, "admin"),
+    #     (courier, "courier"),
+    #     (sender, "sender"),
+    #     (drop_pick_zone, "drop pick zone")
+    # ]
 
-    role = forms.ChoiceField(
-        required=True,
-        choices=ROLE_CHOICES,
-        widget=forms.RadioSelect(attrs={'id': 'id_role'}),
-    )
+    # role = forms.ChoiceField(
+    #     required=True,
+    #     choices=ROLE_CHOICES,
+    #     widget=forms.RadioSelect(attrs={'id': 'id_role'}),
+    # )
 
     name = forms.CharField(
         widget=forms.TextInput(
@@ -101,7 +101,7 @@ class SignUpForm(UserCreationForm):
 
     class Meta:
         model = User
-        fields = ('name', 'username', 'email', 'password1', 'password2', 'role', 'tag')
+        fields = ('name', 'username', 'email', 'password1', 'password2', 'tag')
 
 class PackageForm(forms.ModelForm):
     

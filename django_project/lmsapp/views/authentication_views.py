@@ -12,15 +12,13 @@ def register(request):
     if request.method == 'POST':
         form = SignUpForm(request.POST)
         if form.is_valid():
-            user = form.save()
+            user = form.save(commit=False)
+            user.role = 'sender'
+            user.save()
             msg = 'user created'
 
             dashboard_mapping = {
-                # 'admin': 'admin_dashboard',
-                'courier': 'courier_dashboard',
                 'sender': 'sender_dashboard',
-                # 'recipient': 'recipient_dashboard',
-                'drop_pick_zone': 'drop_pick_zone_dashboard',
             }
             dashboard_url = dashboard_mapping.get(user.role)
             user.backend = 'django.contrib.auth.backends.ModelBackend'
