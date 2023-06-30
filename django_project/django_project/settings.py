@@ -31,7 +31,8 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
-SITE_ID = 3
+SITE_ID = 4
+
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -46,6 +47,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+    
  
 ]
 
@@ -151,13 +153,21 @@ AUTH_USER_MODEL = 'lmsapp.User'
 # DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'smtp.gmail.com'
+# EMAIL_PORT = 587
+# EMAIL_HOST_USER = 'blessingisrael625@gmail.com'
+# EMAIL_HOST_PASSWORD = 'hihbhtfowjllxdcv'
+# EMAIL_USE_TLS = True
+# DEFAULT_FROM_EMAIL = 'blessingisrael625@gmail.com'
+
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_HOST_USER = 'blessingisrael625@gmail.com'
-EMAIL_HOST_PASSWORD = 'hihbhtfowjllxdcv'
+EMAIL_HOST = 'webmail.nftconsult.com'
+EMAIL_PORT = 25
+EMAIL_HOST_USER = 'no-reply@nftconsult.com'
+EMAIL_HOST_PASSWORD = '@12dlN0r3ply'
 EMAIL_USE_TLS = True
-DEFAULT_FROM_EMAIL = 'blessingisrael625@gmail.com'
+DEFAULT_FROM_EMAIL = 'no-reply@nftconsult.com'
 
 
 AUTHENTICATION_BACKENDS = (

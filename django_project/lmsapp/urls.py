@@ -76,4 +76,18 @@ urlpatterns = [
     path('confirm_recipient_pickup/<int:package_id>/', drop_pick_zone_views.confirm_recipient_pickup, name='confirm_recipient_pickup'),
     # path('delivery_courier/<int:package_id>/', drop_pick_zone_views.delivery_courier, name='delivery_courier'),
     path('confirm_pickedup/<int:package_id>/', drop_pick_zone_views.confirm_pickedup, name='confirm_pickedup'),
+
+    path( 'reset_password/', 
+         auth_views.PasswordResetView.as_view(template_name="auth/password_reset.html"), 
+         name= "reset_password"),
+    path( 'reset_password_sent/',
+         auth_views.PasswordResetDoneView.as_view(template_name="auth/password_reset_sent.html"), 
+         name="password_reset_done"),
+    path('reset/<uidb64>/<token>/', 
+         auth_views.PasswordResetConfirmView.as_view(template_name="auth/password_reset_form.html"), 
+         name="password_reset_confirm"),
+
+    path( 'reset_password_complete/', 
+         auth_views.PasswordResetCompleteView.as_view(template_name="auth/password_reset_done.html"), 
+         name ="password_reset_complete"),
 ]
