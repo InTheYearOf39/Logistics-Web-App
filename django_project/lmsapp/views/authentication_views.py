@@ -48,7 +48,6 @@ def login_view(request):
                         'admin': 'admin_dashboard',
                         'courier': 'courier_dashboard',
                         'sender': 'sender_dashboard',
-                        # 'recipient': 'recipient_dashboard',
                         'drop_pick_zone': 'drop_pick_zone_dashboard',
                         'warehouse': 'warehouse_dashboard',
                     }
