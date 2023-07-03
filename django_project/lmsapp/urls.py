@@ -27,6 +27,21 @@ urlpatterns = [
     # path('change_password/', authentication_views.change_password, name='change_password'),
 
 
+    # reset password routes
+    path( 'reset_password/', 
+         auth_views.PasswordResetView.as_view(template_name="registration/password_reset_form_.html"), 
+         name= "reset_password"),
+    path( 'reset_password_sent/',
+         auth_views.PasswordResetDoneView.as_view(template_name="registration/password_reset_done_.html"), 
+         name="password_reset_done"),
+    path('reset/<uidb64>/<token>/', 
+         auth_views.PasswordResetConfirmView.as_view(template_name="registration/password_reset_confirm_.html"), 
+         name="password_reset_confirm"),
+    path( 'reset_password_complete/', 
+         auth_views.PasswordResetCompleteView.as_view(template_name="registration/password_reset_complete_.html"), 
+         name ="password_reset_complete"),
+
+
     # admin routes
     path('admin_dashboard/', admin_views.admin, name='admin_dashboard'),
     path('users/', admin_views.users, name='users'),
@@ -66,6 +81,7 @@ urlpatterns = [
     path('to_pickup/<int:package_id>/', warehouse_views.to_pickup, name='to_pickup'),
     # path('reassign_courier/<int:package_id>/', warehouse_views.reassign_courier, name='reassign_courier'),
 
+
     # Drop off and Pick up routes
     path('drop_pick_zone_dashboard/', drop_pick_zone_views.drop_pick_zone_dashboard, name='drop_pick_zone_dashboard'),
     path('confirm-drop-off/<int:package_id>/', drop_pick_zone_views.confirm_drop_off, name='confirm_drop_off'),
@@ -76,4 +92,5 @@ urlpatterns = [
     path('confirm_recipient_pickup/<int:package_id>/', drop_pick_zone_views.confirm_recipient_pickup, name='confirm_recipient_pickup'),
     # path('delivery_courier/<int:package_id>/', drop_pick_zone_views.delivery_courier, name='delivery_courier'),
     path('confirm_pickedup/<int:package_id>/', drop_pick_zone_views.confirm_pickedup, name='confirm_pickedup'),
+    
 ]
