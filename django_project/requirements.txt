@@ -10,6 +10,7 @@ django-allauth==0.54.0
 filelock==3.12.0
 idna==3.4
 lm==0.1.0
+mysqlclient==2.2.0
 oauthlib==3.2.2
 platformdirs==3.5.1
 pycparser==2.21
