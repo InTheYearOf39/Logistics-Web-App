@@ -7,8 +7,8 @@ from django.shortcuts import render, redirect
 from lmsapp.forms import ChangePasswordForm
 from django.contrib.auth import update_session_auth_hash
 from django.shortcuts import redirect, get_object_or_404
-from django.contrib import messages
 from django.core.mail import send_mail
+from django.conf import settings
 
 
 
@@ -121,8 +121,9 @@ def confirm_arrival(request, package_id):
 
         sender_user = User.objects.get(username=package.user.username)
         sender_email = sender_user.email
+        sender = settings.EMAIL_HOST_USER
 
-        send_mail(subject, message, sender_email, [sender_email])   
+        send_mail(subject, message, sender, [sender_email])   
 
         messages.success(request, "Package arrival notified successfully.")
     else:

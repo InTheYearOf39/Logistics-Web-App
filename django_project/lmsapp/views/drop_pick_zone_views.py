@@ -38,8 +38,9 @@ def confirm_drop_off(request, package_id):
 
         sender_user = User.objects.get(username=package.user.username)
         sender_email = sender_user.email
+        sender = settings.EMAIL_HOST_USER
 
-        send_mail(subject, message, sender_email, [sender_email])
+        send_mail(subject, message, sender, [sender_email])
 
         return redirect('dpz_dispatch')
 
@@ -182,8 +183,9 @@ def confirm_pickup(request, package_id):
 
         sender_user = User.objects.get(username=package.user.username)
         sender_email = sender_user.email
+        sender = settings.EMAIL_HOST_USER
 
-        send_mail(subject, message, sender_email, [sender_email])
+        send_mail(subject, message, sender, [sender_email])
 
         return redirect('dispatched_packages')
 
