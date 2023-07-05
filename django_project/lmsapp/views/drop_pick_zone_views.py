@@ -80,7 +80,7 @@ def confirm_at_pickup(request, package_id):
         except Exception as e:
             messages.error(request, "Failed to send email notification. Please try again later.")
 
-        return redirect('drop_pick_zone_dashboard')  # Replace with the appropriate URL for the warehouse dashboard
+        return redirect('drop_pick_zone_dashboard')
     else:
         messages.error(request, "Invalid request.")
 
@@ -134,8 +134,6 @@ def confirm_pickup(request, package_id):
         package.status = 'en_route'
         package.save()
         
-
-
         subject = 'Package Update: En Route to Warehouse'
         message = f'Dear Sender, your package {package.package_number} is now en route to the warehouse.'
 
@@ -174,7 +172,6 @@ def delivery_courier(request, package_id):
             courier.status = 'available'
         
         courier.save()
-
 
         return redirect('drop_pick_zone_dashboard')
 
