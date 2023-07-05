@@ -11,7 +11,9 @@ from django.contrib import messages
 from django.core.mail import send_mail
 from django.conf import settings
 
-# the view displays a warehouse dashboard template where warehouse users can see packages grouped by drop_pick_zone, select packages and assign them to available couriers
+"""  
+ The view displays a warehouse dashboard template where warehouse users can see packages grouped by drop_pick_zone, select packages and assign them to available couriers
+ """
 @login_required
 def warehouse_dashboard(request):
     greeting_message = get_time_of_day()
@@ -85,7 +87,8 @@ def change_password(request):
         form = ChangePasswordForm(request.user)
     return render(request, 'warehouse/change_password.html', {'form': form})
 
-# Handles the confirmation of package arrival at the warehouse. It updates the package status, updates the courier's status if applicable, sends an email notification to the sender
+"""  Handles the confirmation of package arrival at the warehouse. It updates the package status, updates the courier's status if applicable, sends an email notification to the sender
+ """
 def confirm_arrival(request, package_id):
     if request.method == 'POST':
         warehouse = request.user
@@ -116,7 +119,8 @@ def confirm_arrival(request, package_id):
 
     return redirect('ready_packages')  # Replace with the appropriate URL for the warehouse dashboard
 
-#the view displays a list of packages with the 'in_house'status and allows the user to assign selected packages to available couriers and drop_pick_zones, and updates the package status to 'in_transit'.
+"""  The view displays a list of packages with the 'in_house'status and allows the user to assign selected packages to available couriers and drop_pick_zones, and updates the package status to 'in_transit'.
+ """ 
 def ready_packages(request):
     ready_packages = Package.objects.filter(status__in=['warehouse_arrival', 'ready_for_pickup', 'in_house'])
     if request.method == 'POST':
@@ -155,7 +159,8 @@ def to_pickup(request, package_id):
 
     return redirect('ready_packages')  # Replace with the appropriate URL for the warehouse dashboard
 
-# the view displays a list of packages ready for pickup and allows the user to assign selected packages to couriers and drop_pick_zones. It handles form submissions, updates the package assignments and statuses, and provides available couriers and drop_pick_zones in the context.
+"""  the view displays a list of packages ready for pickup and allows the user to assign selected packages to couriers and drop_pick_zones. It handles form submissions, updates the package assignments and statuses, and provides available couriers and drop_pick_zones in the context.
+ """ 
 def ready_for_pickup(request):
     if request.method == 'POST':
         selected_packages = request.POST.getlist('selected_packages')
