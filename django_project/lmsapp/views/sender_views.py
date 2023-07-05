@@ -10,8 +10,10 @@ from django.shortcuts import redirect
 from django.contrib import messages
 
 
-""" Renders out a sender dashboard template and shows packages with the statuses 'ongoing' & 'upcoming' that are for a specific sender.
- """
+"""
+Renders out a sender dashboard template and shows packages with the statuses 
+'ongoing' & 'upcoming' that are for a specific sender.
+"""
 @login_required
 def sender_dashboard(request):
     packages = Package.objects.filter(
@@ -34,10 +36,11 @@ def sender_dashboard(request):
     return render(request, 'sender/sender_dashboard.html', context)
 
 """  
-Handles the registration of new packages by senders, ensuring the form data is valid and saving the package to the database with the appropriate details.
- """ 
+Handles the registration of new packages by senders, ensuring the form data is valid 
+and saving the package to the database with the appropriate details.
+""" 
 def register_package(request):
-    drop_pick_zones = User.objects.filter(role='drop_pick_zone')  # Retrieve users with the role of 'drop_pick_zone'
+    drop_pick_zones = User.objects.filter(role='drop_pick_zone') 
 
     if request.method == 'POST':
         form = PackageForm(request.POST)

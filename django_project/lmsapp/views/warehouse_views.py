@@ -12,8 +12,9 @@ from django.core.mail import send_mail
 from django.conf import settings
 
 """  
- The view displays a warehouse dashboard template where warehouse users can see packages grouped by drop_pick_zone, select packages and assign them to available couriers
- """
+The view displays a warehouse dashboard template where warehouse users can see packages grouped by drop_pick_zone, 
+select packages and assign them to available couriers
+"""
 @login_required
 def warehouse_dashboard(request):
     greeting_message = get_time_of_day()
@@ -57,7 +58,10 @@ def warehouse_dashboard(request):
 
     return render(request, 'warehouse/warehouse_dashboard.html', context)
 
-# the view handles the change password functionality and renders a template with a form for users to enter their new password.
+"""
+The view handles the change password functionality and renders a template with a form 
+for users to enter their new password.
+"""
 @login_required
 def change_password(request):
     if request.method == 'POST':
@@ -73,8 +77,10 @@ def change_password(request):
         form = ChangePasswordForm(request.user)
     return render(request, 'warehouse/change_password.html', {'form': form})
 
-"""  Handles the confirmation of package arrival at the warehouse. It updates the package status, updates the courier's status if applicable, sends an email notification to the sender
- """
+""" 
+Handles the confirmation of package arrival at the warehouse. It updates the package status, 
+updates the courier's status if applicable, sends an email notification to the sender
+"""
 def confirm_arrival(request, package_id):
     if request.method == 'POST':
         warehouse = request.user
@@ -101,10 +107,12 @@ def confirm_arrival(request, package_id):
     else:
         messages.error(request, "Invalid request.")
 
-    return redirect('ready_packages')  # Replace with the appropriate URL for the warehouse dashboard
+    return redirect('ready_packages') 
 
-"""  The view displays a list of packages with the 'in_house'status and allows the user to assign selected packages to available couriers and drop_pick_zones, and updates the package status to 'in_transit'.
- """ 
+""" 
+The view displays a list of packages with the 'in_house'status and allows the user to assign selected packages 
+to available couriers and drop_pick_zones, and updates the package status to 'in_transit'.
+""" 
 def ready_packages(request):
     ready_packages = Package.objects.filter(status__in=['warehouse_arrival', 'ready_for_pickup', 'in_house'])
     if request.method == 'POST':
@@ -134,17 +142,20 @@ def ready_packages(request):
     }
     return render(request, 'warehouse/ready_packages.html', context)
 
-#the view updates the status of a package to "in_transit" from 'ready_for_pickup'()
+#The view updates the status of a package to "in_transit" from 'ready_for_pickup'()
 def to_pickup(request, package_id):
     if request.method == 'POST':
         package = Package.objects.get(pk=package_id)
         package.status = 'in_transit'
         package.save()
 
-    return redirect('ready_packages')  # Replace with the appropriate URL for the warehouse dashboard
+    return redirect('ready_packages')
 
-"""  the view displays a list of packages ready for pickup and allows the user to assign selected packages to couriers and drop_pick_zones. It handles form submissions, updates the package assignments and statuses, and provides available couriers and drop_pick_zones in the context.
- """ 
+""" 
+The view displays a list of packages ready for pickup and allows the user to assign selected packages 
+to couriers and drop_pick_zones. It handles form submissions, updates the package assignments and statuses, 
+and provides available couriers and drop_pick_zones in the context.
+""" 
 def ready_for_pickup(request):
     if request.method == 'POST':
         selected_packages = request.POST.getlist('selected_packages')
@@ -177,7 +188,7 @@ def ready_for_pickup(request):
     }
     return render(request, 'warehouse/ready_for_pickup.html', context)
 
-#the view displays a list packages at the warehouse with the status 'warehouse_arrival' 
+#The view displays a list packages at the warehouse with the status 'warehouse_arrival' 
 def new_arrivals(request):
     arrived_packages = Package.objects.filter(status='warehouse_arrival')
 
