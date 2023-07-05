@@ -11,27 +11,21 @@ from django.contrib import messages
 from django.core.mail import send_mail
 
 
-
+# the view displays a warehouse dashboard template where warehouse users can see packages grouped by drop_pick_zone, select packages and assign them to available couriers
 @login_required
 def warehouse_dashboard(request):
     greeting_message = get_time_of_day()
-    # Retrieve the current warehouse user
     warehouse_user = request.user
 
-    # Retrieve the drop_pick_zones belonging to the warehouse
     drop_pick_zones = User.objects.filter(role='drop_pick_zone', warehouse=warehouse_user)
 
-    # Create an empty dictionary to store packages by location
     packages_by_location = {}
 
-    # Iterate over the drop_pick_zones belonging to the warehouse
     for drop_pick_zone in drop_pick_zones:
-        # Retrieve the packages dropped off at each drop_pick_zone
         packages = Package.objects.filter(dropOffLocation=drop_pick_zone, status='dropped_off')
 
-        # Add the drop_pick_zone and associated packages to the dictionary
         packages_by_location[drop_pick_zone.name] = packages
-
+        
     if request.method == 'POST':
         selected_packages = request.POST.getlist('selected_packages')
         courier_id = request.POST.get('courier')
@@ -39,24 +33,19 @@ def warehouse_dashboard(request):
         if selected_packages and courier_id:
             courier = get_object_or_404(User, id=courier_id, role='courier', status='available')
 
-            # Update the packages with the assigned courier and change their status
             packages = Package.objects.filter(id__in=selected_packages)
             packages.update(courier=courier, status='dispatched')
             
-            # courier_status = Package.objects.filter(courier=courier, status__in=['dispatched', 'upcoming', 'ongoing', 'arrived', 'en_route', 'warehouse_arrival', 'in_transit', 'at_pickup', 'ready_for_pickup']).exists()
             courier_status = Package.objects.filter(courier=courier, status='dispatched').exists()
 
             if courier_status:
-                courier.status = 'on-trip'
-            # else:
-            #     courier.status = 'available'
-            
+                courier.status = 'on-trip'            
             courier.save()
 
             messages.success(request, 'Packages successfully assigned to courier.')
 
             return redirect('warehouse_dashboard')
-
+    
     available_couriers=User.objects.filter(role='courier', status='available')
     context = {
         'packages_by_location': packages_by_location,
@@ -81,6 +70,7 @@ def warehouse_dashboard(request):
 #         form = ChangePasswordForm(request.user)
 #     return render(request, 'warehouse/change_password.html', {'form': form})
 
+# the view handles the change password functionality and renders a template with a form for users to enter their new password.
 def change_password(request):
     if request.method == 'POST':
         form = ChangePasswordForm(request.user, request.POST)
@@ -95,7 +85,7 @@ def change_password(request):
         form = ChangePasswordForm(request.user)
     return render(request, 'warehouse/change_password.html', {'form': form})
 
-
+# Handles the confirmation of package arrival at the warehouse. It updates the package status, updates the courier's status if applicable, sends an email notification to the sender
 def confirm_arrival(request, package_id):
     if request.method == 'POST':
         warehouse = request.user
@@ -106,11 +96,7 @@ def confirm_arrival(request, package_id):
             courier.status = 'available'
             courier.save()
         
-        # Assign the warehouse to the package
-        # warehouse = User.objects.get(role='warehouse')
         package.warehouse = warehouse
-        
-        # Save the package
         package.save()
         
         
@@ -130,6 +116,7 @@ def confirm_arrival(request, package_id):
 
     return redirect('ready_packages')  # Replace with the appropriate URL for the warehouse dashboard
 
+#the view displays a list of packages with the 'in_house'status and allows the user to assign selected packages to available couriers and drop_pick_zones, and updates the package status to 'in_transit'.
 def ready_packages(request):
     ready_packages = Package.objects.filter(status__in=['warehouse_arrival', 'ready_for_pickup', 'in_house'])
     if request.method == 'POST':
@@ -159,7 +146,7 @@ def ready_packages(request):
     }
     return render(request, 'warehouse/ready_packages.html', context)
 
-
+#the view updates the status of a package to "in_transit" from 'ready_for_pickup'()
 def to_pickup(request, package_id):
     if request.method == 'POST':
         package = Package.objects.get(pk=package_id)
@@ -168,6 +155,7 @@ def to_pickup(request, package_id):
 
     return redirect('ready_packages')  # Replace with the appropriate URL for the warehouse dashboard
 
+# the view displays a list of packages ready for pickup and allows the user to assign selected packages to couriers and drop_pick_zones. It handles form submissions, updates the package assignments and statuses, and provides available couriers and drop_pick_zones in the context.
 def ready_for_pickup(request):
     if request.method == 'POST':
         selected_packages = request.POST.getlist('selected_packages')
@@ -200,8 +188,7 @@ def ready_for_pickup(request):
     }
     return render(request, 'warehouse/ready_for_pickup.html', context)
 
-
-
+#the view displays a list packages at the warehouse with the status 'warehouse_arrival' 
 def new_arrivals(request):
     arrived_packages = Package.objects.filter(status='warehouse_arrival')
 

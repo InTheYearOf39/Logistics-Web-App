@@ -10,7 +10,7 @@ from django.shortcuts import redirect
 from django.contrib import messages
 
 
-
+#Renders out a sender dashboard template and shows packages with the statuses 'ongoing' & 'upcoming' that are for a specific sender.
 @login_required
 def sender_dashboard(request):
     packages = Package.objects.filter(
@@ -32,6 +32,7 @@ def sender_dashboard(request):
         }
     return render(request, 'sender/sender_dashboard.html', context)
 
+# Handles the registration of new packages by senders, ensuring the form data is valid and saving the package to the database with the appropriate details.
 def register_package(request):
     drop_pick_zones = User.objects.filter(role='drop_pick_zone')  # Retrieve users with the role of 'drop_pick_zone'
 
@@ -59,11 +60,12 @@ def register_package(request):
 
     return render(request, 'sender/register_package.html', {'form': form, 'error_message': error_message, 'drop_pick_zones': drop_pick_zones})
 
-
+# Generates a random selection of five digits, concatenated with pn to work as the package number
 def generate_package_number():
     prefix = 'pn'
     digits = ''.join(random.choices(string.digits, k=5))
     return f'{prefix}{digits}'
 
+# Renders the 'sender_history.html' template which should display all the packages that a sender has interacted with
 def sender_history(request):
     return render(request, 'sender/sender_history.html', {})
