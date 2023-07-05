@@ -55,22 +55,8 @@ def warehouse_dashboard(request):
 
     return render(request, 'warehouse/warehouse_dashboard.html', context)
 
-@login_required
-# def change_password(request):
-#     if request.method == 'POST':
-#         form = ChangePasswordForm(request.user, request.POST)
-#         if form.is_valid():
-#             user = form.save()
-#             update_session_auth_hash(request, user)  # Important to update the session
-#             messages.success(request, 'Your password has been successfully changed.')
-#             return redirect('warehouse_dashboard')
-#         else:
-#             messages.error(request, 'Please correct the error below.')
-#     else:
-#         form = ChangePasswordForm(request.user)
-#     return render(request, 'warehouse/change_password.html', {'form': form})
-
 # the view handles the change password functionality and renders a template with a form for users to enter their new password.
+@login_required
 def change_password(request):
     if request.method == 'POST':
         form = ChangePasswordForm(request.user, request.POST)
@@ -99,8 +85,6 @@ def confirm_arrival(request, package_id):
         package.warehouse = warehouse
         package.save()
         
-        
-
         # Send email to sender
         subject = 'Package Dropped Off at Warehouse'
         message = f'Dear sender, your package with delivery number {package.package_number} has been dropped off at the warehouse.'

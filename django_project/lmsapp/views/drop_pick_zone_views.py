@@ -74,7 +74,7 @@ def confirm_at_pickup(request, package_id):
         except Exception as e:
             messages.error(request, "Failed to send email notification. Please try again later.")
 
-        return redirect('drop_pick_zone_dashboard')  # Replace with the appropriate URL for the warehouse dashboard
+        return redirect('drop_pick_zone_dashboard')
     else:
         messages.error(request, "Invalid request.")
 
@@ -95,53 +95,6 @@ def confirm_recipient_pickup(request, package_id):
 
     return redirect('drop_pick_zone_dashboard')
 
-
-# def confirm_at_pickup(request, package_id):
-#     package = get_object_or_404(Package, id=package_id)
-#     package.status = 'ready_for_pickup'
-#     package.save()
-
-#     # Generate a 3-digit OTP
-#     otp = str(random.randint(100000, 999999))
-#     # Save the OTP in the package
-#     package.otp = otp
-#     package.save()
-    
-#     courier = package.courier
-#     if courier:
-#         courier.status = 'available'
-#         courier.save()
-
-#     # Send email to recipient
-#     subject = 'Package Ready for Pickup'
-#     message = f'Dear recipient, your package with delivery number {package.package_number} is ready for pickup at {package.dropOffLocation}.\n\n' \
-#               f'Please provide the following OTP when picking up the package: {otp}.\n\n' \
-#               f'Thank you.'
-#     recipient_email = package.recipientEmail
-#     send_mail(subject, message, 'sender@example.com', [recipient_email])
-
-#     # Redirect to the desired page after confirming the pickup
-#     return redirect('drop_pick_zone_dashboard')
-
-# def confirm_recipient_pickup(request, package_id):
-#     if request.method == 'POST':
-#         package = Package.objects.get(pk=package_id)
-#         entered_code = request.POST.get('inputField')
-
-#         if package.status == 'ready_for_pickup' and package.otp == entered_code:
-#             package.status = 'completed'
-#             package.save()
-#             messages.success(request, "Package delivery confirmed successfully.")
-#         else:
-#             messages.error(request, "Invalid OTP. Please try again.")
-            
-#         # courier = package.courier
-#         # if courier:
-#         #     courier.status = 'available'
-#         #     courier.save()
-
-#     return redirect('drop_pick_zone_dashboard')
-
 #the view retrieves packages that are marked as 'dropped_off' and belong to the current drop pick zone user. It then renders the dispatch.html template, passing the retrieved packages to be displayed.
 def dispatch(request):
     drop_pick_zone = request.user
@@ -152,15 +105,11 @@ def dispatch(request):
     }
     return render(request, 'drop_pick_zone/dispatch.html', context)
 
-
-
 #the view retrieves packages that are marked as 'dispatched' and belong to the current drop pick zone user. It then renders the dispatched_packages.html template, passing the retrieved packages to be displayed.
 def dispatched_packages(request):
     drop_pick_zone = request.user
     packages = Package.objects.filter(dropOffLocation=drop_pick_zone, status='dispatched')
     return render(request, 'drop_pick_zone/dispatched_packages.html', {'packages': packages})
-
-
 
 #the view allows the drop pick zone to confirm the pickup of a package. Upon confirmation, the package status is updated and an email notification is sent to the sender. 
 def confirm_pickup(request, package_id):
@@ -170,8 +119,6 @@ def confirm_pickup(request, package_id):
         package.status = 'en_route'
         package.save()
         
-
-
         subject = 'Package Update: En Route to Warehouse'
         message = f'Dear Sender, your package {package.package_number} is now en route to the warehouse.'
 
@@ -208,7 +155,6 @@ def delivery_courier(request, package_id):
             courier.status = 'available'
         
         courier.save()
-
 
         return redirect('drop_pick_zone_dashboard')
 
