@@ -39,7 +39,7 @@ def confirm_drop_off(request, package_id):
         sender_user = User.objects.get(username=package.user.username)
         sender_email = sender_user.email
 
-        send_mail(subject, message, sender_email, [sender_email])
+        send_mail(subject, message, settings.EMAIL_HOST_USER, [sender_email])
 
         return redirect('dpz_dispatch')
 
@@ -68,11 +68,10 @@ def confirm_at_pickup(request, package_id):
         # Send the email with OTP
         subject = "Package Arrival Notification"
         message = f"Dear {package.recipientName},\n\nYour package with delivery number {package.package_number} has arrived at its destination.\n\nOTP: Your One Time Password is: {otp}, please do not share this with anyone but your courier.\n\nThank you,\nThe Courier Service Team"
-        sender = settings.EMAIL_HOST_USER
         receiver = package.recipientEmail
 
         try:
-            send_mail(subject, message, sender, [receiver])
+            send_mail(subject, message, settings.EMAIL_HOST_USER, [receiver])
             messages.success(request, "Email notification sent successfully.")
 
             # # Update the status to 'arrived'
@@ -183,7 +182,7 @@ def confirm_pickup(request, package_id):
         sender_user = User.objects.get(username=package.user.username)
         sender_email = sender_user.email
 
-        send_mail(subject, message, sender_email, [sender_email])
+        send_mail(subject, message, settings.EMAIL_HOST_USER, [sender_email])
 
         return redirect('dispatched_packages')
 
