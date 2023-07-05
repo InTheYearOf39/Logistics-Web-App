@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, redirect, get_object_or_404
 from django.db.models import Q, Case, When, IntegerField, Count
 from lmsapp.utils import get_time_of_day
-from lmsapp.models import Package, User
+from lmsapp.models import Package, User, Warehouse
 from lmsapp.utils import get_time_of_day
 from django.shortcuts import redirect, get_object_or_404
 from lmsapp.forms import WarehouseForm, DropPickForm
@@ -139,20 +139,6 @@ def dropoffs(request):
 def dispatch(request):
     return render(request, 'admin/dispatch.html', {})
 
-# def create_warehouse(request):
-#     if request.method == 'POST':
-#         form = WarehouseForm(request.POST)
-#         if form.is_valid():
-#             user = form.save(commit=False)
-#             user.role = 'warehouse'
-#             # Set default password for the warehouse user
-#             user.password = make_password('warehouse@warehouse')
-#             form.save()
-#             # Optionally, redirect to a success page
-#             return redirect('warehouses')
-#     else:
-#         form = WarehouseForm()
-#     return render(request, 'admin/create_warehouse.html', {'form': form})
 
 def create_warehouse(request):
     if request.method == 'POST':
@@ -175,30 +161,6 @@ def warehouses(request):
         'warehouses': warehouses
     }
     return render(request, 'admin/warehouses.html', context)
-
-# def create_drop_pick(request):
-#     warehouses = User.objects.filter(role='warehouse')
-#     if request.method == 'POST':
-#         form = DropPickForm(request.POST)
-#         if form.is_valid():
-#             drop_pick = form.save(commit=False)
-#             drop_pick.role = 'drop_pick_zone'
-            
-#             # Set default password for the drop_pick_zone user
-#             drop_pick.password = make_password('droppick@droppick')
-            
-#             # Retrieve the selected warehouse ID from the form
-#             warehouse_id = request.POST.get('warehouse')
-#             if warehouse_id:
-#                 warehouse = User.objects.get(id=warehouse_id)
-#                 drop_pick.warehouse = warehouse
-
-#             drop_pick.save()
-#             return redirect('drop_pick_zones')
-#     else:
-#         form = DropPickForm()
-    
-#     return render(request, 'admin/create_drop_pick.html', {'form': form, 'warehouses': warehouses})
 
 def create_drop_pick(request):
     warehouses = User.objects.filter(role='warehouse')
@@ -232,18 +194,6 @@ def drop_pick_zones(request):
         'drop_pick_zones': drop_pick_zones
     }
     return render(request, 'admin/drop_pick_zones.html', context)
-
-# def create_courier(request):
-#     if request.method == 'POST':
-#         form = CourierForm(request.POST)
-#         if form.is_valid():
-#             form.save()
-#             return redirect('riders')  # Redirect to the courier list page
-#     else:
-#         form = CourierForm()
-
-#     context = {'form': form}
-#     return render(request, 'admin/create_courier.html', context)
 
 def create_courier(request):
     if request.method == 'POST':
