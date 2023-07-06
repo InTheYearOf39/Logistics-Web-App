@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, redirect
 from django.db.models import Q, Case, When, IntegerField
 from django.contrib.auth.decorators import login_required
 from lmsapp.forms import PackageForm
-from lmsapp.models import Package, User
+from lmsapp.models import Package, User,Warehouse,DropPickZone
 import random
 import string
 from lmsapp.utils import get_time_of_day
@@ -40,7 +40,11 @@ Handles the registration of new packages by senders, ensuring the form data is v
 and saving the package to the database with the appropriate details.
 """ 
 def register_package(request):
+
+    drop_pick_zones = DropPickZone.objects.filter()  # Retrieve users with the role of 'drop_pick_zone'
+
     drop_pick_zones = User.objects.filter(role='drop_pick_zone') 
+
 
     if request.method == 'POST':
         form = PackageForm(request.POST)

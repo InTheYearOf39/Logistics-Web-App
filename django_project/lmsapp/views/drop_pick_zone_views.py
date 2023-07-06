@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from lmsapp.models import Package, User
+from lmsapp.models import Package, User, DropPickZone
 from lmsapp.utils import get_time_of_day
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, get_object_or_404
@@ -17,8 +17,19 @@ User = get_user_model()
 The view displays the dashboard for a drop pick zone. It retrieves the packages assigned to the drop pick zone with specific statuses and renders them in the 'drop_pick_zone/drop_pick_zone_dashboard.html' template.
 """
 @login_required
+# def drop_pick_zone_dashboard(request):
+#     drop_pick_zone = request.user
+#     # packages = Package.objects.filter(dropOffLocation=drop_pick_zone, status__in=['upcoming', 'in_transit', 'at_pickup', 'ready_for_pickup'])
+#     packages = Package.objects.filter()
+#     greeting_message = get_time_of_day()
+#     context = {
+#         'greeting_message': greeting_message,
+#         'packages': packages,
+#     }
+#     return render(request, 'drop_pick_zone/drop_pick_zone_dashboard.html', context)
+
 def drop_pick_zone_dashboard(request):
-    drop_pick_zone = request.user
+    drop_pick_zone = DropPickZone.objects.get(users=request.user)
     packages = Package.objects.filter(dropOffLocation=drop_pick_zone, status__in=['upcoming', 'in_transit', 'at_pickup', 'ready_for_pickup'])
     greeting_message = get_time_of_day()
     context = {
@@ -27,11 +38,15 @@ def drop_pick_zone_dashboard(request):
     }
     return render(request, 'drop_pick_zone/drop_pick_zone_dashboard.html', context)
 
+
+
+
 """ 
 the view enables a drop_pick_zone user to confirm the drop-off of a package at the drop_pick_zone. 
 When the user submits the confirmation form, the package status is updated to 'dropped_off', 
 and an email notification is sent to the sender.
 """
+
 def confirm_drop_off(request, package_id):
     package = get_object_or_404(Package, id=package_id)
 
@@ -104,7 +119,7 @@ def confirm_recipient_pickup(request, package_id):
         package = Package.objects.get(pk=package_id)
         entered_code = request.POST.get('inputField')
 
-        if package.status == 'ready_for_pickup' and package.otp == entered_code:
+        if package.status == 'ready_for_pickup' and str(package.otp) == entered_code:
             package.status = 'completed'
             package.save()
             messages.success(request, "Package delivery confirmed successfully.")
@@ -118,7 +133,8 @@ The view retrieves the packages dropped off at the current drop pick zone and di
 The retrieved packages are passed to the template through the context.
 """
 def dispatch(request):
-    drop_pick_zone = request.user
+    # drop_pick_zone = request.user
+    drop_pick_zone = DropPickZone.objects.get(users=request.user)
     packages = Package.objects.filter(dropOffLocation=drop_pick_zone, status='dropped_off')
     
     context = {
@@ -131,7 +147,8 @@ The view retrieves packages that are marked as 'dispatched' and belong to the cu
 It then renders the dispatched_packages.html template, passing the retrieved packages to be displayed.
 """
 def dispatched_packages(request):
-    drop_pick_zone = request.user
+    # drop_pick_zone = request.user
+    drop_pick_zone = DropPickZone.objects.get(users=request.user)
     packages = Package.objects.filter(dropOffLocation=drop_pick_zone, status='dispatched')
     return render(request, 'drop_pick_zone/dispatched_packages.html', {'packages': packages})
 

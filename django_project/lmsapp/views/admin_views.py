@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, redirect, get_object_or_404
 from django.db.models import Q, Case, When, IntegerField, Count
 from lmsapp.utils import get_time_of_day
-from lmsapp.models import Package, User
+from lmsapp.models import Package, User, Warehouse
 from lmsapp.utils import get_time_of_day
 from django.shortcuts import redirect, get_object_or_404
 from lmsapp.forms import WarehouseForm, DropPickForm
@@ -156,11 +156,15 @@ def dropoffs(request):
 def dispatch(request):
     return render(request, 'admin/dispatch.html', {})
 
+
+
+
 """
 A function to handle the creation of a warehouse through a form i.e 'WarehouseForm'. 
 The form data is validated, and if valid, a warehouse is created, saved to the database.
 If the request method is not POST or the form is not valid, the form is displayed to the user for input.
 """
+
 def create_warehouse(request):
     if request.method == 'POST':
         form = WarehouseForm(request.POST)
@@ -187,6 +191,8 @@ def warehouses(request):
     }
     return render(request, 'admin/warehouses.html', context)
 
+
+
 """
 A function to handle the creation of a drop-pick zone user through a form 'DropPickForm'. 
 The form data is validated, and if valid, a drop-pick zone is created, saved to the database.
@@ -194,6 +200,7 @@ The warehouses queryset is also passed to the template to display available ware
 Since a drop-pick zone must belong to a warehouse. If the request method is not POST or the form is not valid, 
 the form is displayed to the user for input.
 """
+
 def create_drop_pick(request):
     warehouses = User.objects.filter(role='warehouse')
     if request.method == 'POST':
@@ -229,12 +236,15 @@ def drop_pick_zones(request):
     }
     return render(request, 'admin/drop_pick_zones.html', context)
 
+
+
 """
 A function to handle the creation of a courier user through a form 'CourierForm'. 
 The form data is validated, and if valid, a courier user is created, saved to the database
 and the user is redirected to the 'admin/riders.html' page. If the request method is not POST 
 or the form is not valid, the form is displayed to the user for input.
 """
+
 def create_courier(request):
     if request.method == 'POST':
         form = CourierForm(request.POST)
