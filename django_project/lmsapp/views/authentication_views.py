@@ -6,7 +6,10 @@ from lmsapp.forms import ChangePasswordForm
 from django.contrib.auth import update_session_auth_hash
 
 
-
+"""
+A function to handle user registration. The form data is validated, and if valid, a user is created, saved to the database, and logged in. The user is then redirected to their respective dashboard based on their role.
+If the form is not valid or the request method is not POST, the registration form is displayed.
+"""
 def register(request):
     msg = None
     if request.method == 'POST':
@@ -33,7 +36,10 @@ def register(request):
         form = SignUpForm()
     return render(request,'auth/register.html', {'form': form, 'msg': msg})
 
-
+"""
+A function to handle user login. The form data is validated, and if valid, the user is authenticated and logged in. 
+The user is then redirected to their respective dashboard based on their role. If the form is not valid or the request method is not POST, the login form is displayed.
+ """
 def login_view(request):
     form = LoginForm(request.POST or None)
     msg = None
@@ -60,11 +66,20 @@ def login_view(request):
             msg = 'error validating form'
     return render(request, 'auth/login.html', {'form': form, 'msg': msg})
 
+"""
+A function to handle user logout. When a user accesses this view, they will be logged out 
+and redirected to the 'index.html/' template.
+"""
 def logout_user(request):
     logout(request)
     return redirect('index.html/')
 
-
+"""
+A function to handle password change for a user. The form data is validated, and if valid, 
+the user's password is updated and the session authentication hash is updated. The user is 
+then redirected to their respective dashboard based on their role. If the form is not valid 
+or the request method is not POST, the password change form is displayed.
+"""
 def change_password(request):
     # Mapping of user roles to dashboard URLs
     dashboard_urls = {

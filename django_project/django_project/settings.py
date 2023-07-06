@@ -105,7 +105,7 @@ DATABASES = {
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'LMS-db',
+#         'NAME': 'LMS-App',
 #         'USER': '',
 #         'PASSWORD': '',
 #         'HOST': 'localhost',

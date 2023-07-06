@@ -9,7 +9,11 @@ from django.contrib.auth.hashers import make_password
 from lmsapp.forms import CourierForm
 
 
-
+""" 
+A function to handle the logic for an admin dashboard page, including querying and
+displaying packages and functionality depending on the different delivery types, 
+and rendering the corresponding template with the appropriate context
+"""
 def admin(request):
     packages = Package.objects.filter(
         Q(status='ongoing') | Q(status='dropped_off') | Q(status='ready_for_pickup') | Q(status='upcoming') 
@@ -44,8 +48,9 @@ def admin(request):
     }
     return render(request, 'admin/admin_dashboard.html', context)
 
+# A function to retrieve all the users from the database, and send the user information to a template 
 def users(request):
-    users = User.objects.all()  # Retrieve all users from the database
+    users = User.objects.all()
     
     context = {
         'users': users
@@ -53,6 +58,10 @@ def users(request):
     
     return render(request, 'admin/users.html', context)
 
+"""
+ A function to handle the assignment of a courier to a package. It retrieves the package and couriers, 
+ updates the package and courier objects, and redirects to the admin dashboard after a successful assignment.
+ """
 def assign_courier(request, package_id):
     package = get_object_or_404(Package, id=package_id)
 
@@ -87,7 +96,12 @@ def assign_courier(request, package_id):
     
     return render(request, 'admin/assign_courier.html', context)
 
-
+"""
+A function to update the status of couriers based on the status of their assigned packages. If a courier has assigned packages,
+ their status is determined by the presence of 'ongoing' or 'arrived' packages. If a courier has no assigned packages, 
+ their status is set to 'available'. The updated courier objects are saved in the database, and the 'admin/riders.html' 
+ template is rendered with the couriers queryset as context.
+"""
 def riders(request):
     couriers = User.objects.filter(role='courier')  
     
@@ -110,6 +124,8 @@ def riders(request):
     }
     return render(request, 'admin/riders.html', context)
 
+
+# A function to to retrieve packages with the status 'completed' and pass them to the 'admin/admin_history.html' template
 def admin_history(request):
     packages = Package.objects.filter(
         Q(status='completed')
@@ -119,6 +135,10 @@ def admin_history(request):
     }
     return render(request, 'admin/admin_history.html', context)
 
+"""
+A Function to retrieve dropped off items and group the packages by their respective drop-off locations and
+render them on the 'admin/dropoffs.html' template.
+ """
 def dropoffs(request):
     dropoff_locations = User.objects.filter(packages_dropped_off__status='dropped_off').distinct()
     packages_by_location = {}
@@ -133,12 +153,17 @@ def dropoffs(request):
     return render(request, 'admin/dropoffs.html', context)
 
 
-
-
-
 def dispatch(request):
     return render(request, 'admin/dispatch.html', {})
 
+
+
+
+"""
+A function to handle the creation of a warehouse through a form i.e 'WarehouseForm'. 
+The form data is validated, and if valid, a warehouse is created, saved to the database.
+If the request method is not POST or the form is not valid, the form is displayed to the user for input.
+"""
 
 def create_warehouse(request):
     if request.method == 'POST':
@@ -149,18 +174,32 @@ def create_warehouse(request):
             # Set default password for the warehouse user
             user.set_password('warehouse@warehouse')
             form.save()
-            # Optionally, redirect to a success page
+
             return redirect('warehouses')
     else:
         form = WarehouseForm()
     return render(request, 'admin/create_warehouse.html', {'form': form})
 
+"""
+A function to retrieve warehouses from the database by quering the db by the User model
+for users with the 'warehouse' role and passing them to the 'admin/warehouses.html' template.
+"""
 def warehouses(request):
     warehouses = User.objects.filter(role='warehouse')
     context = {
         'warehouses': warehouses
     }
     return render(request, 'admin/warehouses.html', context)
+
+
+
+"""
+A function to handle the creation of a drop-pick zone user through a form 'DropPickForm'. 
+The form data is validated, and if valid, a drop-pick zone is created, saved to the database.
+The warehouses queryset is also passed to the template to display available warehouses for selection in the form.
+Since a drop-pick zone must belong to a warehouse. If the request method is not POST or the form is not valid, 
+the form is displayed to the user for input.
+"""
 
 def create_drop_pick(request):
     warehouses = User.objects.filter(role='warehouse')
@@ -186,14 +225,25 @@ def create_drop_pick(request):
     
     return render(request, 'admin/create_drop_pick.html', {'form': form, 'warehouses': warehouses})
 
-
-
+"""
+A function to retrieve drop-pick zones from the database by querying the db by the User model
+for users with the 'drop-pick' role and passing them to the 'admin/drop_pick_zones.html' template.
+"""
 def drop_pick_zones(request):
     drop_pick_zones = User.objects.filter(role='drop_pick_zone')
     context = {
         'drop_pick_zones': drop_pick_zones
     }
     return render(request, 'admin/drop_pick_zones.html', context)
+
+
+
+"""
+A function to handle the creation of a courier user through a form 'CourierForm'. 
+The form data is validated, and if valid, a courier user is created, saved to the database
+and the user is redirected to the 'admin/riders.html' page. If the request method is not POST 
+or the form is not valid, the form is displayed to the user for input.
+"""
 
 def create_courier(request):
     if request.method == 'POST':
@@ -204,7 +254,7 @@ def create_courier(request):
             # Set default password for the warehouse user
             user.set_password('courier@courier')
             form.save()
-            # Optionally, redirect to a success page
+
             return redirect('riders')
     else:
         form = CourierForm()
