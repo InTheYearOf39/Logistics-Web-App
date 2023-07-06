@@ -74,11 +74,15 @@ def confirm_at_pickup(request, package_id):
             courier.save()
 
         subject = "Package Arrival Notification"
-        message = f"Dear {package.recipientName},\n\nYour package with delivery number {package.package_number} has arrived at its destination.\n\nOTP: Your One Time Password is: {otp}, please do not share this with anyone but your courier.\n\nThank you,\nThe Courier Service Team"
+        message_receiver = f"Dear {package.recipientName},\n\nYour package with delivery number {package.package_number} has arrived at the pick-up location.\n\nOTP: Your One Time Password is: {otp}, please do not share this with anyone but your courier.\n\nThank you,\nThe Courier Service Team"
+        message_sender = f"Dear Sender,\n\nThe package with delivery number {package.package_number} has arrived at the pick-up location.\n\nThank you,\nThe Courier Service Team."
         receiver = package.recipientEmail
+        sender_user = User.objects.get(username=package.user.username)
+
 
         try:
-            send_mail(subject, message, settings.EMAIL_HOST_USER, [receiver])
+            send_mail(subject, message_receiver, settings.EMAIL_HOST_USER, [receiver])
+            send_mail(subject, message_sender, settings.EMAIL_HOST_USER, [sender_user.email])
             messages.success(request, "Email notification sent successfully.")
 
         except Exception as e:
@@ -92,7 +96,7 @@ def confirm_at_pickup(request, package_id):
 
 """ 
 The view confirms the recipient's pickup of a package from the drop_pick_zone by comparing the entered OTP 
-with the one stored in the package. If the OTP matches and the package status is 'ready_for_pickup', 
+with the one stored in the package. I the OTP matches and the package status is 'ready_for_pickup', 
 the package status is updated to 'completed'
 """
 def confirm_recipient_pickup(request, package_id):
