@@ -114,6 +114,17 @@ class Package(models.Model):
     def save(self, *args, **kwargs):
         if not self.package_number:
             self.package_number = self.generate_package_number()
+
+        if self.status in ['dropped_off', 'in_house', 'ready_for_pickup']:
+            if self.status == 'dropped_off':
+                self.package_number = f"{self.dropOffLocation.tag}-{self.package_number}"
+            
+            if self.status == 'in_house' and self.warehouse:
+                self.package_number = f"{self.warehouse.tag}-{self.package_number}"
+                                
+            if self.status == 'ready_for_pickup':
+                self.package_number = f"{self.dropOffLocation.tag}-{self.package_number}"
+                
         super().save(*args, **kwargs)
 
     def generate_package_number(self):
