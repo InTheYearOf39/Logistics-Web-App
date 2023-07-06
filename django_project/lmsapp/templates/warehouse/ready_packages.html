@@ -9,7 +9,7 @@
 {% block content %}
 
 
-<form method="post">
+<form action="{% url 'ready_for_pickup' %}" method="POST">
     {% csrf_token %}
     <h2 class="mt-3">In House</h2>
     <div class="table-responsive">
@@ -65,9 +65,9 @@
         <h4 class="mt-3 mb-2">Select Drop-Pick Zone</h4>
         <select class="form-control" name="drop_pick_zone">
             {% for drop_pick_zone in available_drop_pick_zones %}
-            <option value="{{ drop_pick_zone.id }}">{{ drop_pick_zone.username }}</option>
+            <option value="{{ drop_pick_zone.drop_pick_zone.id }}">{{ drop_pick_zone.drop_pick_zone.name }}</option>
             {% endfor %}
-        </select>
+        </select>      
     </div>
     <a href="{% url 'ready_for_pickup' %}"><button class="btn btn-primary text-white mt-3"> Assign</button></a>
 </form>

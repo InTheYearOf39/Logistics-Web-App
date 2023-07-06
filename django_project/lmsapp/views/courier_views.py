@@ -29,12 +29,12 @@ def notify_arrival(request, package_id):
         # Send email to sender
         sender_email = package.recipientEmail
         sender_message = f"Your package with ID {package.package_number} has arrived at the warehouse."
-        send_mail('Package Arrival Notification', sender_message, 'garynkuraiji@gmail.com', [sender_email])
+        send_mail('Package Arrival Notification', sender_message, settings.EMAIL_HOST_USER, [sender_email])
 
         # Send email to warehouse
         warehouse_email = 'warehouse@example.com'  # Replace with actual warehouse email
         warehouse_message = f"A package with ID {package.package_number} has arrived at the warehouse."
-        send_mail('Package Arrival Notification', warehouse_message, 'sender@example.com', [warehouse_email])
+        send_mail('Package Arrival Notification', warehouse_message, settings.EMAIL_HOST_USER, [warehouse_email])
 
         messages.success(request, "Package arrival notified successfully.")
     else:

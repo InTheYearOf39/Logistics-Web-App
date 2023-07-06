@@ -109,6 +109,7 @@ class Package(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='upcoming')  # default status is 'upcoming'
     created_at = models.DateTimeField(default=timezone.now)
     assigned_at = models.DateTimeField(default=timezone.now)
+    otp = models.CharField(max_length=6, null=True, blank=True)
 
     def save(self, *args, **kwargs):
         if not self.package_number:

@@ -27,7 +27,6 @@ User = get_user_model()
 
 def drop_pick_zone_dashboard(request):
     drop_pick_zone = DropPickZone.objects.get(users=request.user)
-    print(drop_pick_zone)
     packages = Package.objects.filter(dropOffLocation=drop_pick_zone, status__in=['upcoming', 'in_transit', 'at_pickup', 'ready_for_pickup'])
     greeting_message = get_time_of_day()
     context = {
@@ -52,7 +51,7 @@ def confirm_drop_off(request, package_id):
         sender_user = User.objects.get(username=package.user.username)
         sender_email = sender_user.email
 
-        send_mail(subject, message, sender_email, [sender_email])
+        send_mail(subject, message, settings.EMAIL_HOST_USER, [sender_email])
 
         return redirect('dpz_dispatch')
 
@@ -106,7 +105,7 @@ def confirm_recipient_pickup(request, package_id):
         package = Package.objects.get(pk=package_id)
         entered_code = request.POST.get('inputField')
 
-        if package.status == 'ready_for_pickup' and package.otp == entered_code:
+        if package.status == 'ready_for_pickup' and str(package.otp) == entered_code:
             package.status = 'completed'
             package.save()
             messages.success(request, "Package delivery confirmed successfully.")
@@ -163,7 +162,8 @@ def confirm_recipient_pickup(request, package_id):
 #     return redirect('drop_pick_zone_dashboard')
 
 def dispatch(request):
-    drop_pick_zone = request.user
+    # drop_pick_zone = request.user
+    drop_pick_zone = DropPickZone.objects.get(users=request.user)
     packages = Package.objects.filter(dropOffLocation=drop_pick_zone, status='dropped_off')
     
     context = {
@@ -174,7 +174,8 @@ def dispatch(request):
 
 
 def dispatched_packages(request):
-    drop_pick_zone = request.user
+    # drop_pick_zone = request.user
+    drop_pick_zone = DropPickZone.objects.get(users=request.user)
     packages = Package.objects.filter(dropOffLocation=drop_pick_zone, status='dispatched')
     return render(request, 'drop_pick_zone/dispatched_packages.html', {'packages': packages})
 
@@ -196,7 +197,7 @@ def confirm_pickup(request, package_id):
         sender_user = User.objects.get(username=package.user.username)
         sender_email = sender_user.email
 
-        send_mail(subject, message, sender_email, [sender_email])
+        send_mail(subject, message, settings.EMAIL_HOST_USER, [sender_email])
 
         return redirect('dispatched_packages')
 

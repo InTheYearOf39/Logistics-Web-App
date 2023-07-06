@@ -1,7 +1,7 @@
 from lmsapp.utils import get_time_of_day
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, redirect, get_object_or_404
-from lmsapp.models import Package, User
+from lmsapp.models import Package, User,DropPickZone, Warehouse
 from django.contrib import messages
 from django.shortcuts import render, redirect
 from lmsapp.forms import ChangePasswordForm
@@ -9,6 +9,7 @@ from django.contrib.auth import update_session_auth_hash
 from django.shortcuts import redirect, get_object_or_404
 from django.contrib import messages
 from django.core.mail import send_mail
+from django.conf import settings
 
 
 
@@ -18,10 +19,13 @@ def warehouse_dashboard(request):
     # Retrieve the current warehouse user
     warehouse_user = request.user
 
-    # Retrieve the drop_pick_zones belonging to the warehouse
-    drop_pick_zones = User.objects.filter(role='drop_pick_zone', warehouse=warehouse_user)
+    # Retrieve the associated warehouse for the warehouse user
+    warehouse = warehouse_user.warehouse
 
-    # Create an empty dictionary to store packages by location
+    # Retrieve the drop_pick_zones belonging to the warehouse
+    drop_pick_zones = DropPickZone.objects.filter(warehouse=warehouse)
+
+    # Create a dictionary to store packages by location
     packages_by_location = {}
 
     # Iterate over the drop_pick_zones belonging to the warehouse
@@ -42,14 +46,11 @@ def warehouse_dashboard(request):
             # Update the packages with the assigned courier and change their status
             packages = Package.objects.filter(id__in=selected_packages)
             packages.update(courier=courier, status='dispatched')
-            
-            # courier_status = Package.objects.filter(courier=courier, status__in=['dispatched', 'upcoming', 'ongoing', 'arrived', 'en_route', 'warehouse_arrival', 'in_transit', 'at_pickup', 'ready_for_pickup']).exists()
+
             courier_status = Package.objects.filter(courier=courier, status='dispatched').exists()
 
             if courier_status:
                 courier.status = 'on-trip'
-            # else:
-            #     courier.status = 'available'
             
             courier.save()
 
@@ -57,7 +58,7 @@ def warehouse_dashboard(request):
 
             return redirect('warehouse_dashboard')
 
-    available_couriers=User.objects.filter(role='courier', status='available')
+    available_couriers = User.objects.filter(role='courier', status='available')
     context = {
         'packages_by_location': packages_by_location,
         'greeting_message': greeting_message,
@@ -66,21 +67,8 @@ def warehouse_dashboard(request):
 
     return render(request, 'warehouse/warehouse_dashboard.html', context)
 
-@login_required
-# def change_password(request):
-#     if request.method == 'POST':
-#         form = ChangePasswordForm(request.user, request.POST)
-#         if form.is_valid():
-#             user = form.save()
-#             update_session_auth_hash(request, user)  # Important to update the session
-#             messages.success(request, 'Your password has been successfully changed.')
-#             return redirect('warehouse_dashboard')
-#         else:
-#             messages.error(request, 'Please correct the error below.')
-#     else:
-#         form = ChangePasswordForm(request.user)
-#     return render(request, 'warehouse/change_password.html', {'form': form})
 
+@login_required
 def change_password(request):
     if request.method == 'POST':
         form = ChangePasswordForm(request.user, request.POST)
@@ -98,7 +86,9 @@ def change_password(request):
 
 def confirm_arrival(request, package_id):
     if request.method == 'POST':
-        warehouse = request.user
+        warehouse_user = request.user
+        warehouse = warehouse_user.warehouse
+
         package = Package.objects.get(pk=package_id)
         package.status = 'in_house'
         courier = package.courier
@@ -107,14 +97,11 @@ def confirm_arrival(request, package_id):
             courier.save()
         
         # Assign the warehouse to the package
-        # warehouse = User.objects.get(role='warehouse')
         package.warehouse = warehouse
         
         # Save the package
         package.save()
         
-        
-
         # Send email to sender
         subject = 'Package Dropped Off at Warehouse'
         message = f'Dear sender, your package with delivery number {package.package_number} has been dropped off at the warehouse.'
@@ -122,7 +109,7 @@ def confirm_arrival(request, package_id):
         sender_user = User.objects.get(username=package.user.username)
         sender_email = sender_user.email
 
-        send_mail(subject, message, sender_email, [sender_email])   
+        send_mail(subject, message, settings.EMAIL_HOST_USER, [sender_email])   
 
         messages.success(request, "Package arrival notified successfully.")
     else:
@@ -155,9 +142,10 @@ def ready_packages(request):
     context = {
         'ready_packages': ready_packages,
         'available_couriers': User.objects.filter(role='courier', status='available'),
-        'available_drop_pick_zones': User.objects.filter(role='drop_pick_zone')
+        'available_drop_pick_zones': User.objects.filter(role='drop_pick_zone').select_related('drop_pick_zone')
     }
     return render(request, 'warehouse/ready_packages.html', context)
+
 
 
 def to_pickup(request, package_id):
@@ -176,7 +164,7 @@ def ready_for_pickup(request):
 
         if selected_packages and courier_id and drop_pick_zone_id:
             courier = get_object_or_404(User, id=courier_id, role='courier')
-            drop_pick_zone = get_object_or_404(User, id=drop_pick_zone_id, role='drop_pick_zone')
+            drop_pick_zone = get_object_or_404(DropPickZone, id=drop_pick_zone_id)
 
             # Update the packages with the assigned courier and change their status
             packages = Package.objects.filter(id__in=selected_packages)
@@ -191,7 +179,7 @@ def ready_for_pickup(request):
 
     ready_packages = Package.objects.filter(status='in_transit')
     available_couriers = User.objects.filter(role='courier', status='available')
-    available_drop_pick_zones = User.objects.filter(role='drop_pick_zone')
+    available_drop_pick_zones = DropPickZone.objects.all()
 
     context = {
         'ready_packages': ready_packages,
