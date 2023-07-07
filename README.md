@@ -38,7 +38,7 @@ In the following steps, you will setup your development environment, fork and cl
   $ pip install virtualenv    
   $ virtualenv -p python3.10 'environment name goes here without the quotations'   
   ```
-  __Note__: We specified `python10` because it is what we have have installed and setup for this  project.   
+  __Note__: We specified `python3.10` because it is what we have have installed and setup for this project.   
 
    
   
