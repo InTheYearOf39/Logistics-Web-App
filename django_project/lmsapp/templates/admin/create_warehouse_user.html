@@ -1,0 +1,70 @@
+{% extends 'admin/admin_base.html' %}
+
+{% load static %}
+
+
+{% block content %}
+
+
+<div class="container mb-5" style="margin-left: 4rem;">
+  <div class="row justify-content-center ml-5">
+    <div class="col-md-12">
+    <form class="well form-horizontal" action=" " method="post"  id="contact_form">
+      {% csrf_token %}
+
+      {{ form.errors }}
+
+<fieldset>
+
+<!-- Form Name -->
+<legend class="my-4">CREATE USER </legend>
+
+<!-- Text input-->
+
+<div class="form-group mt-2">
+    <label class="col-md-8 control-label" >Name</label> 
+      <div class="col-md-8 inputGroupContainer">
+      <div class="input-group">
+    <span class="input-group-text">👤</span>
+    <input name="name" placeholder="Name" class="form-control"  type="text">
+      </div>
+    </div>
+  </div>
+
+<!-- Text input-->
+
+<div class="form-group mt-2">
+  <label class="col-md-8 control-label" >Username</label> 
+    <div class="col-md-8 inputGroupContainer">
+    <div class="input-group">
+  <span class="input-group-text">👤</span>
+  <input name="username" placeholder="Username" class="form-control"  type="text">
+    </div>
+  </div>
+</div>
+
+<!-- Text input-->
+<div class="form-group mt-2"> 
+    <label class="col-md-8 control-label">Warehouse</label>
+      <div class="col-md-8 selectContainer">
+      <div class="input-group">
+        <span class="input-group-text">🏬</span>
+          <span class="input-group-addon"><i class="glyphicon glyphicon-list"></i></span>
+          <select name="warehouse" class="form-control selectpicker">
+            <option value="">Please select warehouse</option>  
+            {% for warehouse in warehouses %}
+              <option value="{{ warehouse.id }}">{{ warehouse.name }}</option>
+            {% endfor %}
+          </select>
+    </div>
+  </div>
+</div>
+
+<div class="form-group mt-2">
+    <label class="col-md-8 control-label"></label>
+    <div class="col-md-8">
+      <button type="submit" class="btn btn-info text-white" >Add <span class="glyphicon glyphicon-send"></span></button>
+    </div>
+  </div> 
+
+{% endblock %}

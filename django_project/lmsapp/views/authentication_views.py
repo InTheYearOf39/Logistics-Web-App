@@ -66,6 +66,7 @@ def login_view(request):
             msg = 'error validating form'
     return render(request, 'auth/login.html', {'form': form, 'msg': msg})
 
+
 """
 A function to handle user logout. When a user accesses this view, they will be logged out 
 and redirected to the 'index.html/' template.
@@ -73,6 +74,7 @@ and redirected to the 'index.html/' template.
 def logout_user(request):
     logout(request)
     return redirect('index.html/')
+
 
 """
 A function to handle password change for a user. The form data is validated, and if valid, 
