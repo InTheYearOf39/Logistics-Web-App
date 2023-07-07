@@ -1,9 +1,7 @@
 
 # Lastmile.pudonet.net
 
-___
-
-
+<div>&nbsp;</div>
 <h2>Preview of <a href="https://lastmile.pudonet.net">lastmile.pudonet.net</a> Web App<h2>
 
 ![Alt lastmile.pudonet.net web App screenshot](django_project/static/img/face.png)
@@ -12,8 +10,6 @@ _Visit [lastmile.pudonet.net](https://lastmile.pudonet.net) to learn more!_
 ## What is lastmile.pudonet.net?
 
 Lastmile.pudonet.net is a Third-Party Logistics Management web-based application built to facilitate the process of tracking and managing of packages from one location to a set destination.
-
-<div>&nbsp;</div>
 
 
 ## Contributing to the lastmile.pudonet.net Web Application
