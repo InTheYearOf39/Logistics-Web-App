@@ -269,26 +269,23 @@ def create_warehouse_user(request):
         username = request.POST.get('username')
         warehouse_id = request.POST.get('warehouse')
 
-        warehouse = Warehouse.objects.get(id=warehouse_id)
+        if warehouse_id:
+            warehouse = get_object_or_404(Warehouse, id=warehouse_id)
 
-        # Create the user with the role "warehouse"
-        user = User.objects.create(
-            username=username,
-            password='warehouse@warehouse',
-            name=name,
-            role='warehouse',
-            warehouse=warehouse
-        )
+            # Create the user with the role "warehouse"
+            user = User.objects.create_user(username=username, password='warehouse@warehouse', role='warehouse', name=name, warehouse=warehouse)
+            user.save()
 
-        # Optionally, you can redirect to a success page or perform other actions
-        return redirect('warehouses')
-
+            # Optionally, you can redirect to a success page or perform other actions
+            return redirect('warehouses')
+    
+    # Retrieve the warehouses
     warehouses = Warehouse.objects.all()
+
     context = {
         'warehouses': warehouses
     }
     return render(request, 'admin/create_warehouse_user.html', context)
-
 
 def create_drop_pick_user(request):
     if request.method == 'POST':
