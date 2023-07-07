@@ -144,7 +144,7 @@ A Function to retrieve dropped off items and group the packages by their respect
 render them on the 'admin/dropoffs.html' template.
  """
 def dropoffs(request):
-    dropoff_locations = User.objects.filter(packages_dropped_off__status='dropped_off').distinct()
+    dropoff_locations = DropPickZone.objects.filter(packages_dropped_off__status='dropped_off').distinct()
     packages_by_location = {}
 
     for dropoff_location in dropoff_locations:
