@@ -14,7 +14,7 @@ Lastmile.pudonet.net is a Third-Party Logistics Management web-based application
 
 ## Contributing:
 
-In the following steps, you will setup your development environment, fork and clone the repository, run the site locally, and finally commit, sign off, and push any changes made for review.
+In the following steps, you will setup your development environment, fork and clone the repository, run the site locally, and finally commit, and push any changes made for review.
 
 ### 1. Set up your development environment
 
