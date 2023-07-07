@@ -6,7 +6,7 @@ ___
 
 <h2>Preview of <a href="https://lastmile.pudonet.net">lastmile.pudonet.net</a> Web App<h2>
 
-![Alt lastmile.pudonet.net web App screenshot](Logistics-Web-App\django_project\static\img\face.png)
+![Alt lastmile.pudonet.net web App screenshot](django_project/static/img/face.png)
 _Visit [lastmile.pudonet.net](https://lastmile.pudonet.net) to learn more!_
 
 ## What is lastmile.pudonet.net?
