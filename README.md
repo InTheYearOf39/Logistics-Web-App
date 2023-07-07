@@ -12,7 +12,7 @@ _Visit [lastmile.pudonet.net](https://lastmile.pudonet.net) to learn more!_
 Lastmile.pudonet.net is a Third-Party Logistics Management web-based application built to facilitate the process of tracking and managing of packages from one location to a set destination.
 
 
-## Contributing to the lastmile.pudonet.net Web Application
+## Contributing:
 
 In the following steps, you will setup your development environment, fork and clone the repository, run the site locally, and finally commit, sign off, and push any changes made for review.
 
