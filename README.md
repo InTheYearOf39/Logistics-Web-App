@@ -59,7 +59,7 @@ In the following steps, you will setup your development environment, fork and cl
   ```bash
   $ py manage.py runserver
   ```
-  _Note: This command should spin up a development server running locally at `http://127.0.0.1:8000/` or `http://localhost:8000/`
+  __Note__: This command should spin up a development server running locally at `http://127.0.0.1:8000/` or `http://localhost:8000/`
 
 ### 4. Create a Pull Request
 
