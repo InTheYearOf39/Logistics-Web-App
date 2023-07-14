@@ -26,7 +26,9 @@ SECRET_KEY = 'django-insecure-&igkzc8#ldlo!n$dvpq=w-3r5xju&z^@w9k68u=kqmmw&hjig&
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
+
+
 
 
 # Application definition
@@ -191,3 +193,9 @@ AUTHENTICATION_BACKENDS = (
 
 # LOGIN_REDIRECT_URL = "/"
 # LOGOUT_REDIRECT_URL = "/"
+
+# set Xframe to allow for all on same site embed and iframes
+X_FRAME_OPTIONS = "SAMEORIGIN"
+
+# allow google maps api for distance compuattions
+X_FRAME_OPTIONS = 'ALLOW-FROM https://maps.googleapis.com/'

@@ -35,10 +35,14 @@
     <div class="col-md-8 inputGroupContainer">
     <div class="input-group">
         <span class="input-group-text">📌</span>
-  <input name="address" placeholder="Address" class="form-control" type="text">
+  <input id="address" name="address" placeholder="Address" class="form-control" type="text">
     </div>
   </div>
 </div>
+
+<input id="latitude" name="latitude" placeholder="latitude" class="form-control" type="text" hidden>
+
+<input id="longitude" name="longitude" placeholder="longitude" class="form-control" type="text" hidden>
 
 
 <!-- Text input-->
@@ -84,6 +88,29 @@
   </div>
 </div>
     <!-- /.container -->
+
+    <script>
+      //load after page loads
+      $(function () { 
+
+        //initiate auto complete 
+      var from_autocomplete = new google.maps.places.Autocomplete($("#address")[0], {});
+
+      google.maps.event.addListener(from_autocomplete, 'place_changed', function() {
+      var place = from_autocomplete.getPlace();
+      //console.log(place);
+      //console.log("latitude:"+place.geometry.location.lat());
+      //console.log("longitude:"+place.geometry.location.lng());
+      //set values into the feilds
+      $("#latitude").val(place.geometry.location.lat());
+      $("#longitude").val(place.geometry.location.lng());
+
+
+      });
+
+       
+      });
+    </script>
 
 
 {% endblock %}

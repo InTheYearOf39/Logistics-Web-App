@@ -9,6 +9,7 @@ from django.contrib.auth.hashers import make_password
 from lmsapp.forms import CourierForm
 from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
+from django.views.decorators.clickjacking import xframe_options_exempt
 
 User = get_user_model()
 
@@ -168,6 +169,8 @@ A function to handle the creation of a warehouse through a form i.e 'WarehouseFo
 The form data is validated, and if valid, a warehouse is created, saved to the database.
 If the request method is not POST or the form is not valid, the form is displayed to the user for input.
 """
+#allow loading resources from other locations
+@xframe_options_exempt
 def create_warehouse(request):
     if request.method == 'POST':
         name = request.POST.get('name')
