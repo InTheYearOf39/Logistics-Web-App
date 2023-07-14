@@ -105,20 +105,21 @@
   
               <div class="col-12">
                 <label for="recipientAddress" class="form-label">Recipient Address</label>
-                <input type="text" class="form-control" id="recipientAddress" name="recipientAddress" placeholder="Recipient Address">
+                <input id="recipientAddress" name="recipientAddress" placeholder="Recipient Address" class="form-control" type="text">
                 <div class="invalid-feedback">
                   Please enter a valid email address for shipping updates.
                 </div>
               </div>
-  
+
+              
               <div class="col-12">
                 <label for="sendersAddress" class="form-label"> Sender's Address</label>
-                <input type="text" class="form-control" id="sendersAddress" name="sendersAddress" placeholder="Sender's Address" required>
+                <input id="senderAddress" name="sendersAddress" placeholder="Sender's Address" class="form-control" type="text">
                 <div class="invalid-feedback">
                   Please enter your shipping address.
                 </div>
               </div>
-  
+
               <div class="col-sm-3 col-md-12">
                 <button class="w-100 btn btn-primary btn-25-on-lg text-white" type="submit">Click to confirm</button>
               </div>
@@ -126,5 +127,56 @@
         </div>
       </div>
   </div>
+
+  <script>
+    function getGPS(){
+      
+      //pick the location
+    if ("geolocation" in navigator){
+        navigator.geolocation.getCurrentPosition(function(position){
+                
+                console.log(position.coords);
+               
+            }, function(error) {
+            
+            console.log("failed to get location");
+            alert("failed to get your GPS location, Please enable GPS");
+            console.log(error);
+                },{maximumAge:0, enableHighAccuracy: true});
+    }else{
+        
+        console.log("Device does not support geolocation!");
+        //alert("Device does not support geolocation!");
+        alert("Device does not support geolocation!");
+    }
+    }
+
+    //load after page loads
+    $(function () {
+      getGPS();
+    });
+  </script>
+
+<script>
+  // Load after page loads
+  $(function() {
+    // Initiate autocomplete for the recipient address field
+    var recipientAutocomplete = new google.maps.places.Autocomplete($("#recipientAddress")[0], {});
+
+    google.maps.event.addListener(recipientAutocomplete, 'place_changed', function() {
+      var place = recipientAutocomplete.getPlace();
+      // Log or process the selected place if needed
+    });
+
+    // Initiate autocomplete for the sender's address field
+    var senderAutocomplete = new google.maps.places.Autocomplete($("#senderAddress")[0], {});
+
+    google.maps.event.addListener(senderAutocomplete, 'place_changed', function() {
+      var place = senderAutocomplete.getPlace();
+      // Log or process the selected place if needed
+    });
+  });
+</script>
+
 
   {% endblock %}

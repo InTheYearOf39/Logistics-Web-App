@@ -20,6 +20,24 @@
  
      <!-- Favicons -->
      <link href="{% static 'img/favicon.png' %}" rel="icon">
+
+     <script src="{% static 'js/jquery-3.3.1.min.js' %}"></script>
+
+     <!--Add files for google address utocomplete-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+    <script>
+    //default callback for googlemaps
+    function initMap()
+    {
+
+    }
+    </script>
+
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB5r4DsYYly-d272kJopRlb9FCclcWokrE&callback=initMap&libraries=places&language=en-AU"></script>
+
+    
+
+    
      
     <style>
       .bd-placeholder-img {

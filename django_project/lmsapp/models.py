@@ -20,6 +20,8 @@ class Warehouse(models.Model):
     address = models.CharField(max_length=40)
     phone = models.CharField(max_length=20, null=True, blank=True)
     tag = models.CharField(max_length=20, null=True, blank=True)
+    latitude = models.FloatField( null=True, blank=True)
+    longitude = models.FloatField( null=True, blank=True)
     
 
     def __str__(self):
@@ -31,6 +33,8 @@ class DropPickZone(models.Model):
     phone = models.CharField(max_length=20, null=True, blank=True)
     warehouse = models.ForeignKey(Warehouse, on_delete=models.CASCADE, related_name='drop_pick_zones')
     tag = models.CharField(max_length=20, null=True, blank=True)
+    latitude = models.FloatField( null=True, blank=True)
+    longitude = models.FloatField( null=True, blank=True)
 
     def __str__(self):
         return self.name
