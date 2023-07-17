@@ -17,7 +17,7 @@ Renders out a sender dashboard template and shows packages with the statuses
 @login_required
 def sender_dashboard(request):
     packages = Package.objects.filter(
-        Q(status='ongoing') | Q(status='upcoming')
+        user=request.user
     ).order_by(
         Case(
             When(status='upcoming', then=0),
