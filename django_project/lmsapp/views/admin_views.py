@@ -177,11 +177,13 @@ def create_warehouse(request):
         address = request.POST.get('address')
         phone = request.POST.get('phone')
         tag = request.POST.get('tag')
+        longitude = request.POST.get('longitude') 
+        latitude = request.POST.get('latitude')
 
-        warehouse = Warehouse(name=name, address=address, phone=phone, tag=tag)
+
+        warehouse = Warehouse(name=name, address=address, phone=phone, tag=tag, latitude=latitude, longitude=longitude)
         warehouse.save()
 
-        # Optionally, you can redirect to a success page or perform other actions
         return redirect('warehouses')
 
     return render(request, 'admin/create_warehouse.html')
@@ -214,13 +216,14 @@ def create_drop_pick(request):
         phone = request.POST.get('phone')
         tag = request.POST.get('tag')
         warehouse_id = request.POST.get('warehouse')
+        longitude = request.POST.get('longitude') 
+        latitude = request.POST.get('latitude')
 
         warehouse = Warehouse.objects.get(id=warehouse_id)
 
-        drop_pick_zone = DropPickZone(name=name, address=address, phone=phone, tag=tag, warehouse=warehouse)
+        drop_pick_zone = DropPickZone(name=name, address=address, phone=phone, tag=tag, warehouse=warehouse, longitude=longitude, latitude=latitude)
         drop_pick_zone.save()
 
-        # Optionally, you can redirect to a success page or perform other actions
         return redirect('drop_pick_zones')
 
     warehouses = Warehouse.objects.all()
@@ -279,7 +282,6 @@ def create_warehouse_user(request):
             user = User.objects.create_user(username=username, password='warehouse@warehouse', role='warehouse', name=name, warehouse=warehouse)
             user.save()
 
-            # Optionally, you can redirect to a success page or perform other actions
             return redirect('warehouses')
     
     # Retrieve the warehouses
@@ -303,7 +305,6 @@ def create_drop_pick_user(request):
             user = User.objects.create_user(username=username, password='droppick@droppick', role='drop_pick_zone', name=name, drop_pick_zone=drop_pick_zone)
             user.save()
 
-            # Optionally, you can redirect to a success page or perform other actions
             return redirect('drop_pick_zones')
     
     # Retrieve the drop pick zones
