@@ -135,28 +135,7 @@
   </div>
 
   <script>
-    // function getGPS(){
-      
-    //   //pick the location
-    // if ("geolocation" in navigator){
-    //     navigator.geolocation.getCurrentPosition(function(position){
-                
-    //             console.log(position.coords);
-               
-    //         }, function(error) {
-            
-    //         console.log("failed to get location");
-    //         alert("failed to get your GPS location, Please enable GPS");
-    //         console.log(error);
-    //             },{maximumAge:0, enableHighAccuracy: true});
-    // }else{
-        
-    //     console.log("Device does not support geolocation!");
-    //     //alert("Device does not support geolocation!");
-    //     alert("Device does not support geolocation!");
-    // }
-    // }
-
+    
     function getGPS() {
     // pick the location
     if ("geolocation" in navigator) {
@@ -189,28 +168,6 @@
         };
         request.send();
 
-        // var geocoder = new google.maps.Geocoder();
-        // geocoder.reverse( {lat:position.coords.latitude, lon:position.coords.longitude}, function(results, status) {
-        //   if (status == google.maps.GeocoderStatus.OK)
-        //   {
-        //       // do something with the geocoded result
-        //       console.log("latitude:"+results[0].geometry.location.lat());
-        //       console.log("longitude:"+results[0].geometry.location.lng());
-            
-        //       var distance = getDistance(from_location, results[0].geometry.location);
-        //         console.log("distance:"+distance+"metres");
-        //   }
-        //   else
-        //   {
-        //     console.log(results);
-        //     console.log("Could not reverse geo code");
-        //     //alert("Could not reverse geo code");
-        //   }
-        // });
-
-
- 
-
       }, function (error) {
         console.log("Failed to get location");
         alert("Failed to get your GPS location. Please enable GPS.");
@@ -222,8 +179,6 @@
     }
   }
 
-
- 
     //load after page loads
     $(function () {
       getGPS();
