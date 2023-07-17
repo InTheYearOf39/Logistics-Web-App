@@ -209,6 +209,8 @@ The warehouses queryset is also passed to the template to display available ware
 Since a drop-pick zone must belong to a warehouse. If the request method is not POST or the form is not valid, 
 the form is displayed to the user for input.
 """
+#allow loading resources from other locations
+@xframe_options_exempt
 def create_drop_pick(request):
     if request.method == 'POST':
         name = request.POST.get('name')
