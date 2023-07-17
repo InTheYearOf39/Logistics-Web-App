@@ -11,7 +11,7 @@
         <div class="col-md-8 col-lg-10">
           <h4 class="my-5">Add Package</h4>
           
-          <form class="needs-validation" novalidate action="{% url 'register_package' %}" method="post">
+          <form class="needs-validation" novalidate action="{% url 'register_package' %}" method="post" id="packageForm" onsubmit="populateLocation()">
             {% csrf_token %}
             <div class="row g-3">
               <div class="col-sm-6">
@@ -47,6 +47,10 @@
                   Please select a delivery location.
                 </div>
               </div>
+
+            <input type="hidden" id="sender_latitude" name="sender_latitude" value="">
+            <input type="hidden" id="sender_longitude" name="sender_longitude" value="">
+
               
               <script>
                 const deliveryTypeSelect = document.getElementById("deliveryType");
@@ -102,6 +106,8 @@
                 </div>
               </div>
               
+              <input type="hidden" id="recipient_latitude" name="recipient_latitude" value="">
+              <input type="hidden" id="recipient_longitude" name="recipient_longitude" value="">
   
               <div class="col-12">
                 <label for="recipientAddress" class="form-label">Recipient Address</label>
@@ -129,27 +135,50 @@
   </div>
 
   <script>
-    function getGPS(){
-      
-      //pick the location
-    if ("geolocation" in navigator){
-        navigator.geolocation.getCurrentPosition(function(position){
-                
-                console.log(position.coords);
-               
-            }, function(error) {
-            
-            console.log("failed to get location");
-            alert("failed to get your GPS location, Please enable GPS");
-            console.log(error);
-                },{maximumAge:0, enableHighAccuracy: true});
-    }else{
-        
-        console.log("Device does not support geolocation!");
-        //alert("Device does not support geolocation!");
-        alert("Device does not support geolocation!");
+    
+    function getGPS() {
+    // pick the location
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(function (position) {
+        //console.log(position.coords);
+        //set the GPS into feilds
+        const sender_latitude = position.coords.latitude;
+        const sender_longitude = position.coords.longitude;
+        document.getElementById("sender_latitude").value = sender_latitude;
+        document.getElementById("sender_longitude").value = sender_longitude;
+
+        //get human readable name for current GPS location
+        //get cordinates
+
+        var request = new XMLHttpRequest();
+        var g_key= '{{ api_key }}';
+        console.log(g_key)
+        var method = 'GET';
+        var url = 'https://maps.googleapis.com/maps/api/geocode/json?latlng='+sender_latitude+','+sender_longitude+'&sensor=true'+'&key='+g_key;
+        var async = true;
+
+        request.open(method, url, async);
+        request.onreadystatechange = function(){
+          if(request.readyState == 4 && request.status == 200){
+            var data = JSON.parse(request.responseText);
+            var address = data.results[0];
+            //console.log(address.formatted_address);
+            document.getElementById("senderAddress").value = address.formatted_address;
+          }
+
+        };
+        request.send();
+
+      }, function (error) {
+        console.log("Failed to get location");
+        alert("Failed to get your GPS location. Please enable GPS.");
+        console.log(error);
+      }, { maximumAge: 0, enableHighAccuracy: true });
+    } else {
+      console.log("Device does not support geolocation!");
+      alert("Device does not support geolocation!");
     }
-    }
+  }
 
     //load after page loads
     $(function () {
@@ -166,6 +195,10 @@
     google.maps.event.addListener(recipientAutocomplete, 'place_changed', function() {
       var place = recipientAutocomplete.getPlace();
       // Log or process the selected place if needed
+      //set values into the feilds
+      $("#recipient_latitude").val(place.geometry.location.lat());
+      $("#recipient_longitude").val(place.geometry.location.lng());
+
     });
 
     // Initiate autocomplete for the sender's address field
@@ -174,6 +207,10 @@
     google.maps.event.addListener(senderAutocomplete, 'place_changed', function() {
       var place = senderAutocomplete.getPlace();
       // Log or process the selected place if needed
+      //set values into the feilds
+      document.getElementById("sender_latitude").value = place.geometry.location.lat();
+      document.getElementById("sender_longitude").value = place.geometry.location.lng();
+
     });
   });
 </script>

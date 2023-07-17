@@ -8,7 +8,8 @@ import string
 from lmsapp.utils import get_time_of_day
 from django.shortcuts import redirect
 from django.contrib import messages
-
+from django.views.decorators.clickjacking import xframe_options_exempt
+from django.conf import settings
 
 """
 Renders out a sender dashboard template and shows packages with the statuses 
@@ -39,7 +40,10 @@ def sender_dashboard(request):
 Handles the registration of new packages by senders, ensuring the form data is valid 
 and saving the package to the database with the appropriate details.
 """ 
+#allow loading resources from other locations
+@xframe_options_exempt
 def register_package(request):
+    api_key = settings.API_KEY
     drop_pick_zones = DropPickZone.objects.filter()  # Retrieve users with the role of 'drop_pick_zone'
 
     if request.method == 'POST':
@@ -47,7 +51,18 @@ def register_package(request):
         if form.is_valid():
             package = form.save(commit=False)
             package.user = request.user
-            package.package_number = generate_package_number()
+            package.package_number = generate_package_number()           
+            
+            sender_longitude = request.POST.get('sender_longitude') 
+            sender_latitude = request.POST.get('sender_latitude')
+
+            recipient_longitude = request.POST.get('recipient_longitude') 
+            recipient_latitude = request.POST.get('recipient_latitude')
+
+            package.recipient_latitude = recipient_latitude
+            package.recipient_longitude = recipient_longitude
+            package.sender_latitude = sender_latitude
+            package.sender_longitude = sender_longitude
             
             # Check if the selected courier is already assigned to a package
             courier = package.courier
@@ -63,8 +78,14 @@ def register_package(request):
     else:
         form = PackageForm()
         error_message = None
+    context = {
+        'form': form, 
+        'error_message': error_message, 
+        'drop_pick_zones': drop_pick_zones, 
+        'api_key': api_key
+        }
 
-    return render(request, 'sender/register_package.html', {'form': form, 'error_message': error_message, 'drop_pick_zones': drop_pick_zones})
+    return render(request, 'sender/register_package.html', context)
 
 
 def generate_package_number():

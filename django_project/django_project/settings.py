@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 
 from pathlib import Path
 import os
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -178,12 +179,12 @@ AUTH_USER_MODEL = 'lmsapp.User'
 # DEFAULT_FROM_EMAIL = 'blessingisrael625@gmail.com'
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'webmail.nftconsult.com'
+EMAIL_HOST = config('EMAIL_HOST')
 EMAIL_PORT = 25
-EMAIL_HOST_USER = 'no-reply@nftconsult.com'
-EMAIL_HOST_PASSWORD = '@12dlN0r3ply'
+EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 EMAIL_USE_TLS = True
-DEFAULT_FROM_EMAIL = 'no-reply@nftconsult.com'
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL')
 
 
 AUTHENTICATION_BACKENDS = (
@@ -199,3 +200,6 @@ X_FRAME_OPTIONS = "SAMEORIGIN"
 
 # allow google maps api for distance compuattions
 X_FRAME_OPTIONS = 'ALLOW-FROM https://maps.googleapis.com/'
+
+# google API KEY
+API_KEY = config('API_KEY')

@@ -109,6 +109,10 @@ class Package(models.Model):
     recipientTelephone = models.CharField(max_length=100)
     recipientAddress = models.CharField(max_length=200)
     sendersAddress = models.CharField(max_length=200)
+    sender_latitude = models.FloatField( null=True, blank=True)
+    sender_longitude = models.FloatField( null=True, blank=True)
+    recipient_latitude = models.FloatField( null=True, blank=True)
+    recipient_longitude = models.FloatField( null=True, blank=True)
     package_number = models.CharField(max_length=50, unique=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='upcoming')  # default status is 'upcoming'
     created_at = models.DateTimeField(default=timezone.now)
