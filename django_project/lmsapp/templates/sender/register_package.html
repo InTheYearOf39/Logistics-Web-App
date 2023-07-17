@@ -151,7 +151,8 @@
         //get cordinates
 
         var request = new XMLHttpRequest();
-        var g_key = 'AIzaSyB5r4DsYYly-d272kJopRlb9FCclcWokrE';
+        var g_key= '{{ api_key }}';
+        console.log(g_key)
         var method = 'GET';
         var url = 'https://maps.googleapis.com/maps/api/geocode/json?latlng='+sender_latitude+','+sender_longitude+'&sensor=true'+'&key='+g_key;
         var async = true;

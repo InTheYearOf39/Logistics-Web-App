@@ -9,7 +9,7 @@ from lmsapp.utils import get_time_of_day
 from django.shortcuts import redirect
 from django.contrib import messages
 from django.views.decorators.clickjacking import xframe_options_exempt
-
+from django.conf import settings
 
 """
 Renders out a sender dashboard template and shows packages with the statuses 
@@ -43,6 +43,7 @@ and saving the package to the database with the appropriate details.
 #allow loading resources from other locations
 @xframe_options_exempt
 def register_package(request):
+    api_key = settings.API_KEY
     drop_pick_zones = DropPickZone.objects.filter()  # Retrieve users with the role of 'drop_pick_zone'
 
     if request.method == 'POST':
@@ -77,8 +78,14 @@ def register_package(request):
     else:
         form = PackageForm()
         error_message = None
+    context = {
+        'form': form, 
+        'error_message': error_message, 
+        'drop_pick_zones': drop_pick_zones, 
+        'api_key': api_key
+        }
 
-    return render(request, 'sender/register_package.html', {'form': form, 'error_message': error_message, 'drop_pick_zones': drop_pick_zones})
+    return render(request, 'sender/register_package.html', context)
 
 
 def generate_package_number():
