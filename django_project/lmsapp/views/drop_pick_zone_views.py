@@ -3,11 +3,12 @@ from lmsapp.models import Package, User, DropPickZone
 from lmsapp.utils import get_time_of_day
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, get_object_or_404
-from django.core.mail import send_mail
+from django.core.mail import send_mail, EmailMessage
 from django.contrib.auth import get_user_model
 from django.contrib import messages
 import random
 from django.conf import settings
+import os
 
 
 
@@ -47,7 +48,20 @@ def confirm_drop_off(request, package_id):
         sender_user = User.objects.get(username=package.user.username)
         sender_email = sender_user.email
 
-        send_mail(subject, message, settings.EMAIL_HOST_USER, [sender_email])
+        # Create an EmailMessage instance
+        email = EmailMessage(subject, message, settings.EMAIL_HOST_USER, [sender_email])
+
+        # Get the path to the image
+        image_path = os.path.join(settings.STATIC_ROOT, 'img', 'DroppedOff.png')
+
+        # Check if the image file exists
+        if os.path.isfile(image_path):
+            # Attach the image to the email
+            with open(image_path, 'rb') as image_file:
+                email.attach_file(image_path, 'image/png')
+
+        # Send the email
+        email.send()
 
         return redirect('dpz_dispatch')
 
