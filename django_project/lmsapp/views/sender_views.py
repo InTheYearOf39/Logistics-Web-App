@@ -17,8 +17,10 @@ Renders out a sender dashboard template and shows packages with the statuses
 """
 @login_required
 def sender_dashboard(request):
+    user = request.user
     packages = Package.objects.filter(
-        Q(status='ongoing') | Q(status='upcoming')
+        Q(status='ongoing') | Q(status='upcoming'),
+        user=user
     ).order_by(
         Case(
             When(status='upcoming', then=0),
@@ -33,8 +35,9 @@ def sender_dashboard(request):
     context = {
         'greeting_message': greeting_message,
         'packages': packages
-        }
+    }
     return render(request, 'sender/sender_dashboard.html', context)
+
 
 """  
 Handles the registration of new packages by senders, ensuring the form data is valid 

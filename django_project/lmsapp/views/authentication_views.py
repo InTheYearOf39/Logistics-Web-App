@@ -1,15 +1,47 @@
 from django.shortcuts import render, redirect, redirect
 from django.contrib.auth import authenticate, login, logout
 from lmsapp.forms import SignUpForm, LoginForm
+from lmsapp.models import User
 from django.contrib import messages
 from lmsapp.forms import ChangePasswordForm
 from django.contrib.auth import update_session_auth_hash
+from django.contrib.sites.shortcuts import get_current_site
+from django.core.mail import send_mail
+from django.conf import settings
 
 
-"""
-A function to handle user registration. The form data is validated, and if valid, a user is created, saved to the database, and logged in. The user is then redirected to their respective dashboard based on their role.
-If the form is not valid or the request method is not POST, the registration form is displayed.
-"""
+# def register(request):
+#     msg = None
+#     if request.method == 'POST':
+#         form = SignUpForm(request.POST)
+#         if form.is_valid():
+#             user = form.save(commit=False)
+#             user.role = 'sender'
+#             user.is_active = False  
+#             user.save()
+            
+#             # Generate and save a unique verification token
+#             user.generate_verification_token()
+            
+#             # Send verification email
+#             current_site = get_current_site(request)
+#             subject = 'Activate your account'
+#             message = f" {{" \
+#                         f"'user': user, " \
+#                         f"'domain': current_site.domain" \
+#                         f"}}"
+
+
+#             send_mail(subject, message, settings.EMAIL_HOST_USER, to=[user.email])
+            
+#             msg = 'user created'
+#             return redirect('email_verification_sent')
+#         else:
+#             msg = 'form is not valid'
+#     else:
+#         form = SignUpForm()
+#     return render(request, 'auth/register.html', {'form': form, 'msg': msg})
+
 def register(request):
     msg = None
     if request.method == 'POST':
@@ -17,24 +49,78 @@ def register(request):
         if form.is_valid():
             user = form.save(commit=False)
             user.role = 'sender'
+            user.is_active = False  
+
+            user.generate_verification_token()
             user.save()
-            msg = 'user created'
-
-            dashboard_mapping = {
-                'sender': 'sender_dashboard',
-            }
-            dashboard_url = dashboard_mapping.get(user.role)
-            user.backend = 'django.contrib.auth.backends.ModelBackend'
-
-            login(request, user)
+            # Send verification email
+            current_site = get_current_site(request)
+            subject = 'Activate your account'
+            message = f"A new account matching this email was detected on our system,\n"\
+                      f"Click the following link to activate your account:\n\n" \
+                      f"{current_site.domain}/verify-email?verification_token={user.verification_token}\n"\
+                      f"If this wasn't you, ignore this message"
             
-            return redirect(dashboard_url)
-
+            send_mail(subject, message, settings.EMAIL_HOST_USER, [user.email])
+            
+            msg = 'user created'
+            return redirect('email_verification_sent')
         else:
             msg = 'form is not valid'
     else:
         form = SignUpForm()
-    return render(request,'auth/register.html', {'form': form, 'msg': msg})
+    return render(request, 'auth/register.html', {'form': form, 'msg': msg})
+
+def verify_email(request):
+    token = request.GET.get('verification_token')
+    user = User.objects.get(verification_token=token)
+    
+    if user:
+        user.is_active = True
+        user.save()
+        user.backend = 'django.contrib.auth.backends.ModelBackend'
+        login(request, user)
+        return redirect('sender_dashboard')
+    else:
+        return redirect('email_verification_failed')
+
+
+
+
+
+
+
+
+
+"""
+A function to handle user registration. The form data is validated, and if valid, a user is created, saved to the database, and logged in. The user is then redirected to their respective dashboard based on their role.
+If the form is not valid or the request method is not POST, the registration form is displayed.
+"""
+# def register(request):
+#     msg = None
+#     if request.method == 'POST':
+#         form = SignUpForm(request.POST)
+#         if form.is_valid():
+#             user = form.save(commit=False)
+#             user.role = 'sender'
+#             user.save()
+#             msg = 'user created'
+
+#             dashboard_mapping = {
+#                 'sender': 'sender_dashboard',
+#             }
+#             dashboard_url = dashboard_mapping.get(user.role)
+#             user.backend = 'django.contrib.auth.backends.ModelBackend'
+
+#             login(request, user)
+            
+#             return redirect(dashboard_url)
+
+#         else:
+#             msg = 'form is not valid'
+#     else:
+#         form = SignUpForm()
+#     return render(request,'auth/register.html', {'form': form, 'msg': msg})
 
 """
 A function to handle user login. The form data is validated, and if valid, the user is authenticated and logged in. 
@@ -66,6 +152,13 @@ def login_view(request):
             msg = 'error validating form'
     return render(request, 'auth/login.html', {'form': form, 'msg': msg})
 
+""""A function to notify a user when an account verification token has been sent"""
+def email_verification_sent(request):
+    return render(request, 'auth/email_verification_sent.html')
+
+""""A function to notify a user when their account verification has failed"""
+def email_verification_failed(request):
+    return render(request, 'auth/email_verification_failed.html')
 
 """
 A function to handle user logout. When a user accesses this view, they will be logged out 

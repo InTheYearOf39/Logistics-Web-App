@@ -24,22 +24,24 @@ urlpatterns = [
     path('register/', authentication_views.register, name='register'),
     path('logout/', auth_views.LogoutView.as_view(template_name='index.html'), name='logout_user'),
     path('change_password/', authentication_views.change_password, name='change_password'),
-    # path('change_password/', authentication_views.change_password, name='change_password'),
-
+#     path('change_password/', authentication_views.change_password, name='change_password'),
+	path('email-verification-sent/', authentication_views.email_verification_sent, name='email_verification_sent'),
+    path('email-verification-failed/', authentication_views.email_verification_failed, name='email_verification_failed'),
+    path('verify-email/', authentication_views.verify_email, name='verify_email'),
 
     # reset password routes
     path( 'reset_password/', 
-         auth_views.PasswordResetView.as_view(template_name="registration/password_reset_form_.html"), 
-         name= "reset_password"),
+        auth_views.PasswordResetView.as_view(template_name="registration/password_reset_form_.html"), 
+        name= "reset_password"),
     path( 'reset_password_sent/',
-         auth_views.PasswordResetDoneView.as_view(template_name="registration/password_reset_done_.html"), 
-         name="password_reset_done"),
+        auth_views.PasswordResetDoneView.as_view(template_name="registration/password_reset_done_.html"), 
+        name="password_reset_done"),
     path('reset/<uidb64>/<token>/', 
-         auth_views.PasswordResetConfirmView.as_view(template_name="registration/password_reset_confirm_.html"), 
-         name="password_reset_confirm"),
+        auth_views.PasswordResetConfirmView.as_view(template_name="registration/password_reset_confirm_.html"), 
+        name="password_reset_confirm"),
     path( 'reset_password_complete/', 
-         auth_views.PasswordResetCompleteView.as_view(template_name="registration/password_reset_complete_.html"), 
-         name ="password_reset_complete"),
+        auth_views.PasswordResetCompleteView.as_view(template_name="registration/password_reset_complete_.html"), 
+        name ="password_reset_complete"),
 
 
     # admin routes

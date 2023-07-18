@@ -4,6 +4,7 @@ from django.utils import timezone
 import random
 import string
 from django.core.exceptions import ValidationError
+from django.utils.crypto import get_random_string
 
 
 class CustomUserManager(UserManager):
@@ -55,6 +56,7 @@ class User(AbstractUser):
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, verbose_name='Role', null=False)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='available')
     objects = CustomUserManager()
+    verification_token = models.CharField(max_length=200, null=True, blank=True)
 
     # Add warehouse-specific fields
     tag = models.CharField(max_length=20, null=True, blank=True)
@@ -65,11 +67,19 @@ class User(AbstractUser):
     # Add drop_pick_zone-specific fields
     warehouse = models.ForeignKey(Warehouse, related_name='users', on_delete=models.CASCADE, null=True, blank=True)
 
+    def generate_verification_token(self, length=64):
+        token = get_random_string(length)
+        self.verification_token = token
+        print(token)
+        return token
+    
+    def save(self, *args, **kwargs):
+        # if not self.pk:
+        #     self.generate_verification_token()
+        return super().save(*args, **kwargs)
+
     def __str__(self):
         return self.username
-
-
-
 
 
 class Package(models.Model):
