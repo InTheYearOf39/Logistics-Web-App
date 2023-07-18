@@ -17,7 +17,6 @@ Renders out a sender dashboard template and shows packages with the statuses
 """
 @login_required
 def sender_dashboard(request):
-    user = request.user
     packages = Package.objects.filter(
         user=request.user
     ).order_by(
