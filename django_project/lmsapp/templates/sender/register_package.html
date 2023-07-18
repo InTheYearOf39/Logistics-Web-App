@@ -46,7 +46,9 @@
                 <div class="invalid-feedback">
                   Please select a delivery location.
                 </div>
+               
               </div>
+              
 
             <input type="hidden" id="sender_latitude" name="sender_latitude" value="">
             <input type="hidden" id="sender_longitude" name="sender_longitude" value="">
@@ -134,6 +136,7 @@
       </div>
   </div>
 
+
   <script>
     
     function getGPS() {
@@ -152,7 +155,6 @@
 
         var request = new XMLHttpRequest();
         var g_key= '{{ api_key }}';
-        console.log(g_key)
         var method = 'GET';
         var url = 'https://maps.googleapis.com/maps/api/geocode/json?latlng='+sender_latitude+','+sender_longitude+'&sensor=true'+'&key='+g_key;
         var async = true;
@@ -169,6 +171,9 @@
         };
         request.send();
 
+        // get new droplist
+        redraw_dropoff_list(sender_latitude, sender_longitude);
+
       }, function (error) {
         console.log("Failed to get location");
         alert("Failed to get your GPS location. Please enable GPS.");
@@ -179,6 +184,27 @@
       alert("Device does not support geolocation!");
     }
   }
+
+  //get drop lits in javacsript
+  /*
+  var drop_lists = {{ drop_pick_zones_json|safe }};
+  */
+
+  function redraw_dropoff_list(lat, lng)
+  {
+
+    $.ajax({
+        method: "POST",
+        url: "/api",
+        data: { action: "get_closest_drop_pick_locations", lat: lat, lng: lng }
+    }).done(function( response ) {
+        //console.log(response);
+        //overide options
+        $("#dropOffLocation").html(response.data);
+    });
+
+  }
+
 
     //load after page loads
     $(function () {
@@ -210,6 +236,9 @@
       //set values into the feilds
       document.getElementById("sender_latitude").value = place.geometry.location.lat();
       document.getElementById("sender_longitude").value = place.geometry.location.lng();
+
+      // get new droplist
+      redraw_dropoff_list(place.geometry.location.lat(), place.geometry.location.lng());
 
     });
   });

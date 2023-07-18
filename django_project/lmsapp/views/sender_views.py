@@ -9,7 +9,9 @@ from lmsapp.utils import get_time_of_day
 from django.shortcuts import redirect
 from django.contrib import messages
 from django.views.decorators.clickjacking import xframe_options_exempt
+from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
+import math
 
 """
 Renders out a sender dashboard template and shows packages with the statuses 
@@ -44,8 +46,10 @@ and saving the package to the database with the appropriate details.
 #allow loading resources from other locations
 @xframe_options_exempt
 def register_package(request):
+    # import json
+    from django.core.serializers.json import DjangoJSONEncoder
     api_key = settings.API_KEY
-    drop_pick_zones = DropPickZone.objects.filter()  # Retrieve users with the role of 'drop_pick_zone'
+    drop_pick_zones = DropPickZone.objects.all().values()  # Retrieve users with the role of 'drop_pick_zone'
 
     if request.method == 'POST':
         form = PackageForm(request.POST)
@@ -79,15 +83,16 @@ def register_package(request):
     else:
         form = PackageForm()
         error_message = None
+    #drop_pick_zones_json = json.dumps(list(drop_pick_zones), cls=DjangoJSONEncoder)
     context = {
         'form': form, 
         'error_message': error_message, 
         'drop_pick_zones': drop_pick_zones, 
+        #'drop_pick_zones_json': drop_pick_zones_json, 
         'api_key': api_key
         }
 
     return render(request, 'sender/register_package.html', context)
-
 
 def generate_package_number():
     prefix = 'pn'
@@ -96,3 +101,85 @@ def generate_package_number():
 
 def sender_history(request):
     return render(request, 'sender/sender_history.html', {})
+
+@xframe_options_exempt
+@csrf_exempt
+def api(request):
+    import json
+    from django.http import JsonResponse
+    # check wat action I am doing now
+    params = {}
+    #determine what type of call
+    if request.method == "POST":
+        params = dict(request.POST.items())
+    elif request.method == "GET":
+        params = dict(request.GET.items())
+
+    # decalre reponse
+    
+    response = {"error":True, "error_msg":"API error occured"}
+    if params.get("action","") == "":
+        response["error"] = True
+        response["error_msg"] = "No action specified"
+    elif params.get("action","") == "get_closest_drop_pick_locations":
+        # do your stuff
+        if params.get("lat","") == "" or params.get("lng","") == "":
+            response["error"] = True
+            response["error_msg"] = "Please provide GPS data"
+        else:
+            response["error"] = False
+            response["error_msg"] = "completed successfully "
+            response["data"] = get_closest_drop_off(params.get("lat"), params.get("lng"))
+    elif params.get("action","") == "print home":
+        response["error"] = False
+        response["error_msg"] = "completed successfully "
+        response["data"] = "my_data"
+    
+    return JsonResponse(response, safe=False)
+
+def get_closest_drop_off(lat, lng):
+    #retruns a json llist of all locations
+    #liooop through all drop picks
+    # get distance in meteresd or kms for each droppick in comparison to GPS lat long passed
+    # formulate a list of the drop pciks with those closest first
+    # return this list
+    closest_drop_pick_zones = []
+    drop_pick_zones = DropPickZone.objects.all().values()
+    for drop_pick_zone in drop_pick_zones:
+        distance = calculate_distance(
+            float(lat),
+            float(lng),
+            drop_pick_zone["latitude"],
+            drop_pick_zone["longitude"]
+        )
+        drop_pick_zone["distance"] = distance
+        closest_drop_pick_zones.append(drop_pick_zone)
+
+    closest_drop_pick_zones.sort(key=lambda x: x["distance"])
+    closest_drop_pick_zones = closest_drop_pick_zones[:5]
+    # dormulate html string for lookups
+    html = """<option value="" selected="" disabled="">-- Select Drop Off --</option>"""
+    for x in closest_drop_pick_zones:
+        html += "<option value='" + str(x["id"]) + "'>" + str(x["name"]) + " (" + str(round(x["distance"], 1)) + " Kms)</option>  "
+
+    # forumlate HTML string of all options
+    return html
+
+
+def calculate_distance(lat1, lon1, lat2, lon2):
+    # Convert latitude and longitude from degrees to radians
+    
+    lat1_rad = math.radians(lat1)
+    lon1_rad = math.radians(lon1)
+    lat2_rad = math.radians(lat2)
+    lon2_rad = math.radians(lon2)
+
+    # Haversine formula
+    dlon = lon2_rad - lon1_rad
+    dlat = lat2_rad - lat1_rad
+    a = math.sin(dlat / 2) ** 2 + math.cos(lat1_rad) * math.cos(lat2_rad) * math.sin(dlon / 2) ** 2
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+    distance = 6371 * c  # Radius of the Earth in kilometers
+
+    return distance
+
