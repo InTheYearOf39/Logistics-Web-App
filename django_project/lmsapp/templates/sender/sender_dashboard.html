@@ -59,42 +59,39 @@
 
                       <form action="" method="post">
                         {% csrf_token %}
-                        <div class="modal fade" id="staticBackdrop{{ package.id }}" data-bs-backdrop="static"
-                          data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel"
-                          aria-hidden="true">
+                        <div class="modal fade" id="staticBackdrop{{ package.id }}" data-bs-backdrop="static" data-bs-keyboard="false"
+                          tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
                           <div class="modal-dialog modal-dialog-centered">
                             <div class="modal-content">
                               <div class="modal-header">
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                               </div>
-                              
-                              {% for package in packages %}
                               {% if package.status == 'upcoming' %}
-                              <div class="d-flex align-items-center justify-content-center">
-                                <img src="{% static 'img/Upcoming.png' %}" alt="" width="498px" height="498px">
-                              </div>
+                                <div class="d-flex align-items-center justify-content-center">
+                                  <img src="{% static 'img/Upcoming.png' %}" alt="" width="498px" height="498px">
+                                </div>
                               {% elif package.status == 'dropped_off' %}
-                              <div class="d-flex align-items-center justify-content-center">
-                                <img src="{% static 'img/DroppedOff.png' %}" alt="" width="498px" height="498px">
-                              </div>
+                                <div class="d-flex align-items-center justify-content-center">
+                                  <img src="{% static 'img/DroppedOff.png' %}" alt="" width="498px" height="498px">
+                                </div>
                               {% elif package.status == 'in_house' %}
-                              <div class="d-flex align-items-center justify-content-center">
-                                <img src="{% static 'img/InHouse.png' %}" alt="" width="498px" height="498px">
-                              </div>
+                                <div class="d-flex align-items-center justify-content-center">
+                                  <img src="{% static 'img/InHouse.png' %}" alt="" width="498px" height="498px">
+                                </div>
                               {% elif package.status == 'arrived' %}
-                              <div class="d-flex align-items-center justify-content-center">
-                                <img src="{% static 'img/Arrived.png' %}" alt="" width="498px" height="498px">
-                              </div>
+                                <div class="d-flex align-items-center justify-content-center">
+                                  <img src="{% static 'img/Arrived.png' %}" alt="" width="498px" height="498px">
+                                </div>
                               {% elif package.status == 'completed' %}
-                              <img src="{% static 'img/success.png' %}" alt="" width="498px" height="498px">
+                                <img src="{% static 'img/success.png' %}" alt="" width="498px" height="498px">
                               {% endif %}
-                              {% endfor %}
                             </div>
                           </div>
                         </div>
                         <button type="button" class="btn btn-sm btn-warning text-white" data-bs-toggle="modal"
                           data-bs-target="#staticBackdrop{{ package.id }}">View Status</button>
                       </form>
+                      
                       
 
 
@@ -141,38 +138,37 @@
                                           <th scope="row">Status:</th>
                                           <td>
                                       
-                                    <form action="" method="post">
-                                        {% csrf_token %}
-                                        <button type="button" class="btn btn-sm btn-warning text-white custom-modal-trigger" data-target="#customModal{{ package.id }}">View Status</button>
-                                        <div class="custom-modal" id="customModal{{ package.id }}">
-                                            <div class="custom-modal-content">
-                                                <div class="custom-modal-header">
+                                            <form action="" method="post">
+                                              {% csrf_token %}
+                                              <button type="button" class="btn btn-sm btn-warning text-white custom-modal-trigger" data-target="#customModal{{ package.id }}">View Status</button>
+                                              <div class="custom-modal" id="customModal{{ package.id }}">
+                                                <div class="custom-modal-content">
+                                                  <div class="custom-modal-header">
                                                     <button type="button" class="custom-modal-close" data-target="#customModal{{ package.id }}">&times;</button>
+                                                  </div>
+                                                  {% if package.status == 'upcoming' %}
+                                                    <div class="d-flex align-items-center justify-content-center">
+                                                      <img src="{% static 'img/Upcoming.png' %}" alt="" width="300px" height="300px">
+                                                    </div>
+                                                  {% elif package.status == 'dropped_off' %}
+                                                    <div class="d-flex align-items-center justify-content-center">
+                                                      <img src="{% static 'img/DroppedOff.png' %}" alt="" width="300px" height="300px">
+                                                    </div>
+                                                  {% elif package.status == 'in_house' %}
+                                                    <div class="d-flex align-items-center justify-content-center">
+                                                      <img src="{% static 'img/InHouse.png' %}" alt="" width="300px" height="300px">
+                                                    </div>
+                                                  {% elif package.status == 'arrived' %}
+                                                    <div class="d-flex align-items-center justify-content-center">
+                                                      <img src="{% static 'img/Arrived.png' %}" alt="" width="350px" height="350px">
+                                                    </div>
+                                                  {% elif package.status == 'completed' %}
+                                                    <img src="{% static 'img/success.png' %}" alt="" width="300px" height="300px">
+                                                  {% endif %}
                                                 </div>
-                                                {% for package in packages %}
-                                                {% if package.status == 'upcoming' %}
-                                                <div class="d-flex align-items-center justify-content-center">
-                                                  <img src="{% static 'img/Upcoming.png' %}" alt="" width="300px" height="300px">
-                                                </div>
-                                                {% elif package.status == 'dropped_off' %}
-                                                <div class="d-flex align-items-center justify-content-center">
-                                                  <img src="{% static 'img/DroppedOff.png' %}" alt="" width="300px" height="300px">
-                                                </div>
-                                                {% elif package.status == 'in_house' %}
-                                                <div class="d-flex align-items-center justify-content-center">
-                                                  <img src="{% static 'img/InHouse.png' %}" alt="" width="300px" height="300px">
-                                                </div>
-                                                {% elif package.status == 'arrived' %}
-                                                <div class="d-flex align-items-center justify-content-center">
-                                                  <img src="{% static 'img/Arrived.png' %}" alt="" width="350px" height="350px">
-                                                </div>
-                                                {% elif package.status == 'completed' %}
-                                                <img src="{% static 'img/success.png' %}" alt="" width="300px" height="300px">
-                                                {% endif %}
-                                                {% endfor %}
-                                            </div>
-                                        </div>
-                                    </form>
+                                              </div>
+                                            </form>
+                                            
                                           </td>
                                       </tr>
                                   </tbody>

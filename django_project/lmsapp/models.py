@@ -112,6 +112,7 @@ class Package(models.Model):
     packageName = models.CharField(max_length=100)
     deliveryType = models.CharField(max_length=20, choices=DELIVERY_CHOICES)
     dropOffLocation = models.ForeignKey(DropPickZone, on_delete=models.CASCADE, null=True, blank=True, default=None, related_name='packages_dropped_off')
+    recipientPickUpLocation = models.ForeignKey(DropPickZone, on_delete=models.CASCADE, null=True, blank=True, default=None, related_name='packages_picked_up')
     warehouse = models.ForeignKey(Warehouse, on_delete=models.CASCADE, null=True, blank=True, related_name='packages_in_house')
     packageDescription = models.TextField()
     recipientName = models.CharField(max_length=100)
