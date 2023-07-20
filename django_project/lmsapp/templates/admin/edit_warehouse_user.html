@@ -1,0 +1,75 @@
+<!-- edit_warehouse_user.html -->
+{% extends 'admin/admin_base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="container mb-5" style="margin-left: 4rem;">
+  <div class="row justify-content-center ml-5">
+    <div class="col-md-12">
+      <form class="well form-horizontal" action="{% url 'edit_warehouse_user' user.id %}" method="post" id="contact_form">
+        {% csrf_token %}
+        {{ form.errors }}
+
+        <fieldset>
+
+          <!-- Form Name -->
+          <legend class="my-4">EDIT USER</legend>
+
+          <!-- Text input -->
+          <div class="form-group mt-2">
+            <label class="col-md-8 control-label">Name</label>
+            <div class="col-md-8 inputGroupContainer">
+              <div class="input-group">
+                <span class="input-group-text">👤</span>
+                <input name="name" placeholder="Name" class="form-control" type="text" value="{{ user.name }}">
+              </div>
+            </div>
+          </div>
+
+          <!-- Text input -->
+          <div class="form-group mt-2">
+            <label class="col-md-8 control-label">Username</label>
+            <div class="col-md-8 inputGroupContainer">
+              <div class="input-group">
+                <span class="input-group-text">👤</span>
+                <input name="username" placeholder="Username" class="form-control" type="text" value="{{ user.username }}">
+              </div>
+            </div>
+          </div>
+
+          <!-- Select input -->
+          <div class="form-group mt-2">
+            <label class="col-md-8 control-label">Warehouse</label>
+            <div class="col-md-8 selectContainer">
+              <div class="input-group">
+                <span class="input-group-text">🏬</span>
+                <span class="input-group-addon"><i class="glyphicon glyphicon-list"></i></span>
+                <select name="warehouse" class="form-control selectpicker">
+                  <option value="">Please select warehouse</option>
+                  {% for warehouse in warehouses %}
+                    {% if user.warehouse == warehouse %}
+                      <option value="{{ warehouse.id }}" selected>{{ warehouse.name }}</option>
+                    {% else %}
+                      <option value="{{ warehouse.id }}">{{ warehouse.name }}</option>
+                    {% endif %}
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group mt-2">
+            <label class="col-md-8 control-label"></label>
+            <div class="col-md-8">
+              <button type="submit" class="btn btn-info text-white">SAVE <span class="glyphicon glyphicon-send"></span></button>
+            </div>
+          </div>
+
+        </fieldset>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

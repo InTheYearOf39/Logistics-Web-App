@@ -58,6 +58,10 @@ urlpatterns = [
     path('create_drop_pick_user/', admin_views.create_drop_pick_user, name='create_drop_pick_user'),
     path('create_courier/', admin_views.create_courier, name='create_courier'),
     path('warehouses/', admin_views.warehouses, name='warehouses'),
+    path('edit_warehouse/<int:warehouse_id>//', admin_views.edit_warehouse, name='edit_warehouse'),
+    path('delete_warehouse/<int:warehouse_id>/', admin_views.delete_warehouse, name='delete_warehouse'),
+    path('edit_warehouse_user/<int:user_id>/', admin_views.edit_warehouse_user, name='edit_warehouse_user'),
+    path('delete_warehouse_user/<int:user_id>/', admin_views.delete_warehouse_user, name='delete_warehouse_user'),
     path('drop_pick_zones/', admin_views.drop_pick_zones, name='drop_pick_zones'),
 
 

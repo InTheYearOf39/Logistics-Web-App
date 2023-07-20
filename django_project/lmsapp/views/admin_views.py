@@ -316,3 +316,91 @@ def create_drop_pick_user(request):
         'drop_pick_zones': drop_pick_zones
     }
     return render(request, 'admin/create_drop_pick_user.html', context)
+
+# views.py
+def edit_warehouse(request, warehouse_id):
+    warehouse = get_object_or_404(Warehouse, id=warehouse_id)
+
+    if request.method == 'POST':
+        # Get the form data from the request.POST dictionary
+        name = request.POST['name']
+        address = request.POST['address']
+        phone = request.POST['phone']
+        tag = request.POST['tag']
+        latitude = request.POST['latitude']
+        longitude = request.POST['longitude']
+
+        # Update the warehouse model instance with the new data
+        warehouse.name = name
+        warehouse.address = address
+        warehouse.phone = phone
+        warehouse.tag = tag
+        warehouse.latitude = latitude
+        warehouse.longitude = longitude
+
+        # Save the updated warehouse details to the database
+        warehouse.save()
+
+        # Redirect to the warehouses list page after editing
+        return redirect('warehouses')
+
+    return render(request, 'admin/edit_warehouse.html', {'warehouse': warehouse})
+
+def delete_warehouse(request, warehouse_id):
+    warehouse = get_object_or_404(Warehouse, id=warehouse_id)
+
+    if request.method == 'POST':
+        # Delete the warehouse
+        warehouse.delete()
+        return redirect('warehouses')
+
+    return render(request, 'admin/warehouses.html', {'warehouse': warehouse})
+
+
+def edit_warehouse_user(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+
+    if request.method == 'POST':
+        # Check if the form was submitted for deletion
+        if 'delete_user' in request.POST:
+            # Delete the warehouse user
+            user.delete()
+            return redirect('warehouse_users_list')
+
+        # If not deletion, handle the form for updating the user details
+        name = request.POST.get('name')
+        username = request.POST.get('username')
+        warehouse_id = request.POST.get('warehouse')
+
+        if warehouse_id:
+            warehouse = get_object_or_404(Warehouse, id=warehouse_id)
+
+            # Update the user details
+            user.name = name
+            user.username = username
+            user.warehouse = warehouse
+            user.save()
+
+            return redirect('warehouses')
+
+    # Retrieve the warehouses
+    warehouses = Warehouse.objects.all()
+
+    context = {
+        'user': user,
+        'warehouses': warehouses
+    }
+    return render(request, 'admin/edit_warehouse_user.html', context)
+
+
+def delete_warehouse_user(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+    
+    if request.method == 'POST':
+        # Delete the warehouse user
+        user.delete()
+        return redirect('warehouses')
+    
+    # If the request method is not POST, show the confirmation modal
+    return render(request, 'admin/delete_warehouse_user.html', {'user': user})
+

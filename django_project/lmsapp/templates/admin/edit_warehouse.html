@@ -1,0 +1,114 @@
+{% extends 'admin/admin_base.html' %}
+
+{% load static %}
+
+
+{% block content %}
+
+
+<div class="container mb-5" style="margin-left: 4rem;">
+  <div class="row justify-content-center ml-5">
+    <div class="col-md-12">
+    <form class="well form-horizontal" action=" " method="post"  id="contact_form">
+      {% csrf_token %}
+<fieldset>
+
+<!-- Form Name -->
+<legend class="my-4">EDIT WARE HOUSE</legend>
+
+<!-- Text input-->
+
+<div class="form-group mt-2">
+    <label class="col-md-8 control-label">Full Name</label>
+    <div class="col-md-8 inputGroupContainer">
+        <div class="input-group">
+            <span class="input-group-text">👤</span>
+            <input name="name" placeholder="Name" class="form-control" type="text" value="{{ warehouse.name }}">
+        </div>
+    </div>
+</div>
+
+<!-- Text input-->
+      
+<div class="form-group mt-2">
+  <label class="col-md-8 control-label">Address</label>  
+    <div class="col-md-8 inputGroupContainer">
+    <div class="input-group">
+        <span class="input-group-text">📌</span>
+  <input id="address" name="address" placeholder="Address" class="form-control" type="text" value="{{ warehouse.address }}">
+    </div>
+  </div>
+</div>
+
+<input id="latitude" name="latitude" placeholder="latitude" class="form-control" value="{{ warehouse.latitude }}" type="text" hidden>
+
+<input id="longitude" name="longitude" placeholder="longitude" class="form-control" value="{{ warehouse.longitude }}"type="text" hidden>
+
+
+<!-- Text input-->
+       
+<div class="form-group mt-2">
+  <label class="col-md-8 control-label">Contact</label>  
+    <div class="col-md-8 inputGroupContainer">
+    <div class="input-group">
+        <span class="input-group-text">📞</span>
+  <input name="phone" placeholder="Phone number" class="form-control" type="text" value="{{ warehouse.phone }}">
+    </div>
+  </div>
+</div>
+
+
+<!-- Text input-->
+<div class="form-group mt-2">
+  <label class="col-md-8 control-label">Tag</label>  
+    <div class="col-md-8 inputGroupContainer">
+    <div class="input-group">
+        <span class="input-group-text">🏷️</span>
+  <input name="tag" placeholder="Tag alias" class="form-control" type="text" value="{{ warehouse.tag }}">
+    </div>
+  </div>
+</div>
+
+<!-- Text input-->
+
+
+<!-- Button -->
+<div class="form-group mt-2">
+  <label class="col-md-8 control-label"></label>
+  <div class="col-md-8">
+    <button type="submit" class="btn btn-info text-white" >Save <span class="glyphicon glyphicon-send"></span></button>
+  </div>
+</div>
+
+</fieldset>
+</form>
+    </div>
+  </div>
+</div>
+    <!-- /.container -->
+
+    <script>
+      //load after page loads
+      $(function () { 
+
+        //initiate auto complete 
+      var from_autocomplete = new google.maps.places.Autocomplete($("#address")[0], {});
+
+      google.maps.event.addListener(from_autocomplete, 'place_changed', function() {
+      var place = from_autocomplete.getPlace();
+      //console.log(place);
+      //console.log("latitude:"+place.geometry.location.lat());
+      //console.log("longitude:"+place.geometry.location.lng());
+      //set values into the feilds
+      $("#latitude").val(place.geometry.location.lat());
+      $("#longitude").val(place.geometry.location.lng());
+
+
+      });
+
+       
+      });
+    </script>
+
+
+{% endblock %}

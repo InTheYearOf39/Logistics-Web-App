@@ -19,6 +19,8 @@
         <th scope="col">Contact</th>
         <th scope="col">Address</th>
         <th scope="col">Tag</th>
+        <th scope="col">Edit</th>
+        <th scope="col">Delete</th>
       </tr>
     </thead>
     <tbody>
@@ -28,6 +30,36 @@
           <td>{{ warehouse.phone }}</td>
           <td>{{ warehouse.address }}</td>
           <td>{{ warehouse.tag }}</td>
+          <td>
+            <a href="{% url 'edit_warehouse' warehouse.id %}">
+                <button type="button" class="btn btn-sm btn-info text-white">Edit</button>
+            </a>
+        </td>
+        <td>
+          <button type="button" class="btn btn-sm btn-danger text-white" data-bs-toggle="modal" data-bs-target="#deleteModal{{ warehouse.id }}">Delete</button>
+        </td>
+        
+        <!-- Delete Warehouse Modal -->
+        <div class="modal fade" id="deleteModal{{ warehouse.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ warehouse.id }}" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel{{ warehouse.id }}">Confirm Delete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                Are you sure you want to delete the warehouse {{ warehouse.name }}?
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form action="{% url 'delete_warehouse' warehouse.id %}" method="post">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
         </tr>
       {% endfor %}
     </tbody>
@@ -44,6 +76,8 @@
         <th scope="col">Name</th>
         <th scope="col">User Name</th>
         <th scope="col">Warehouse</th>
+        <th scope="col">Edit</th>
+        <th scope="col">Delete</th>
       </tr>
     </thead>
     <tbody>
@@ -52,6 +86,35 @@
         <td>{{ user.name }}</td>
         <td>{{ user.username }}</td>
         <td>{{ user.warehouse.name }}</td>
+        <td>
+          <a href="{% url 'edit_warehouse_user' user.id %}"><button type="submit" class="btn btn-sm btn-info text-white" data-bs-toggle="modal" data-bs-target="">Edit</button></a>
+        </td>
+        <td>
+          <button type="button" class="btn btn-sm btn-danger text-white" data-bs-toggle="modal" data-bs-target="#deleteModal{{ user.id }}">Delete</button>
+        </td>
+
+        <!-- Delete Warehouse User Modal -->
+        <div class="modal fade" id="deleteModal{{ user.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ user.id }}" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel{{ user.id }}">Confirm Delete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                Are you sure you want to delete the warehouse user {{ user.name }}?
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form action="{% url 'delete_warehouse_user' user.id %}" method="post">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </tr>
       {% endfor %}
     </tbody>
