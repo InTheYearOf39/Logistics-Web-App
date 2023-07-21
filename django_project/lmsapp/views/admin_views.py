@@ -144,19 +144,26 @@ def admin_history(request):
 A Function to retrieve dropped off items and group the packages by their respective drop-off locations and
 render them on the 'admin/dropoffs.html' template.
  """
+# def dropoffs(request):
+#     dropoff_locations = DropPickZone.objects.filter(packages_dropped_off__status='dropped_off').distinct()
+#     packages_by_location = {}
+
+#     for dropoff_location in dropoff_locations:
+#         packages = Package.objects.filter(dropOffLocation=dropoff_location, status='dropped_off')
+#         packages_by_location[dropoff_location.name] = packages
+
+#     context = {
+#         'packages_by_location': packages_by_location,
+#     }
+#     return render(request, 'admin/dropoffs.html', context)
+
 def dropoffs(request):
-    dropoff_locations = DropPickZone.objects.filter(packages_dropped_off__status='dropped_off').distinct()
-    packages_by_location = {}
-
-    for dropoff_location in dropoff_locations:
-        packages = Package.objects.filter(dropOffLocation=dropoff_location, status='dropped_off')
-        packages_by_location[dropoff_location.name] = packages
-
+    packages = Package.objects.filter(status='dropped_off')
+    
     context = {
-        'packages_by_location': packages_by_location,
+        'packages': packages,
     }
     return render(request, 'admin/dropoffs.html', context)
-
 
 
 
