@@ -21,6 +21,8 @@
         <th scope="col">Address</th>
         <th scope="col">Tag</th>
         <th scope="col">Warehouse</th>
+        <th scope="col">Edit</th>
+        <th scope="col">Delete</th>
       </tr>
     </thead>
     <tbody>
@@ -31,6 +33,35 @@
           <td>{{ drop_pick_zone.address }}</td>
           <td>{{ drop_pick_zone.tag }}</td>
           <td>{{ drop_pick_zone.warehouse.name }}</td>
+          <td>
+            <a href="{% url 'edit_drop_pick_zones' drop_pick_zone.id%}">
+                <button type="button" class="btn btn-sm btn-info text-white">Edit</button>
+            </a>
+          </td>
+          <td>
+            <button type="button" class="btn btn-sm btn-danger text-white" data-bs-toggle="modal" data-bs-target="#deleteModal{{ drop_pick_zone.id }}">DELETE</button>
+          </td>
+          <!-- Delete Drop-Pick Zone Modal -->
+          <div class="modal fade" id="deleteModal{{ drop_pick_zone.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ drop_pick_zone.id }}" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="deleteModalLabel{{ drop_pick_zone.id }}">Confirm Delete</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  Are you sure you want to delete the drop-pick zone {{ drop_pick_zone.name }}?
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                  <form action="{% url 'delete_drop_pick_zone' drop_pick_zone.id %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
         </tr>
       {% endfor %}
     </tbody>
@@ -48,6 +79,8 @@
         <th scope="col">Name</th>
         <th scope="col">User Name</th>
         <th scope="col">Drop Pick Zone</th>
+        <th scope="col">Edit</th>
+        <th scope="col">Delete</th>
       </tr>
     </thead>
     <tbody>
@@ -56,6 +89,36 @@
         <td>{{ user.name }}</td>
         <td>{{ user.username }}</td>
         <td>{{ user.drop_pick_zone }}</td>
+        <td>
+          <a href="{% url 'edit_drop_pick_zone_user' drop_pick_zone_user_id=user.id %}">
+            <button type="button" class="btn btn-sm btn-info text-white">Edit</button>
+          </a>
+        </td>
+        <td>
+          <button type="button" class="btn btn-sm btn-danger text-white" data-bs-toggle="modal" data-bs-target="#deleteModal{{ user.id }}">Delete</button>
+      </td>
+
+          <!-- Delete User Modal -->
+          <div class="modal fade" id="deleteModal{{ user.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ user.id }}" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteModalLabel{{ user.id }}">Confirm Delete</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Are you sure you want to delete the user {{ user.name }}?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <form action="{% url 'delete_drop_pick_zone_user' drop_pick_zone_user_id=user.id %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+          </div>
       </tr>
       {% endfor %}
     </tbody>
