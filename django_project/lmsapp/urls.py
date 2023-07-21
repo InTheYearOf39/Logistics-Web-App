@@ -17,6 +17,9 @@ urlpatterns = [
     path('services/', site_views.services, name='services'),
     path('about/', site_views.about, name='about'),
     path('contact/', site_views.contact, name='contact'),
+    path('home/', site_views.home, name='dashboard_home'),
+    path('home_register/', site_views.home_register, name='home_register'),
+    path('master_dashboard/', site_views.master_dashboard, name='master_dashboard'),
 
 
     # authentication routes
@@ -81,16 +84,16 @@ urlpatterns = [
     path('warehouse_dashboard/', warehouse_views.warehouse_dashboard, name='warehouse_dashboard'),
     path('confirm_arrival/<int:package_id>/', warehouse_views.confirm_arrival, name='confirm_arrival'),
     path('new_arrivals/', warehouse_views.new_arrivals, name='new_arrivals'),
-    path('ready_packages/', warehouse_views.ready_packages, name='ready_packages'),
+    path('ready_packages/', warehouse_views.in_house, name='in_house'),
     path('ready_for_pickup/', warehouse_views.ready_for_pickup, name='ready_for_pickup'),
     path('to_pickup/<int:package_id>/', warehouse_views.to_pickup, name='to_pickup'),
     # path('reassign_courier/<int:package_id>/', warehouse_views.reassign_courier, name='reassign_courier'),
 
 
     # Drop off and Pick up routes
-    path('drop_pick_zone_dashboard/', drop_pick_zone_views.drop_pick_zone_dashboard, name='drop_pick_zone_dashboard'),
+    path('drop_pick_zone/dashboard/', drop_pick_zone_views.drop_pick_zone_dashboard, name='drop_pick_zone_dashboard'),
     path('confirm-drop-off/<int:package_id>/', drop_pick_zone_views.confirm_drop_off, name='confirm_drop_off'),
-    path('drop_pick_zone_dispatch/', drop_pick_zone_views.dispatch, name='dpz_dispatch'),
+    path('drop_pick_zone/received/', drop_pick_zone_views.received_packages, name='received_packages'),
     path('dispatched_packages/', drop_pick_zone_views.dispatched_packages, name='dispatched_packages'),
     path('confirm_pickup/<int:package_id>/', drop_pick_zone_views.confirm_pickup, name='confirm_pickup'),
     path('confirm_at_pickup/<int:package_id>/', drop_pick_zone_views.confirm_at_pickup, name='confirm_at_pickup'),

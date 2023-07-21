@@ -1,4 +1,4 @@
-{% extends 'admin/admin_base.html' %}
+{% extends 'dashboard_base.html' %}
 
 {% load static %}
 
@@ -17,7 +17,7 @@
 <fieldset>
 
 <!-- Form Name -->
-<legend class="my-4">CREATE DROP-PICK </legend>
+<h5 class="my-4">Create Drop-Pick </h5>
 
 <!-- Text input-->
 
@@ -65,7 +65,7 @@
   <label class="col-md-8 control-label">Warehouse</label>
     <div class="col-md-8 selectContainer">
     <div class="input-group">
-        <span class="input-group-addon"><i class="glyphicon glyphicon-list"></i></span>
+        <span class="input-group-text">🏬</span>
         <select name="warehouse" class="form-control selectpicker">
           <option value="">Please select warehouse</option>  
           {% for warehouse in warehouses %}

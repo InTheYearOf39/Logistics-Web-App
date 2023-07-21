@@ -1,85 +1,68 @@
-{% extends 'admin/admin_base.html' %}
+{% extends 'dashboard_base.html' %}
 
 {% load static %}
 
-
 {% block content %}
 
-<h2 class="my-5">Dropped Off Items</h2>
-
-{% for dropoff_location, packages in packages_by_location.items %}
-<div class="container">
-    <h2>Drop Off Location: {{ dropoff_location}}</h2>
-    <div class="table-responsive">
-        <table class="table table-striped table-sm">
-            <thead>
+<div class="row">
+    <h5>Dropped Off Items</h5>
+    {% for dropoff_location, packages in packages_by_location.items %}
+    <div class="col-md-12">
+          
+          <!-- /.row--><br>
+          <h6>Drop Off Location: {{ dropoff_location}}</h6>
+          <div class="table-responsive mb-4 bg-white">
+            <table class="table border mb-0">
+              <thead class="table-white fw-semibold">
                 <tr>
-                    <th scope="col">No.</th>
-                    <th scope="col">Package Title</th>
-                    <th scope="col">Recipient</th>
-                    <th scope="col">Address From</th>
-                    <th scope="col">Address To</th>
-                    <th scope="col">Package Number</th>
+                  <th>No</th>
+                  <th>Package</th>
+                  <th>Recipient</th>
+                  <th>From</th>
+                  <th>To</th>
+                  <th>Package No</th>
+                  <th></th>
                 </tr>
-            </thead>
-            <tbody>
+              </thead>
+              <tbody>
                 {% for package in packages %}
-                    <tr>
-                        <td>{{ forloop.counter }}</td>
-                        <td>{{ package.packageName }}</td>
-                        <td>{{ package.recipientName }}</td>
-                        <td>{{ package.sendersAddress }}</td>
-                        <td>{{ package.recipientAddress }}</td>
-                        <td>{{ package.package_number }}</td>
-                    </tr>
+                <tr class="align-middle">
+                  <td class="text-start">
+                    <div class="small text-medium-emphasis"><span>{{ forloop.counter }}</span></div>
+                  </td>
+                  <td class="text-start">
+                    <div class="small text-medium-emphasis"><span>{{ package.packageName }}</span></div>
+                  </td>
+                  <td class="text-start">
+                    <div class="small text-medium-emphasis"><span>{{ package.recipientName }}</span></div>
+                  </td>
+                  <td class="text-start">
+                    <div class="small text-medium-emphasis"><span>{{ package.sendersAddress }}</span></div>
+                  </td>
+                  <td class="text-start">
+                    <div class="small text-medium-emphasis"><span>{{ package.recipientAddress }}</span></div>
+                  </td>
+                  <td class="text-start">
+                    <div class="small text-medium-emphasis"><span>{{ package.package_number }}</span></div>
+                  </td>
+                 
+                  <td>
+                    <div class="dropdown">
+                      <button class="btn btn-transparent p-0" type="button" data-coreui-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="icon cil-options"></i>
+                      </button>
+                      <div class="dropdown-menu dropdown-menu-end"><a class="dropdown-item" href="#">Info</a><a class="dropdown-item" href="#">Edit</a><a class="dropdown-item text-danger" href="#">Delete</a></div>
+                    </div>
+                  </td>
+                </tr>
                 {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</div>
-{% endfor %}
-
-
-
-<!-- <div class="container">
-    <div class="table-responsive">
-      <table class="table table-striped table-sm">
-        <thead>
-            <tr>
-                <th scope="col">No.</th>
-                <th scope="col">Package Title</th>
-                <th scope="col">Recipient</th>
-                <th scope="col">Address From</th>
-                <th scope="col">Address To</th>
-                <th scope="col">Package Number</th>
-                
-                
-            </tr>
-        </thead>
-        <tbody>
-            {% for package in packages %}
-            {% if package.status == "dropped_off" %}
-            <tr>
-                <td>{{ forloop.counter }}</td>
-                <td>{{ package.packageName }}</td>
-                <td>{{ package.recipientName }}</td>
-                <td>{{ package.sendersAddress }}</td>
-                <td>{{ package.recipientAddress }}</td>
-                <td>{{ package.package_number }}</td>
-            
-            </tr>
-            {% endif %}
-            {% endfor %}
-        </tbody>
-    </table>
-    
+              </tbody>
+            </table>
+          </div>
         
-      </div>
-</div> -->
-
-
-
-
-
-
+    </div>
+    <!-- /.col-->
+    {% endfor %}
+  </div>
+  
 {% endblock %}

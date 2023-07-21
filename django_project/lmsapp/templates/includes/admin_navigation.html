@@ -1,0 +1,73 @@
+<ul class="sidebar-nav" data-coreui="navigation" data-simplebar>
+      <li class="nav-item"><a class="nav-link" href="{% url 'master_dashboard' %}">
+        <i class="nav-icon cil-speedometer"></i>Main Dashboard</a>
+    </li>
+    
+    <li class="nav-title">Manage</li>
+    <li class="nav-item"><a class="nav-link" href="{% url 'admin_dashboard' %}">
+        <i class="nav-icon cil-speedometer"></i>Dashboard</a>
+    </li>
+    <li class="nav-item"><a class="nav-link" href="{% url 'dropoffs' %}">
+        <i class="nav-icon cil-speedometer"></i>Dropoffs</a>
+    </li>
+    <li class="nav-item"><a class="nav-link" href="{% url 'admin_dispatch' %}">
+        <i class="nav-icon cil-speedometer"></i>Dispatch</a>
+    </li>
+        
+    <li class="nav-title">Components</li>
+    <li class="nav-item"><a class="nav-link" href="{% url 'warehouses' %}"><i class="nav-icon cil-drop"></i>Warehouses</a></li>
+    <li class="nav-item"><a class="nav-link" href="{% url 'drop_pick_zones' %}"><i class="nav-icon cil-pencil"></i>Drop-Picks</a></li>
+
+    <li class="nav-title">Users</li>
+    <li class="nav-item"><a class="nav-link" href="{% url 'users' %}">
+      <i class="nav-icon cil-speedometer"></i>All Users</a>
+    </li>
+    
+    <li class="nav-group"><a class="nav-link nav-group-toggle" href="#"><i class="nav-icon cil-puzzle"></i>Senders</a>
+      <ul class="nav-group-items">
+        <li class="nav-item"><a class="nav-link" href="#">
+          <i class="nav-icon cil-puzzle"></i>View Senders</a>
+        </li>
+      </ul>
+    </li>
+    <li class="nav-group"><a class="nav-link nav-group-toggle" href="#"><i class="nav-icon cil-cursor"></i>Couriers</a>
+      <ul class="nav-group-items">
+        <li class="nav-item"><a class="nav-link" href="{% url 'riders' %}">
+          <i class="nav-icon cil-puzzle"></i>View Couriers</a>
+        </li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'create_courier' %}">
+          <i class="nav-icon cil-puzzle"></i>Add Courier</a>
+        </li>
+      </ul>
+    </li>
+    <li class="nav-group"><a class="nav-link nav-group-toggle" href="#"><i class="nav-icon cil-cursor"></i>Warehouses</a>
+      <ul class="nav-group-items">
+        <li class="nav-item"><a class="nav-link" href="#">
+          <i class="nav-icon cil-puzzle"></i>View Warehouses</a>
+        </li>
+        <li class="nav-item"><a class="nav-link" href="#">
+          <i class="nav-icon cil-puzzle"></i>Add Warehouse user</a>
+        </li>
+      </ul>
+    </li>
+    <li class="nav-group"><a class="nav-link nav-group-toggle" href="#"><i class="nav-icon cil-cursor"></i>Drop-Picks</a>
+      <ul class="nav-group-items">
+        <li class="nav-item"><a class="nav-link" href="#">
+          <i class="nav-icon cil-puzzle"></i>View Drop-Picks</a>
+        </li>
+        <li class="nav-item"><a class="nav-link" href="#">
+          <i class="nav-icon cil-puzzle"></i>Add Drop-Pick user</a>
+        </li>
+      </ul>
+    </li>
+
+    <li class="nav-title">Reports</li>
+    <li class="nav-group"><a class="nav-link nav-group-toggle" href="#"><i class="nav-icon cil-puzzle"></i>Reports</a>
+      <ul class="nav-group-items">
+        <li class="nav-item"><a class="nav-link" href="{% url 'admin_history' %}">
+          <i class="nav-icon cil-puzzle"></i>History</a>
+        </li>
+      </ul>
+    </li>
+
+</ul>

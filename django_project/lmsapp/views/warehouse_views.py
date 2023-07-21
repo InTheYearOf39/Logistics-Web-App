@@ -124,13 +124,13 @@ def confirm_arrival(request, package_id):
     else:
         messages.error(request, "Invalid request.")
 
-    return redirect('ready_packages')  # Replace with the appropriate URL for the warehouse dashboard
+    return redirect('in_house')  # Replace with the appropriate URL for the warehouse dashboard
 
 """ 
 The view displays a list of packages with the 'in_house'status and allows the user to assign selected packages 
 to available couriers and drop_pick_zones, and updates the package status to 'in_transit'.
 """ 
-def ready_packages(request):
+def in_house(request):
     ready_packages = Package.objects.filter(status__in=['warehouse_arrival', 'ready_for_pickup', 'in_house'])
     if request.method == 'POST':
         selected_packages = request.POST.getlist('selected_packages')
