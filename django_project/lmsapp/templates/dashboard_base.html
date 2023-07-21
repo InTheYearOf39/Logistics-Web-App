@@ -47,12 +47,15 @@
     <!-- sidebar -->
     <div class="sidebar sidebar-dark sidebar-fixed" id="sidebar">
       <div class="sidebar-brand d-none d-md-flex">
-        <svg class="sidebar-brand-full" width="118" height="46" alt="CoreUI Logo">
+        <!-- <svg class="sidebar-brand-full" width="118" height="46" alt="CoreUI Logo">
           <use xlink:href="/static/dist/assets/brand/coreui.svg#full"></use>
         </svg>
         <svg class="sidebar-brand-narrow" width="46" height="46" alt="CoreUI Logo">
           <use xlink:href="/static/dist/assets/brand/coreui.svg#signet"></use>
-        </svg>
+        </svg> -->
+        <p class="sidebar-brand-full fw-bold">LMS</p>
+        <p class="sidebar-brand-narrow fw-bold">LMS</p>
+        
       </div>
 
           {% if request.user.role == "admin" %}
@@ -137,7 +140,8 @@
       <div class="body flex-grow-1 px-3">
 
                                     <!-- body content is here -->
-        <div class="container-lg">
+        <!-- <div class="container-lg"> -->
+          <div class="container-fluid">
            
           {% block content %}{% endblock %}
                                     

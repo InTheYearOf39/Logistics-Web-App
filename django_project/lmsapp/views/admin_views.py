@@ -316,3 +316,17 @@ def create_drop_pick_user(request):
         'drop_pick_zones': drop_pick_zones
     }
     return render(request, 'admin/create_drop_pick_user.html', context)
+
+def warehouse_users(request):
+    warehouse_users = User.objects.filter(role='warehouse')
+    context = {
+        'warehouse_users': warehouse_users
+        }
+    return render(request, 'admin/warehouse_users.html', context)
+
+def drop_pick_users(request):
+    drop_pick_users = User.objects.filter(role='drop_pick_zone')
+    context = {
+        'drop_pick_users': drop_pick_users
+        }
+    return render(request, 'admin/drop_pick_users.html', context)

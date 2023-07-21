@@ -42,21 +42,21 @@
     </li>
     <li class="nav-group"><a class="nav-link nav-group-toggle" href="#"><i class="nav-icon cil-cursor"></i>Warehouses</a>
       <ul class="nav-group-items">
-        <li class="nav-item"><a class="nav-link" href="#">
-          <i class="nav-icon cil-puzzle"></i>View Warehouses</a>
+        <li class="nav-item"><a class="nav-link" href="{% url 'warehouse_users' %}">
+          <i class="nav-icon cil-puzzle"></i>View Warehouse admins</a>
         </li>
-        <li class="nav-item"><a class="nav-link" href="#">
-          <i class="nav-icon cil-puzzle"></i>Add Warehouse user</a>
+        <li class="nav-item"><a class="nav-link" href="{% url 'create_warehouse_user' %}">
+          <i class="nav-icon cil-puzzle"></i>Add Warehouse admin</a>
         </li>
       </ul>
     </li>
     <li class="nav-group"><a class="nav-link nav-group-toggle" href="#"><i class="nav-icon cil-cursor"></i>Drop-Picks</a>
       <ul class="nav-group-items">
-        <li class="nav-item"><a class="nav-link" href="#">
-          <i class="nav-icon cil-puzzle"></i>View Drop-Picks</a>
+        <li class="nav-item"><a class="nav-link" href="{% url 'drop_pick_users' %}">
+          <i class="nav-icon cil-puzzle"></i>View Drop-Pick admins</a>
         </li>
-        <li class="nav-item"><a class="nav-link" href="#">
-          <i class="nav-icon cil-puzzle"></i>Add Drop-Pick user</a>
+        <li class="nav-item"><a class="nav-link" href="{% url 'create_drop_pick_user' %}">
+          <i class="nav-icon cil-puzzle"></i>Add Drop-Pick admin</a>
         </li>
       </ul>
     </li>

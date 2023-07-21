@@ -19,6 +19,11 @@
                   <th>To</th>
                   <th>Package No</th>
                   <th>status</th>
+                  {% for package in assigned_packages %}
+                  {% if package.status == 'in_transit' %}
+                  <th></th>
+                  {% endif %}
+                  {% endfor %}
                 </tr>
               </thead>
               <tbody>
