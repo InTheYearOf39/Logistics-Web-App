@@ -4,23 +4,25 @@
 
 {% block content %}
 
-<form action="" method="POST">
-  {% csrf_token %}
-  <h2 class="my-4">Dropped Off Items</h2>
-  <div class="mb-3">
-    <h2>Select a Courier</h2>
-    <select name="courier" class="form-control">
-      {% for courier in available_couriers %}
-        <option value="{{ courier.id }}">{{ courier.name }}</option>
-      {% endfor %}
-    </select>
-  </div>
+
 
 <div class="row">
+  <h5>Dropped Off Items</h5>
+  <form action="" method="POST">
+    {% csrf_token %}
+
+    <div class="mb-3">
+      <h6>Select a Courier</h6>
+      <select name="courier" class="form-control">
+        {% for courier in available_couriers %}
+          <option value="{{ courier.id }}">{{ courier.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
     <div class="col-md-12">
            {% for dropoff_location, packages in packages_by_location.items %}
           <!-- /.row--><br>
-          <h2>Drop Off Location: {{ dropoff_location }}</h2>
+          <h5>Drop Off Location: {{ dropoff_location }}</h5>
 
 
           <div class="table-responsive mb-4 bg-white">
@@ -34,7 +36,6 @@
                   <th>To</th>
                   <th>Package No</th>
                   <th>Select</th>
-                  <th></th>
                 </tr>
               </thead>
               <tbody>
@@ -62,14 +63,6 @@
                     <input type="checkbox" name="selected_packages" value="{{ package.id }}">
                   </td>
                   
-                  <td>
-                    <div class="dropdown">
-                      <button class="btn btn-transparent p-0" type="button" data-coreui-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <i class="icon cil-options"></i>
-                      </button>
-                      <div class="dropdown-menu dropdown-menu-end"><a class="dropdown-item" href="#">Info</a><a class="dropdown-item" href="#">Edit</a><a class="dropdown-item text-danger" href="#">Delete</a></div>
-                    </div>
-                  </td>
                 </tr>
                 {% endfor %}
               </tbody>
@@ -78,10 +71,12 @@
         
     </div>
     <!-- /.col-->
+
+    {% endfor %}
+  <button type="submit" class="btn btn-primary btn-sm text-white mb-3">Assign Courier</button>
+</form>
   </div>
 
-  {% endfor %}
-  <button type="submit" class="btn btn-primary text-white">Assign Courier</button>
-</form>
+  
 
 {% endblock %}
