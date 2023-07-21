@@ -241,10 +241,10 @@ for users with the 'drop-pick' role and passing them to the 'admin/drop_pick_zon
 """
 def drop_pick_zones(request):
     drop_pick_zones = DropPickZone.objects.all()
-    users = User.objects.filter(role='drop_pick_zone')
+    drop_pick_zone_users = User.objects.filter(role='drop_pick_zone')
     context = {
         'drop_pick_zones': drop_pick_zones,
-        'users': users
+        'drop_pick_zone_users': drop_pick_zone_users
     }
     return render(request, 'admin/drop_pick_zones.html', context)
 
