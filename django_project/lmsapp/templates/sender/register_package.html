@@ -2,7 +2,6 @@
 
 {% load static %}
 
-
 {% block content %}
 
 <div class="container my-2" data-aos="fade-up">
@@ -246,12 +245,46 @@
 
   }
 
+  function populateRecipientLocation() {
+    // Function to populate recipient drop-off locations
+    const recipientAddressInput = document.getElementById("recipientAddress");
+    const recipientLatitudeInput = document.getElementById("recipient_latitude");
+    const recipientLongitudeInput = document.getElementById("recipient_longitude");
+    const recipientPickUpLocationContainer = document.getElementById("recipientPickUpLocationContainer");
 
-    //load after page loads
-    $(function () {
-      getGPS();
+    if (recipientAddressInput.value !== "") {
+      // Perform actions to populate recipient drop-off locations based on the recipient's address
+      const recipient_latitude = recipientLatitudeInput.value;
+      const recipient_longitude = recipientLongitudeInput.value;
+      redraw_recipient_dropoff_list(recipient_latitude, recipient_longitude);
+      recipientPickUpLocationContainer.style.display = "block";
+    } else {
+      recipientPickUpLocationContainer.style.display = "none";
+    }
+  }
+
+  // Call the function when the recipient address input changes
+  const recipientAddressInput = document.getElementById("recipientAddress");
+  recipientAddressInput.addEventListener("change", populateRecipientLocation);
+
+  function redraw_recipient_dropoff_list(lat, lng) {
+    // Function to redraw recipient drop-off locations based on recipient's latitude and longitude
+    $.ajax({
+      method: "POST",
+      url: "/api",
+      data: { action: "get_closest_drop_pick_locations", lat: lat, lng: lng },
+    }).done(function (response) {
+      // Sort the drop-off locations based on distance before populating the dropdown
+      const dropOffLocationSelect = $("#recipientPickUpLocation");
+      dropOffLocationSelect.html(response.data);
+      
+      // Note: We are not selecting any option here, so the user can choose from the list of closest drop-off locations.
     });
-  </script>
+  }
+
+  // Call the function once when the page loads
+  getGPS();
+</script>
 
 <script>
   // Load after page loads
@@ -285,5 +318,4 @@
   });
 </script>
 
-
-  {% endblock %}
+{% endblock %}

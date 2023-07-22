@@ -257,10 +257,10 @@ for users with the 'drop-pick' role and passing them to the 'admin/drop_pick_zon
 """
 def drop_pick_zones(request):
     drop_pick_zones = DropPickZone.objects.all()
-    users = User.objects.filter(role='drop_pick_zone')
+    drop_pick_zone_users = User.objects.filter(role='drop_pick_zone')
     context = {
         'drop_pick_zones': drop_pick_zones,
-        'users': users
+        'drop_pick_zone_users': drop_pick_zone_users
     }
     return render(request, 'admin/drop_pick_zones.html', context)
 
@@ -332,6 +332,220 @@ def create_drop_pick_user(request):
         'drop_pick_zones': drop_pick_zones
     }
     return render(request, 'admin/create_drop_pick_user.html', context)
+
+# views.py
+def edit_warehouse(request, warehouse_id):
+    warehouse = get_object_or_404(Warehouse, id=warehouse_id)
+
+    if request.method == 'POST':
+        # Get the form data from the request.POST dictionary
+        name = request.POST['name']
+        address = request.POST['address']
+        phone = request.POST['phone']
+        tag = request.POST['tag']
+        latitude = request.POST['latitude']
+        longitude = request.POST['longitude']
+
+        # Update the warehouse model instance with the new data
+        warehouse.name = name
+        warehouse.address = address
+        warehouse.phone = phone
+        warehouse.tag = tag
+        warehouse.latitude = latitude
+        warehouse.longitude = longitude
+
+        # Save the updated warehouse details to the database
+        warehouse.save()
+
+        # Redirect to the warehouses list page after editing
+        return redirect('warehouses')
+
+    return render(request, 'admin/edit_warehouse.html', {'warehouse': warehouse})
+
+def delete_warehouse(request, warehouse_id):
+    warehouse = get_object_or_404(Warehouse, id=warehouse_id)
+
+    if request.method == 'POST':
+        # Delete the warehouse
+        warehouse.delete()
+        return redirect('warehouses')
+
+    return render(request, 'admin/warehouses.html', {'warehouse': warehouse})
+
+
+def edit_warehouse_user(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+
+    if request.method == 'POST':
+        # Check if the form was submitted for deletion
+        if 'delete_user' in request.POST:
+            # Delete the warehouse user
+            user.delete()
+            return redirect('warehouse_users_list')
+
+        # If not deletion, handle the form for updating the user details
+        name = request.POST.get('name')
+        username = request.POST.get('username')
+        warehouse_id = request.POST.get('warehouse')
+
+        if warehouse_id:
+            warehouse = get_object_or_404(Warehouse, id=warehouse_id)
+
+            # Update the user details
+            user.name = name
+            user.username = username
+            user.warehouse = warehouse
+            user.save()
+
+            return redirect('warehouses')
+
+    # Retrieve the warehouses
+    warehouses = Warehouse.objects.all()
+
+    context = {
+        'user': user,
+        'warehouses': warehouses
+    }
+    return render(request, 'admin/edit_warehouse_user.html', context)
+
+
+def delete_warehouse_user(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+    
+    if request.method == 'POST':
+        # Delete the warehouse user
+        user.delete()
+        return redirect('warehouses')
+    
+    # If the request method is not POST, show the confirmation modal
+    return render(request, 'admin/delete_warehouse_user.html', {'user': user})
+
+
+def edit_drop_pick_zones(request, drop_pick_zone_id):
+    drop_pick_zone = get_object_or_404(DropPickZone, id=drop_pick_zone_id)
+
+    if request.method == 'POST':
+        # Get form data
+        name = request.POST.get('name')
+        address = request.POST.get('address')
+        phone = request.POST.get('phone')
+        tag = request.POST.get('tag')
+        warehouse_id = request.POST.get('warehouse')
+
+        if warehouse_id:
+            warehouse = get_object_or_404(Warehouse, id=warehouse_id)
+
+            # Update the drop-pick zone details
+            drop_pick_zone.name = name
+            drop_pick_zone.address = address
+            drop_pick_zone.phone = phone
+            drop_pick_zone.tag = tag
+            drop_pick_zone.warehouse = warehouse
+            drop_pick_zone.save()
+
+            return redirect('drop_pick_zones')
+    
+    # Retrieve the warehouses
+    warehouses = Warehouse.objects.all()
+
+    context = {
+        'drop_pick_zone': drop_pick_zone,
+        'warehouses': warehouses,
+    }
+    return render(request, 'admin/edit_drop_pick_zones.html', context)
+
+def delete_drop_pick_zone(request, drop_pick_zone_id):
+    drop_pick_zone = get_object_or_404(DropPickZone, id=drop_pick_zone_id)
+    if request.method == 'POST':
+        # Perform the delete operation
+        drop_pick_zone.delete()
+        return redirect('drop_pick_zones')
+
+    return render(request, 'admin/delete_drop_pick_zone.html', {'drop_pick_zone': drop_pick_zone})
+
+def edit_drop_pick_zone_user(request, drop_pick_zone_user_id):
+    drop_pick_zone_user = get_object_or_404(User, id=drop_pick_zone_user_id, role='drop_pick_zone')
+
+    if request.method == 'POST':
+        # Get form data
+        name = request.POST.get('name')
+        username = request.POST.get('username')
+        drop_pick_zone_id = request.POST.get('drop_pick_zone')
+
+        if drop_pick_zone_id:
+            drop_pick_zone = get_object_or_404(DropPickZone, id=drop_pick_zone_id)
+
+            # Update the drop-pick zone user details
+            drop_pick_zone_user.name = name
+            drop_pick_zone_user.username = username
+            drop_pick_zone_user.drop_pick_zone = drop_pick_zone
+            drop_pick_zone_user.save()
+
+            return redirect('drop_pick_zones')
+    
+    # Retrieve the drop pick zones
+    drop_pick_zones = DropPickZone.objects.all()
+
+    context = {
+        'drop_pick_zone_user': drop_pick_zone_user,
+        'drop_pick_zones': drop_pick_zones,
+    }
+    return render(request, 'admin/edit_drop_pick_zone_user.html', context)
+
+def edit_drop_pick_zone_user(request, drop_pick_zone_user_id):
+    drop_pick_zone_user = get_object_or_404(User, id=drop_pick_zone_user_id, role='drop_pick_zone')
+
+    if request.method == 'POST':
+        if 'delete' in request.POST:
+            # Delete the drop-pick zone user
+            drop_pick_zone_user.delete()
+            return redirect('drop_pick_zones')
+        
+        # If 'delete' was not in the request.POST, it means we're updating the user details
+        # Get form data
+        name = request.POST.get('name')
+        username = request.POST.get('username')
+        drop_pick_zone_id = request.POST.get('drop_pick_zone')
+
+        if drop_pick_zone_id:
+            drop_pick_zone = get_object_or_404(DropPickZone, id=drop_pick_zone_id)
+
+            # Update the drop-pick zone user details
+            drop_pick_zone_user.name = name
+            drop_pick_zone_user.username = username
+            drop_pick_zone_user.drop_pick_zone = drop_pick_zone
+            drop_pick_zone_user.save()
+
+            return redirect('drop_pick_zones')
+    
+    # Retrieve the drop pick zones
+    drop_pick_zones = DropPickZone.objects.all()
+
+    context = {
+        'drop_pick_zone_user': drop_pick_zone_user,
+        'drop_pick_zones': drop_pick_zones,
+    }
+    return render(request, 'admin/edit_drop_pick_zone_user.html', context)
+
+def delete_drop_pick_zone_user(request, drop_pick_zone_user_id):
+    drop_pick_zone_user = get_object_or_404(User, id=drop_pick_zone_user_id, role='drop_pick_zone')
+
+    if request.method == 'POST':
+        # Delete the drop-pick zone user
+        drop_pick_zone_user.delete()
+        return redirect('drop_pick_zones')
+
+    # Since there's no separate template, we don't need to render anything here.
+    # The confirmation modal will handle the user's decision.
+
+    # You can also add extra context here if required.
+
+    return redirect('drop_pick_zones')  # Redirect back to the drop_pick_zones page.
+
+
+
+
+
 
 def warehouse_users(request):
     warehouse_users = User.objects.filter(role='warehouse')
