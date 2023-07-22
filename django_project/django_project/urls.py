@@ -15,9 +15,16 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
+from django.conf.urls import handler404, handler500
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('lmsapp.urls')),
     path("accounts/", include("allauth.urls")),
 ]
+
+# Custom URL patterns for handling 404 and 500 errors
+handler404 = 'lmsapp.views.site_views.handle_404'  #page_not_found
+handler500 = 'lmsapp.views.site_views.handle_500'   #server_error
+# handler400 = defaults.bad_request                   #bad_request
+# handler403 = defaults.permission_denied             #permission_denied

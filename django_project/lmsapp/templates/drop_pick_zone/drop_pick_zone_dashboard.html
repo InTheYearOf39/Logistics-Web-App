@@ -18,8 +18,12 @@
                   <th>From</th>
                   <th>To</th>
                   <th>Package No</th>
-                  <th>status</th>
-                  <th></th>
+                  <th>Status</th>
+                  {% for package in packages %}
+                  {% if package.status == 'ready_for_pickup' %}
+                  <th>Confirm</th>
+                  {% endif %}
+                  {% endfor %}
                 </tr>
               </thead>
               <tbody>
@@ -50,7 +54,7 @@
                           <button type="submit" class="btn btn-sm btn-warning text-white">Confirm Drop-Off</button>
                       </form>
                       {% elif package.status == 'dropped_off' %}
-                      <button type="button" class="btn btn-sm btn-info text-white">Dropped Off</button>
+                      <button type="button" class="btn btn-sm btn-info text-white" disabled>Dropped Off</button>
                       {% elif package.status == 'in_transit' %}
                       <img src="{% static 'img/transit.png'%}" alt="" width="25px" height="25px">
                       {% elif package.status == 'at_pickup'%}
@@ -65,42 +69,37 @@
                   
                     {% if package.status == 'ready_for_pickup' %}
                     <td>
+                      <!-- Button trigger modal -->
+                      <button type="button" class="btn btn-sm btn-warning text-white" data-coreui-toggle="modal" data-coreui-target="#staticBackdrop{{ package.id }}">
+                        Confirm Pick-Up
+                      </button>
+
                       <form action="{% url 'confirm_recipient_pickup' package_id=package.id %}" method="post">
-                          {% csrf_token %}
-                          <div class="modal fade" id="staticBackdrop{{ package.id }}" data-bs-backdrop="static"
-                              data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel"
-                              aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-centered">
-                              <div class="modal-content">
-                                <div class="modal-header">
-                                    <h1 class="modal-title fs-5" id="staticBackdropLabel">Confirm Package Pickup</h1>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                    <label for="inputField{{ package.id }}"><b>ENTER CODE:</b></label>
-                                    <input type="text" id="inputField{{ package.id }}" name="inputField" class="form-control">
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-danger text-white" data-bs-dismiss="modal">Close</button>
-                                    <button type="submit" class="btn btn-success text-white">Send</button>
-                                </div>
-                              </div>
+                        {% csrf_token %}
+                      <!-- Modal -->
+                      <div class="modal fade" id="staticBackdrop{{ package.id }}" data-coreui-backdrop="static" data-coreui-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                          <div class="modal-content">
+                            <div class="modal-header">
+                              <h5 class="modal-title fw-semibold" id="staticBackdropLabel">Confirm Package Pickup</h5>
+                              <button type="button" class="btn-close" data-coreui-dismiss="modal" aria-label="Close"></button>
                             </div>
+                            <div class="modal-body">
+                              <label for="inputField{{ package.id }}" class="mb-3"><b>ENTER CODE:</b></label>
+                              <input type="text" id="inputField{{ package.id }}" name="inputField" class="form-control form-control-sm">
                           </div>
-                          <button type="button" class="btn btn-sm btn-warning text-white" data-bs-toggle="modal" data-bs-target="#staticBackdrop{{ package.id }}">Confirm Pick-Up</button>
-                      </form>
+                          <div class="d-flex justify-content-center mb-3">
+                            <!-- <button type="button" class="btn btn-danger btn-sm text-white" data-coreui-dismiss="modal">Close</button> -->
+                            <button type="submit" class="btn btn-info btn-md text-white">Confirm</button>
+                          </div>
+                          </div>
+                        </div>
+                      </div>
+                    </form>
+
                     </td>
                     {% endif %}
 
-                
-                  <td>
-                    <div class="dropdown">
-                      <button class="btn btn-transparent p-0" type="button" data-coreui-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <i class="icon cil-options"></i>
-                      </button>
-                      <div class="dropdown-menu dropdown-menu-end"><a class="dropdown-item" href="#">Info</a><a class="dropdown-item" href="#">Edit</a><a class="dropdown-item text-danger" href="#">Delete</a></div>
-                    </div>
-                  </td>
                 </tr>
                 {% endfor %}
               </tbody>

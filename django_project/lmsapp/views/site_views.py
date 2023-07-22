@@ -16,6 +16,12 @@ def contact(request):
 def home(request):
     return render(request, 'home.html', {})
 
+def handle_404(request, exception):
+    return render(request, '404.html', status=404)
+
+def handle_500(request):
+    return render(request, '500.html', status=500)
+
 def home_register(request):
     return render(request, 'home_register.html', {})
 
