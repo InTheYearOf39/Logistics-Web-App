@@ -157,11 +157,20 @@ render them on the 'admin/dropoffs.html' template.
 #     }
 #     return render(request, 'admin/dropoffs.html', context)
 
-def dropoffs(request):
-    packages = Package.objects.filter(status='dropped_off')
+# def dropoffs(request):
+#     packages = Package.objects.filter(status='dropped_off')
     
+#     context = {
+#         'packages': packages,
+#     }
+#     return render(request, 'admin/dropoffs.html', context)
+
+def dropoffs(request):
+    packages = Package.objects.filter(status='dropped_off').select_related('dropOffLocation')
+    sorted_packages = sorted(packages, key=lambda package: package.dropOffLocation.tag)
+
     context = {
-        'packages': packages,
+        'packages': sorted_packages,
     }
     return render(request, 'admin/dropoffs.html', context)
 

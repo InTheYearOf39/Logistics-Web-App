@@ -6,24 +6,23 @@
 {% block content %}
 
 
-<div class="container mb-5" style="margin-left: 4rem;">
-  <div class="row justify-content-center ml-5">
-    <div class="col-md-12">
+<div class="row">
+  <div class="container mb-3">
+      <div class="col-md-12">
     <form class="well form-horizontal" action=" " method="post"  id="contact_form">
       {% csrf_token %}
 
       {{ form.errors }}
 
-<fieldset>
 
 <!-- Form Name -->
-<h5 class="my-4">Create Drop-Pick </h5>
+<h5>Create Drop-Pick </h5>
 
 <!-- Text input-->
 
 <div class="form-group mt-2">
-  <label class="col-md-8 control-label">Full Name</label>  
-  <div class="col-md-8 inputGroupContainer">
+  <label class="col-md-6 control-label">Full Name</label>  
+  <div class="col-md-6 inputGroupContainer">
   <div class="input-group">
   <span class="input-group-text">👤</span>
   <input  name="name" placeholder="Name" class="form-control"  type="text">
@@ -34,8 +33,8 @@
 <!-- Text input-->
       
 <div class="form-group mt-2">
-  <label class="col-md-8 control-label">Address</label>  
-    <div class="col-md-8 inputGroupContainer">
+  <label class="col-md-6 control-label">Address</label>  
+    <div class="col-md-6 inputGroupContainer">
     <div class="input-group">
         <span class="input-group-text">📌</span>
   <input id="address" name="address" placeholder="Address" class="form-control" type="text">
@@ -50,8 +49,8 @@
 <!-- Text input-->
        
 <div class="form-group mt-2">
-  <label class="col-md-8 control-label">Contact</label>  
-    <div class="col-md-8 inputGroupContainer">
+  <label class="col-md-6 control-label">Contact</label>  
+    <div class="col-md-6 inputGroupContainer">
     <div class="input-group">
         <span class="input-group-text">📞</span>
   <input name="phone" placeholder="Phone number" class="form-control" type="text">
@@ -62,8 +61,8 @@
 <!-- Select Basic -->
    
 <div class="form-group mt-2"> 
-  <label class="col-md-8 control-label">Warehouse</label>
-    <div class="col-md-8 selectContainer">
+  <label class="col-md-6 control-label">Warehouse</label>
+    <div class="col-md-6 selectContainer">
     <div class="input-group">
         <span class="input-group-text">🏬</span>
         <select name="warehouse" class="form-control selectpicker">
@@ -78,8 +77,8 @@
 
 <!-- Text input-->
 <div class="form-group mt-2">
-    <label class="col-md-8 control-label">Tag</label>  
-      <div class="col-md-8 inputGroupContainer">
+    <label class="col-md-6 control-label">Tag</label>  
+      <div class="col-md-6 inputGroupContainer">
       <div class="input-group">
           <span class="input-group-text">🏷️</span>
     <input name="tag" placeholder="Tag alias" class="form-control" type="text">
@@ -93,13 +92,12 @@
 
 <!-- Button -->
 <div class="form-group mt-2">
-  <label class="col-md-8 control-label"></label>
-  <div class="col-md-8">
-    <button type="submit" class="btn btn-info text-white" >Add <span class="glyphicon glyphicon-send"></span></button>
+  <label class="col-md-6 control-label"></label>
+  <div class="col-md-6">
+    <button type="submit" class="btn btn-primary btn-sm text-white" >Create<span class="glyphicon glyphicon-send"></span></button>
   </div>
 </div>
 
-</fieldset>
 </form>
     </div>
   </div>

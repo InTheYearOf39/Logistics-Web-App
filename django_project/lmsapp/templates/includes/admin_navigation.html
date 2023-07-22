@@ -15,8 +15,27 @@
     </li>
         
     <li class="nav-title">Components</li>
-    <li class="nav-item"><a class="nav-link" href="{% url 'warehouses' %}"><i class="nav-icon cil-drop"></i>Warehouses</a></li>
-    <li class="nav-item"><a class="nav-link" href="{% url 'drop_pick_zones' %}"><i class="nav-icon cil-pencil"></i>Drop-Picks</a></li>
+    <li class="nav-group"><a class="nav-link nav-group-toggle" href="#"><i class="nav-icon cil-cursor"></i>Warehouses</a>
+      <ul class="nav-group-items">
+        <li class="nav-item"><a class="nav-link" href="{% url 'warehouses' %}">
+          <i class="nav-icon cil-puzzle"></i>View Warehouses</a>
+        </li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'create_warehouse' %}">
+          <i class="nav-icon cil-puzzle"></i>Add Warehouse</a>
+        </li>
+      </ul>
+    </li>
+
+    <li class="nav-group"><a class="nav-link nav-group-toggle" href="#"><i class="nav-icon cil-cursor"></i>Drop-Picks</a>
+      <ul class="nav-group-items">
+        <li class="nav-item"><a class="nav-link" href="{% url 'drop_pick_zones' %}">
+          <i class="nav-icon cil-puzzle"></i>View Drop-Picks</a>
+        </li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'create_drop_pick' %}">
+          <i class="nav-icon cil-puzzle"></i>Add Drop-Pick</a>
+        </li>
+      </ul>
+    </li>
 
     <li class="nav-title">Users</li>
     <li class="nav-item"><a class="nav-link" href="{% url 'users' %}">
