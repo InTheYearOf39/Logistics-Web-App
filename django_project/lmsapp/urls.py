@@ -76,14 +76,14 @@ urlpatterns = [
 
 
     # sender routes
-    path('sender_dashboard/', sender_views.sender_dashboard, name='sender_dashboard'),
+    path('sender/dashboard/', sender_views.sender_dashboard, name='sender_dashboard'),
     path('register_package/', sender_views.register_package, name='register_package'),
     path('api/', sender_views.api, name='api'),
     path('sender_history/', sender_views.sender_history, name='sender_history'),
 
 
     # courier routes
-    path('courier_dashboard/', courier_views.courier_dashboard, name='courier_dashboard'),
+    path('courier/dashboard/', courier_views.courier_dashboard, name='courier_dashboard'),
     path('notify_arrival/<int:package_id>/', courier_views.notify_arrival, name='notify_arrival'),
     path('notify_recipient/<int:package_id>/', courier_views.notify_recipient, name='notify_recipient'),
     path('confirm_delivery/<int:package_id>/', courier_views.confirm_delivery, name='confirm_delivery'),
@@ -92,7 +92,7 @@ urlpatterns = [
 
 
     # Warehouse routes
-    path('warehouse_dashboard/', warehouse_views.warehouse_dashboard, name='warehouse_dashboard'),
+    path('warehouse/dashboard/', warehouse_views.warehouse_dashboard, name='warehouse_dashboard'),
     path('confirm_arrival/<int:package_id>/', warehouse_views.confirm_arrival, name='confirm_arrival'),
     path('new_arrivals/', warehouse_views.new_arrivals, name='new_arrivals'),
     path('ready_packages/', warehouse_views.in_house, name='in_house'),

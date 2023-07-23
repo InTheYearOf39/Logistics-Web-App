@@ -16,37 +16,73 @@ from django.conf import settings
 The view displays a warehouse dashboard template where warehouse users can see packages grouped by drop_pick_zone, 
 select packages and assign them to available couriers
 """
+# @login_required
+# def warehouse_dashboard(request):
+#     greeting_message = get_time_of_day()
+#     # Retrieve the current warehouse user
+#     warehouse_user = request.user
+
+#     # Retrieve the associated warehouse for the warehouse user
+#     warehouse = warehouse_user.warehouse
+
+#     # Retrieve the drop_pick_zones belonging to the warehouse
+#     drop_pick_zones = DropPickZone.objects.filter(warehouse=warehouse)
+
+#     # Create a dictionary to store packages by location
+#     packages_by_location = {}
+
+#     # Iterate over the drop_pick_zones belonging to the warehouse
+#     for drop_pick_zone in drop_pick_zones:
+#         # Retrieve the packages dropped off at each drop_pick_zone
+#         packages = Package.objects.filter(dropOffLocation=drop_pick_zone, status='dropped_off')
+
+#         # Add the drop_pick_zone and associated packages to the dictionary
+#         packages_by_location[drop_pick_zone.name] = packages
+
+#     if request.method == 'POST':
+#         selected_packages = request.POST.getlist('selected_packages')
+#         courier_id = request.POST.get('courier')
+
+#         if selected_packages and courier_id:
+#             courier = get_object_or_404(User, id=courier_id, role='courier', status='available')
+
+#             # Update the packages with the assigned courier and change their status
+#             packages = Package.objects.filter(id__in=selected_packages)
+#             packages.update(courier=courier, status='dispatched')
+
+#             courier_status = Package.objects.filter(courier=courier, status='dispatched').exists()
+
+#             if courier_status:
+#                 courier.status = 'on-trip'
+            
+#             courier.save()
+
+#             messages.success(request, 'Packages successfully assigned to courier.')
+
+#             return redirect('warehouse_dashboard')
+
+#     available_couriers = User.objects.filter(role='courier', status='available')
+#     context = {
+#         'packages_by_location': packages_by_location,
+#         'greeting_message': greeting_message,
+#         'available_couriers': available_couriers
+#     }
+
+#     return render(request, 'warehouse/warehouse_dashboard.html', context)
+
 @login_required
 def warehouse_dashboard(request):
     greeting_message = get_time_of_day()
-    # Retrieve the current warehouse user
     warehouse_user = request.user
-
-    # Retrieve the associated warehouse for the warehouse user
     warehouse = warehouse_user.warehouse
 
-    # Retrieve the drop_pick_zones belonging to the warehouse
-    drop_pick_zones = DropPickZone.objects.filter(warehouse=warehouse)
-
-    # Create a dictionary to store packages by location
-    packages_by_location = {}
-
-    # Iterate over the drop_pick_zones belonging to the warehouse
-    for drop_pick_zone in drop_pick_zones:
-        # Retrieve the packages dropped off at each drop_pick_zone
-        packages = Package.objects.filter(dropOffLocation=drop_pick_zone, status='dropped_off')
-
-        # Add the drop_pick_zone and associated packages to the dictionary
-        packages_by_location[drop_pick_zone.name] = packages
+    packages = Package.objects.filter(dropOffLocation__warehouse=warehouse, status='dropped_off').select_related('dropOffLocation').order_by('dropOffLocation__tag')
 
     if request.method == 'POST':
         selected_packages = request.POST.getlist('selected_packages')
-        courier_id = request.POST.get('courier')
-
+        courier_id = request.POST.get('selectCourier')  # Change the name attribute of the courier select field to "selectCourier"
         if selected_packages and courier_id:
             courier = get_object_or_404(User, id=courier_id, role='courier', status='available')
-
-            # Update the packages with the assigned courier and change their status
             packages = Package.objects.filter(id__in=selected_packages)
             packages.update(courier=courier, status='dispatched')
 
@@ -54,21 +90,21 @@ def warehouse_dashboard(request):
 
             if courier_status:
                 courier.status = 'on-trip'
-            
-            courier.save()
+                courier.save()
 
             messages.success(request, 'Packages successfully assigned to courier.')
-
             return redirect('warehouse_dashboard')
 
     available_couriers = User.objects.filter(role='courier', status='available')
+
     context = {
-        'packages_by_location': packages_by_location,
+        'packages': packages,
         'greeting_message': greeting_message,
         'available_couriers': available_couriers
     }
 
     return render(request, 'warehouse/warehouse_dashboard.html', context)
+
 
 """
 The view handles the change password functionality and renders a template with a form 

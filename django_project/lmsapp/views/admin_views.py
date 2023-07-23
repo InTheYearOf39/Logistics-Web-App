@@ -300,7 +300,7 @@ def create_warehouse_user(request):
             user = User.objects.create_user(username=username, password='warehouse@warehouse', role='warehouse', name=name, warehouse=warehouse)
             user.save()
 
-            return redirect('warehouses')
+            return redirect('create_warehouse_user')
     
     # Retrieve the warehouses
     warehouses = Warehouse.objects.all()
@@ -323,7 +323,7 @@ def create_drop_pick_user(request):
             user = User.objects.create_user(username=username, password='droppick@droppick', role='drop_pick_zone', name=name, drop_pick_zone=drop_pick_zone)
             user.save()
 
-            return redirect('drop_pick_zones')
+            return redirect('create_drop_pick_user')
     
     # Retrieve the drop pick zones
     drop_pick_zones = DropPickZone.objects.all()
