@@ -27,7 +27,6 @@ urlpatterns = [
     path('register/', authentication_views.register, name='register'),
     path('logout/', auth_views.LogoutView.as_view(template_name='index.html'), name='logout_user'),
     path('change_password/', authentication_views.change_password, name='change_password'),
-#     path('change_password/', authentication_views.change_password, name='change_password'),
 	path('email-verification-sent/', authentication_views.email_verification_sent, name='email_verification_sent'),
     path('email-verification-failed/', authentication_views.email_verification_failed, name='email_verification_failed'),
     path('verify-email/', authentication_views.verify_email, name='verify_email'),

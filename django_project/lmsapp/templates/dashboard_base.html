@@ -87,9 +87,10 @@
           <button class="header-toggler px-md-0 me-md-3" type="button" onclick="coreui.Sidebar.getInstance(document.querySelector('#sidebar')).toggle()">
             <i class="icon icon-lg cil-menu"></i>
           </button><a class="header-brand d-md-none" href="#">
-            <svg width="118" height="46" alt="CoreUI Logo">
+            <!-- <svg width="118" height="46" alt="CoreUI Logo">
               <use xlink:href="/static/dist/assets/brand/coreui.svg#full"></use>
-            </svg></a>
+            </svg> -->LMS
+          </a>
           <ul class="header-nav d-none d-md-flex">
             <li class="nav-item"><a class="nav-link" href="#">Dashboard</a></li>
             <li class="nav-item"><a class="nav-link" href="#">Users</a></li>
@@ -129,7 +130,9 @@
           <nav aria-label="breadcrumb">
             <ol class="breadcrumb my-0 ms-2">
               <li class="breadcrumb-item">
-                <!-- if breadcrumb is single--><span>Home</span>
+                <!-- if breadcrumb is single-->
+                <span><a href="/" class="nav-link" style="text-decoration: none;">
+                  Home</a></span>
               </li>
               <li class="breadcrumb-item active"><span>Dashboard</span></li>
             </ol>
