@@ -11,14 +11,29 @@
   <form action="" method="POST">
     {% csrf_token %}
 
-    <div class="mb-3">
+    <!-- <div class="mb-3">
       <h6>Select a Courier</h6>
       <select name="courier" class="form-control">
         {% for courier in available_couriers %}
           <option value="{{ courier.id }}">{{ courier.name }}</option>
         {% endfor %}
       </select>
+    </div> -->
+
+    <div class="form-group col-md-3">
+      <label for="selectCourier" class="form-label form-label-sm">Select courier</label>
+      <select class="form-select form-select-sm" id="selectCourier" name="selectCourier" required>
+        <option value="" selected disabled> -- Select Courier -- </option>
+        {% for courier in available_couriers %}
+        <option value="{{ courier.id }}">{{ courier.name }}</option>
+        {% endfor %}
+      </select>
+      <div class="invalid-feedback">
+        Please select a courier.
+      </div>
     </div>
+
+
     <div class="col-md-12">
            {% for dropoff_location, packages in packages_by_location.items %}
           <!-- /.row--><br>
