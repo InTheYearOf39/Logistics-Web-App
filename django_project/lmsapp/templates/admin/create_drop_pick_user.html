@@ -21,23 +21,22 @@
 <!-- Text input-->
 
 <div class="form-group mt-2">
-    <label class="col-md-6 control-label" >Name</label> 
-      <div class="col-md-6 inputGroupContainer">
-      <div class="input-group">
-    <span class="input-group-text">👤</span>
-    <input name="name" placeholder="Name" class="form-control"  type="text">
-      </div>
+  <label class="col-md-6 control-label" >Name</label> 
+  <div class="col-md-6 inputGroupContainer">
+    <div class="input-group">
+      <span class="input-group-text">👤</span>
+      <input name="name" placeholder="Name" class="form-control form-control-sm"  type="text">
     </div>
   </div>
+</div>
 
 <!-- Text input-->
-
 <div class="form-group mt-2">
   <label class="col-md-6 control-label" >Username</label> 
     <div class="col-md-6 inputGroupContainer">
     <div class="input-group">
   <span class="input-group-text">👤</span>
-  <input name="username" placeholder="Username" class="form-control"  type="text">
+  <input name="username" placeholder="Username" class="form-control form-control-sm"  type="text">
     </div>
   </div>
 </div>
@@ -48,8 +47,8 @@
       <div class="col-md-6 selectContainer">
       <div class="input-group">
         <span class="input-group-text">🏪</span>
-          <span class="input-group-addon"><i class="glyphicon glyphicon-list"></i></span>
-          <select name="drop_pick_zone" class="form-control selectpicker">
+          <!-- <span class="input-group-addon"><i class="glyphicon glyphicon-list"></i></span> -->
+          <select name="drop_pick_zone" class="form-control form-control-sm selectpicker">
             <option value="">Please select drop pick zone</option>
             {% for drop_pick_zone in drop_pick_zones %}
             <option value="{{ drop_pick_zone.id }}">{{ drop_pick_zone.name }}</option>

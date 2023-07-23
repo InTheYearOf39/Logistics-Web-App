@@ -26,5 +26,5 @@ urlpatterns = [
 # Custom URL patterns for handling 404 and 500 errors
 handler404 = 'lmsapp.views.site_views.handle_404'  #page_not_found
 handler500 = 'lmsapp.views.site_views.handle_500'   #server_error
-# handler400 = defaults.bad_request                   #bad_request
-# handler403 = defaults.permission_denied             #permission_denied
+handler400 = 'lmsapp.views.site_views.handle_400'   #bad_request
+handler403 = 'lmsapp.views.site_views.handle_403'   #permission_denied
