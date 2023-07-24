@@ -44,6 +44,7 @@ Handles the registration of new packages by senders, ensuring the form data is v
 and saving the package to the database with the appropriate details.
 """ 
 #allow loading resources from other locations
+@login_required
 @xframe_options_exempt
 def register_package(request):
     # import json
@@ -56,7 +57,7 @@ def register_package(request):
         if form.is_valid():
             package = form.save(commit=False)
             package.user = request.user
-            package.package_number = generate_package_number()           
+            package.package_number = generate_package_number()
             
             sender_longitude = request.POST.get('sender_longitude') 
             sender_latitude = request.POST.get('sender_latitude')
@@ -76,21 +77,24 @@ def register_package(request):
                 return redirect('register_package')
             
             package.status = 'upcoming'
+            # Save the additional fields to the package object
+            package.recipientIdentification = form.cleaned_data['recipientIdentification']
+            package.genderType = form.cleaned_data['genderType']
             package.save()
+
             return redirect('sender_dashboard')
         else:
             error_message = 'Error processing your request'
     else:
         form = PackageForm()
         error_message = None
-    #drop_pick_zones_json = json.dumps(list(drop_pick_zones), cls=DjangoJSONEncoder)
+    
     context = {
         'form': form, 
         'error_message': error_message, 
         'drop_pick_zones': drop_pick_zones, 
-        #'drop_pick_zones_json': drop_pick_zones_json, 
         'api_key': api_key
-        }
+    }
 
     return render(request, 'sender/register_package.html', context)
 

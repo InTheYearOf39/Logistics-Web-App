@@ -116,13 +116,27 @@
               </div>
             </div>
 
-            <div class="col-md-6">
-              <label for="recipientAddress" class="form-label form-label-sm">Recipient Address</label>
-              <input id="recipientAddress" name="recipientAddress" placeholder="Recipient Address" class="form-control form-control-sm" type="text">
+            <div class="col-12">
+              <label for="recipientAddress" class="form-label">Recipient Address</label>
+              <input id="recipientAddress" name="recipientAddress" placeholder="Recipient Address" class="form-control" type="text">
               <div class="invalid-feedback">
                 Please enter a valid email address for shipping updates.
               </div>
             </div>
+
+            <!-- Add this new <div> for the recipient drop-off location -->
+              <div class="col-12" id="recipientPickUpLocationContainer">
+                <label for="recipientPickUpLocation" class="form-label">Recipient Drop Off Location</label>
+                <select class="form-control" id="recipientPickUpLocation" name="recipientPickUpLocation" required>
+                  <option value="" selected disabled>-- Select Recipient Drop Off Location --</option>
+                  {% for drop_pick_zone in drop_pick_zones %}
+                    <option value="{{ drop_pick_zone.id }}">{{ drop_pick_zone.name }}</option>
+                  {% endfor %}
+                </select>
+                <div class="invalid-feedback">
+                  Please select a recipient drop-off location.
+                </div>
+              </div>
 
             <div class="col-md-4">
               <label for="recipientIdentification" class="form-label form-label-sm">National ID/Passport</label>

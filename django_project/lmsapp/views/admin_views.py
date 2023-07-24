@@ -277,8 +277,15 @@ def create_courier(request):
         if form.is_valid():
             user = form.save(commit=False)
             user.role = 'courier'
-            # Set default password for the warehouse user
+            # Set default password for the courier user
             user.set_password('courier@courier')
+            
+            # Get the latitude and longitude from the form data
+            latitude = request.POST.get('latitude')
+            longitude = request.POST.get('longitude')
+            user.latitude = latitude
+            user.longitude = longitude
+            
             form.save()
             # Optionally, redirect to a success page
             return redirect('riders')
@@ -560,3 +567,36 @@ def drop_pick_users(request):
         'drop_pick_users': drop_pick_users
         }
     return render(request, 'admin/drop_pick_users.html', context)
+
+def edit_courier(request, courier_id):
+    courier = get_object_or_404(User, id=courier_id, role='courier')
+
+    if request.method == 'POST':
+        # Get form data
+        name = request.POST.get('name')
+        username = request.POST.get('username')
+        phone = request.POST.get('phone')
+        address = request.POST.get('address')
+
+        # Update the courier details
+        courier.name = name
+        courier.username = username
+        courier.phone = phone
+        courier.address = address
+        courier.save()
+
+        return redirect('riders')  # Redirect back to the drop_pick_zones page
+
+    context = {
+        'courier': courier,
+    }
+    return render(request, 'admin/edit_courier.html', context)
+
+def delete_courier(request, courier_id):
+    courier = get_object_or_404(User, id=courier_id, role='courier')
+
+    if request.method == 'POST':
+        courier.delete()
+        return redirect('riders')
+
+    return redirect('riders')
