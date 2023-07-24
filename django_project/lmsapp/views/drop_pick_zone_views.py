@@ -63,7 +63,7 @@ def confirm_drop_off(request, package_id):
         # Send the email
         email.send()
 
-        return redirect('dpz_dispatch')
+        return redirect('received_packages')
 
     return render(request, 'drop_pick_zone/drop_pick_dashboard.html', {'package': package})
 
@@ -143,7 +143,7 @@ def confirm_recipient_pickup(request, package_id):
 The view retrieves the packages dropped off at the current drop pick zone and displays them in the dispatch template. 
 The retrieved packages are passed to the template through the context.
 """
-def dispatch(request):
+def received_packages(request):
     # drop_pick_zone = request.user
     drop_pick_zone = DropPickZone.objects.get(users=request.user)
     packages = Package.objects.filter(dropOffLocation=drop_pick_zone, status='dropped_off')
@@ -151,7 +151,7 @@ def dispatch(request):
     context = {
         'packages': packages,
     }
-    return render(request, 'drop_pick_zone/dispatch.html', context)
+    return render(request, 'drop_pick_zone/received_packages.html', context)
 
 
 """ 

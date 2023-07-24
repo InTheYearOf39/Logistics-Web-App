@@ -1,4 +1,4 @@
-{% extends 'admin/admin_base.html' %}
+{% extends 'dashboard_base.html' %}
 
 {% load static %}
 
@@ -6,50 +6,49 @@
 {% block content %}
 
 
-<div class="container mb-5" style="margin-left: 4rem;">
-  <div class="row justify-content-center ml-5">
+<div class="row">
+<div class="container mb-5">
     <div class="col-md-12">
     <form class="well form-horizontal" action=" " method="post"  id="contact_form">
       {% csrf_token %}
 
       {{ form.errors }}
 
-<fieldset>
 
 <!-- Form Name -->
-<legend class="my-4">EDIT USER </legend>
+<h5>Edit Drop-Pick User </h5>
 
 <!-- Text input-->
 
-<!-- Text input-->
 <div class="form-group mt-2">
-  <label class="col-md-8 control-label">Name</label>  
-  <div class="col-md-8 inputGroupContainer">
+  <label class="col-md-6 control-label">Name</label>  
+  <div class="col-md-6 inputGroupContainer">
     <div class="input-group">
       <span class="input-group-text">👤</span>
-      <input name="name" placeholder="Name" class="form-control" type="text" value="{{ drop_pick_zone_user.name }}">
+      <input name="name" placeholder="Name" class="form-control form-control-sm" type="text" value="{{ drop_pick_zone_user.name }}">
     </div>
   </div>
 </div>
 
 <!-- Text input-->
 <div class="form-group mt-2">
-  <label class="col-md-8 control-label">Username</label>  
-  <div class="col-md-8 inputGroupContainer">
+  <label class="col-md-6 control-label">Username</label>  
+  <div class="col-md-6 inputGroupContainer">
     <div class="input-group">
       <span class="input-group-text">👤</span>
-      <input name="username" placeholder="Username" class="form-control" type="text" value="{{ drop_pick_zone_user.username }}">
+      <input name="username" placeholder="Username" class="form-control form-control-sm" type="text" value="{{ drop_pick_zone_user.username }}">
     </div>
   </div>
 </div>
 
 <!-- Select Basic -->
 <div class="form-group mt-2"> 
-  <label class="col-md-8 control-label">Drop Pick Zone</label>
-  <div class="col-md-8 selectContainer">
+  <label class="col-md-6 control-label">Drop Pick Zone</label>
+  <div class="col-md-6 selectContainer">
     <div class="input-group">
-      <span class="input-group-addon"><i class="glyphicon glyphicon-list"></i></span>
-      <select name="drop_pick_zone" class="form-control selectpicker">
+      <span class="input-group-text">🏪</span>
+      <!-- <span class="input-group-addon"><i class="glyphicon glyphicon-list"></i></span> -->
+      <select name="drop_pick_zone" class="form-control form-control-sm selectpicker">
         <option value="">Please select drop pick zone</option>
         {% for drop_pick_zone in drop_pick_zones %}
           <option value="{{ drop_pick_zone.id }}" {% if drop_pick_zone.id == drop_pick_zone_user.drop_pick_zone.id %} selected {% endif %}>{{ drop_pick_zone.name }}</option>
@@ -59,12 +58,16 @@
   </div>
 </div>
 
-
 <div class="form-group mt-2">
-    <label class="col-md-8 control-label"></label>
-    <div class="col-md-8">
-      <button type="submit" class="btn btn-info text-white" >Update <span class="glyphicon glyphicon-send"></span></button>
+    <label class="col-md-6 control-label"></label>
+    <div class="col-md-6">
+      <button type="submit" class="btn btn-primary btn-sm text-white" >Update <span class="glyphicon glyphicon-send"></span></button>
     </div>
-  </div> 
+</div> 
+
+</form>
+</div>
+  </div>
+</div>
 
 {% endblock %}

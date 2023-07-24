@@ -1,0 +1,114 @@
+{% extends 'dashboard_base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-md-12">
+          
+          <!-- /.row--><br>
+          <div class="table-responsive mb-4 bg-white">
+            <table class="table border mb-0">
+              <thead class="table-white fw-semibold">
+                <tr>
+                  <th>No</th>
+                  <th>Package</th>
+                  <th>Recipient</th>
+                  <th>From</th>
+                  <th>To</th>
+                  <th>Package No</th>
+                  <th>status</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for package in packages %}
+                <tr class="align-middle">
+                  <td class="text-start">
+                    <div class="small text-medium-emphasis"><span>{{ forloop.counter }}</span></div>
+                  </td>
+                  <td class="text-start">
+                    <div class="small text-medium-emphasis"><span>{{ package.packageName }}</span></div>
+                  </td>
+                  <td class="text-start">
+                    <div class="small text-medium-emphasis"><span>{{ package.recipientName }}</span></div>
+                  </td>
+                  <td class="text-start">
+                    <div class="small text-medium-emphasis"><span>{{ package.sendersAddress }}</span></div>
+                  </td>
+                  <td class="text-start">
+                    <div class="small text-medium-emphasis"><span>{{ package.recipientAddress }}</span></div>
+                  </td>
+                  <td class="text-start">
+                    <div class="small text-medium-emphasis"><span>{{ package.package_number }}</span></div>
+                  </td>
+                  <td class="text-start">
+                    <div class="small text-medium-emphasis"><span>{% if package.status == 'upcoming' %}
+                      <form action="{% url 'confirm_drop_off' package_id=package.id %}" method="post">
+                          {% csrf_token %}
+                          <button type="submit" class="btn btn-sm btn-warning text-white">Confirm Drop-Off</button>
+                      </form>
+                      {% elif package.status == 'dropped_off' %}
+                      <button type="button" class="btn btn-sm btn-info text-white">Dropped Off</button>
+                      {% elif package.status == 'in_transit' %}
+                      <img src="{% static 'img/transit.png'%}" alt="" width="25px" height="25px">
+                      {% elif package.status == 'at_pickup'%}
+                      <form action="{% url 'confirm_at_pickup' package_id=package.id %}" method="post">
+                          {% csrf_token %}
+                          <button type="submit" class="btn btn-sm btn-primary text-white">Confirm</button>
+                      </form>
+                      {% elif package.status == 'ready_for_pickup' %}
+                      <img src="{%static 'img/pickup.png'%}" alt="" width="25px" height="25px">
+                      {% endif %}</span></div>
+                  </td>
+                  
+                    {% if package.status == 'ready_for_pickup' %}
+                    <td>
+                      <form action="{% url 'confirm_recipient_pickup' package_id=package.id %}" method="post">
+                          {% csrf_token %}
+                          <div class="modal fade" id="staticBackdrop{{ package.id }}" data-bs-backdrop="static"
+                              data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel"
+                              aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                              <div class="modal-content">
+                                <div class="modal-header">
+                                    <h1 class="modal-title fs-5" id="staticBackdropLabel">Confirm Package Pickup</h1>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <label for="inputField{{ package.id }}"><b>ENTER CODE:</b></label>
+                                    <input type="text" id="inputField{{ package.id }}" name="inputField" class="form-control">
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-danger text-white" data-bs-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-success text-white">Send</button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <button type="button" class="btn btn-sm btn-warning text-white" data-bs-toggle="modal" data-bs-target="#staticBackdrop{{ package.id }}">Confirm Pick-Up</button>
+                      </form>
+                    </td>
+                    {% endif %}
+
+                
+                  <td>
+                    <div class="dropdown">
+                      <button class="btn btn-transparent p-0" type="button" data-coreui-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="icon cil-options"></i>
+                      </button>
+                      <div class="dropdown-menu dropdown-menu-end"><a class="dropdown-item" href="#">Info</a><a class="dropdown-item" href="#">Edit</a><a class="dropdown-item text-danger" href="#">Delete</a></div>
+                    </div>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        
+    </div>
+    <!-- /.col-->
+  </div>
+
+{% endblock %}

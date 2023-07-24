@@ -144,19 +144,35 @@ def admin_history(request):
 A Function to retrieve dropped off items and group the packages by their respective drop-off locations and
 render them on the 'admin/dropoffs.html' template.
  """
-def dropoffs(request):
-    dropoff_locations = DropPickZone.objects.filter(packages_dropped_off__status='dropped_off').distinct()
-    packages_by_location = {}
+# def dropoffs(request):
+#     dropoff_locations = DropPickZone.objects.filter(packages_dropped_off__status='dropped_off').distinct()
+#     packages_by_location = {}
 
-    for dropoff_location in dropoff_locations:
-        packages = Package.objects.filter(dropOffLocation=dropoff_location, status='dropped_off')
-        packages_by_location[dropoff_location.name] = packages
+#     for dropoff_location in dropoff_locations:
+#         packages = Package.objects.filter(dropOffLocation=dropoff_location, status='dropped_off')
+#         packages_by_location[dropoff_location.name] = packages
+
+#     context = {
+#         'packages_by_location': packages_by_location,
+#     }
+#     return render(request, 'admin/dropoffs.html', context)
+
+# def dropoffs(request):
+#     packages = Package.objects.filter(status='dropped_off')
+    
+#     context = {
+#         'packages': packages,
+#     }
+#     return render(request, 'admin/dropoffs.html', context)
+
+def dropoffs(request):
+    packages = Package.objects.filter(status='dropped_off').select_related('dropOffLocation')
+    sorted_packages = sorted(packages, key=lambda package: package.dropOffLocation.tag)
 
     context = {
-        'packages_by_location': packages_by_location,
+        'packages': sorted_packages,
     }
     return render(request, 'admin/dropoffs.html', context)
-
 
 
 
@@ -284,7 +300,7 @@ def create_warehouse_user(request):
             user = User.objects.create_user(username=username, password='warehouse@warehouse', role='warehouse', name=name, warehouse=warehouse)
             user.save()
 
-            return redirect('warehouses')
+            return redirect('create_warehouse_user')
     
     # Retrieve the warehouses
     warehouses = Warehouse.objects.all()
@@ -307,7 +323,7 @@ def create_drop_pick_user(request):
             user = User.objects.create_user(username=username, password='droppick@droppick', role='drop_pick_zone', name=name, drop_pick_zone=drop_pick_zone)
             user.save()
 
-            return redirect('drop_pick_zones')
+            return redirect('create_drop_pick_user')
     
     # Retrieve the drop pick zones
     drop_pick_zones = DropPickZone.objects.all()
@@ -530,3 +546,17 @@ def delete_drop_pick_zone_user(request, drop_pick_zone_user_id):
 
 
 
+
+def warehouse_users(request):
+    warehouse_users = User.objects.filter(role='warehouse')
+    context = {
+        'warehouse_users': warehouse_users
+        }
+    return render(request, 'admin/warehouse_users.html', context)
+
+def drop_pick_users(request):
+    drop_pick_users = User.objects.filter(role='drop_pick_zone')
+    context = {
+        'drop_pick_users': drop_pick_users
+        }
+    return render(request, 'admin/drop_pick_users.html', context)

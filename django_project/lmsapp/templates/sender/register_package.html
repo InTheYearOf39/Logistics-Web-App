@@ -4,27 +4,57 @@
 
 {% block content %}
 
-<div class="container px-5 pb-5" data-aos="fade-up">
+<div class="container my-2" data-aos="fade-up">
     <div class="row g-5">
         
-        <div class="col-md-8 col-lg-10">
-          <h4 class="my-5">Add Package</h4>
+        <div>
+          <!-- <h4 class="">Add Package</h4> -->
           
           <form class="needs-validation" novalidate action="{% url 'register_package' %}" method="post" id="packageForm" onsubmit="populateLocation()">
             {% csrf_token %}
-            <div class="row g-3">
-              <div class="col-sm-6">
+            <div class="row g-3 mb-3">
+              
+
+              <div class="col-md-4">
+                <label for="sendersAddress" class="form-label form-label-sm"> Sender's Address</label>
+                <input id="senderAddress" name="sendersAddress" placeholder="Sender's Address" class="form-control form-control-sm" type="text">
+                <div class="invalid-feedback">
+                  Please enter your shipping address.
+                </div>
+              </div>
+
+              <div class="col-md-4">
+                <label for="sendersContact" class="form-label form-label-sm"> Sender's Contact</label>
+                <input id="senderContact" name="sendersContact" placeholder="0755123890" class="form-control form-control-sm" type="tel">
+                <div class="invalid-feedback">
+                  Please enter your Contact.
+                </div>
+              </div>
+
+              <div class="form-group col-md-4">
                 <label for="packageName" class="form-label">Package Name</label>
-                <input type="text" class="form-control" id="packageName" name="packageName" placeholder="Package Name" value="" required>
+                <input type="text" class="form-control form-control-sm" id="packageName" name="packageName" placeholder="Package Name" value="" required>
                 <div class="invalid-feedback">
                   Valid Package name is required.
                 </div>
               </div>
 
-              <div class="col-12">
-                <label for="deliveryType" class="form-label">Delivery Type</label>
-                <select class="form-select" id="deliveryType" name="deliveryType" required>
-                  <option value="" selected disabled>-- Select Delivery Type --</option>
+              <div class="col-md-12">
+                <label for="packageDescripton" class="form-label form-label-sm">Package Description</label>
+                <div class="input-group has-validation">
+                  <!-- <input type="text" class="form-control form-control-sm" id="packageDescription" name="packageDescription" placeholder="Enter Description" required> -->
+                  <textarea id="packageDescription" name="packageDescription" placeholder="Enter Description" class="form-control form-control-sm" required></textarea>
+
+                  <div class="invalid-feedback">
+                  Package Description is required.
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group col-md-3">
+                <label for="deliveryType" class="form-label form-label-sm">Delivery Type</label>
+                <select class="form-select form-select-sm" id="deliveryType" name="deliveryType" required>
+                  <option value="" selected disabled> -- Select Delivery Type -- </option>
                   <option value="standard">Standard</option>
                   <option value="premium">Premium</option>
                   <option value="express">Express</option>
@@ -33,10 +63,10 @@
                   Please select a delivery type.
                 </div>
               </div>
-              
-              <div class="col-12" id="dropOffLocationContainer" style="display: none;">
-                <label for="dropOffLocation" class="form-label">Drop Off Location</label>
-                <select class="form-control" id="dropOffLocation" name="dropOffLocation" required>
+
+              <div class="col-md-9" id="dropOffLocationContainer" style="display: none;">
+                <label for="dropOffLocation" class="form-label form-label-sm">Drop Off Location</label>
+                <select class="form-control form-control-sm" id="dropOffLocation" name="dropOffLocation" required>
                   <option value="" selected disabled>-- Select Drop Off Location --</option>
                   {% for drop_pick_zone in drop_pick_zones %}
                     <option value="{{ drop_pick_zone.id }}">{{ drop_pick_zone.name }}</option>
@@ -44,111 +74,108 @@
                 </select>
                 <div class="invalid-feedback">
                   Please select a delivery location.
-                </div>
-               
+                </div>              
               </div>
-              
+
+            </div>
+
+
+            <div class="row g-3">
 
             <input type="hidden" id="sender_latitude" name="sender_latitude" value="">
-            <input type="hidden" id="sender_longitude" name="sender_longitude" value="">
+            <input type="hidden" id="sender_longitude" name="sender_longitude" value="">        
+            
+          
+            <div class="col-md-4">
+              <label for="recipientName" class="form-label form-label-sm">Recipient Name</label>
+              <div class="input-group has-validation">
+                <input type="text" class="form-control form-control-sm" id="recipientName" name="recipientName" placeholder="Recipient Name" required>
+              <div class="invalid-feedback">
+                  Recipient Name is required.
+                </div>
+              </div>
+            </div>
 
-              
-              <script>
-                const deliveryTypeSelect = document.getElementById("deliveryType");
-                const dropOffLocationContainer = document.getElementById("dropOffLocationContainer");
-              
-                deliveryTypeSelect.addEventListener("change", function() {
-                  if (this.value === "standard") {
-                    dropOffLocationContainer.style.display = "block";
-                  } else {
-                    dropOffLocationContainer.style.display = "none";
-                  }
-                });
-              </script>
-              
+            <div class="col-md-4">
+              <label for="recipientEmail" class="form-label form-label-sm">Recipient Email</label>
+              <div class="input-group has-validation">
+                <input type="email" class="form-control form-control-sm" id="recipientEmail" name="recipientEmail" placeholder="Recipient Email" required>
+              <div class="invalid-feedback">
+                  Recipient Email is required.
+                </div>
+              </div>
+            </div>
 
-              <div class="col-12">
-                <label for="packageDescripton" class="form-label">Package Description</label>
-                <div class="input-group has-validation">
-                  <input type="text" class="form-control" id="packageDescription" name="packageDescription" placeholder="Enter Description" required>
+            <div class="col-md-4">
+              <label for="recipientTelephone" class="form-label form-label-sm">Recipient Telephone</label>
+              <div class="input-group has-validation">
+                <input type="tel" class="form-control form-control-sm" id="recipientTelephone" name="recipientTelephone" placeholder="Recipient Telephone" pattern="[0-9]{10}" required>
                 <div class="invalid-feedback">
-                  Package Description is required.
-                  </div>
+                  Please enter a valid ten-digit telephone number.
                 </div>
               </div>
-  
-              <div class="col-12">
-                <label for="recipientName" class="form-label">Recipient Name</label>
-                <div class="input-group has-validation">
-                  <input type="text" class="form-control" id="recipientName" name="recipientName" placeholder="Recipient Name" required>
-                <div class="invalid-feedback">
-                    Recipient Name is required.
-                  </div>
-                </div>
-              </div>
+            </div>
 
-              <div class="col-12">
-                <label for="recipientEmail" class="form-label">Recipient Email</label>
-                <div class="input-group has-validation">
-                  <input type="email" class="form-control" id="recipientEmail" name="recipientEmail" placeholder="Recipient Email" required>
-                <div class="invalid-feedback">
-                    Recipient Email is required.
-                  </div>
-                </div>
+            <div class="col-md-6">
+              <label for="recipientAddress" class="form-label form-label-sm">Recipient Address</label>
+              <input id="recipientAddress" name="recipientAddress" placeholder="Recipient Address" class="form-control form-control-sm" type="text">
+              <div class="invalid-feedback">
+                Please enter a valid email address for shipping updates.
               </div>
+            </div>
 
-              <div class="col-12">
-                <label for="recipientTelephone" class="form-label">Recipient Telephone</label>
-                <div class="input-group has-validation">
-                  <input type="tel" class="form-control" id="recipientTelephone" name="recipientTelephone" placeholder="Recipient Telephone" pattern="[0-9]{10}" required>
-                  <div class="invalid-feedback">
-                    Please enter a valid ten-digit telephone number.
-                  </div>
-                </div>
+            <div class="col-md-4">
+              <label for="recipientIdentification" class="form-label form-label-sm">National ID/Passport</label>
+              <input id="recipientIdentification" name="recipientIdentification" placeholder="Enter Recipient Id" class="form-control form-control-sm" type="text">
+              <div class="invalid-feedback">
+                Please enter a valid email address for shipping updates.
               </div>
+            </div>
+
+            <div class="form-group col-md-2">
+              <label for="genderType" class="form-label form-label-sm">Sex</label>
+              <select class="form-select form-select-sm" id="genderType" name="genderType">
+                <option value="" selected disabled> -- Select Gender-- </option>
+                <option value="female">Female</option>
+                <option value="male">Male</option>
+              </select>
+              <div class="invalid-feedback">
+                Please select a Gender.
+              </div>
+            </div>
+       
+          </div>
+
+
+
+          <div class="row g-3 mt-2">
               
               <input type="hidden" id="recipient_latitude" name="recipient_latitude" value="">
               <input type="hidden" id="recipient_longitude" name="recipient_longitude" value="">
-  
-              <div class="col-12">
-                <label for="recipientAddress" class="form-label">Recipient Address</label>
-                <input id="recipientAddress" name="recipientAddress" placeholder="Recipient Address" class="form-control" type="text">
-                <div class="invalid-feedback">
-                  Please enter a valid email address for shipping updates.
-                </div>
-              </div>
 
-                <!-- Add this new <div> for the recipient drop-off location -->
-                  <div class="col-12" id="recipientPickUpLocationContainer">
-                    <label for="recipientPickUpLocation" class="form-label">Recipient Drop Off Location</label>
-                    <select class="form-control" id="recipientPickUpLocation" name="recipientPickUpLocation" required>
-                      <option value="" selected disabled>-- Select Recipient Drop Off Location --</option>
-                      {% for drop_pick_zone in drop_pick_zones %}
-                        <option value="{{ drop_pick_zone.id }}">{{ drop_pick_zone.name }}</option>
-                      {% endfor %}
-                    </select>
-                    <div class="invalid-feedback">
-                      Please select a recipient drop-off location.
-                    </div>
-                  </div>
-                  
-
-              <div class="col-12">
-                <label for="sendersAddress" class="form-label"> Sender's Address</label>
-                <input id="senderAddress" name="sendersAddress" placeholder="Sender's Address" class="form-control" type="text">
-                <div class="invalid-feedback">
-                  Please enter your shipping address.
-                </div>
+              <div class="col-md-12">
+                <button class="btn btn-primary btn-sm text-white" type="submit">Click to confirm</button>
               </div>
-              
-              <div class="col-sm-3 col-md-12">
-                <button class="w-100 btn btn-primary btn-25-on-lg text-white" type="submit">Click to confirm</button>
-              </div>
+          </div>
+            
           </form>
         </div>
       </div>
   </div>
 
+  <script>
+    const deliveryTypeSelect = document.getElementById("deliveryType");
+    const dropOffLocationContainer = document.getElementById("dropOffLocationContainer");
+  
+    deliveryTypeSelect.addEventListener("change", function() {
+      if (this.value === "standard") {
+        dropOffLocationContainer.style.display = "block";
+      } else {
+        dropOffLocationContainer.style.display = "none";
+      }
+    });
+  </script>
+  
 
   <script>
     

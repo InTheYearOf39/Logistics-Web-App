@@ -1,27 +1,32 @@
+<!DOCTYPE html>
+<!--
+* CoreUI - Free Bootstrap Admin Template
+* @version v4.2.2
+* @link https://coreui.io/product/free-bootstrap-admin-template/
+* Copyright (c) 2023 creativeLabs Łukasz Holeczek
+* Licensed under MIT (https://github.com/coreui/coreui-free-bootstrap-admin-template/blob/main/LICENSE)
+-->
 {% load static %}
-
-<!doctype html>
+<!-- Breadcrumb-->
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
-    <meta name="generator" content="Hugo 0.84.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <meta name="description" content="Logistics Management System">
+    <meta name="author" content="Muhumuza Ivan, Nkuraija Gary, Wogunya Israel">
+    <meta name="keywords" content="Logistics,Warehouse,Drop off,Inventory,Shipment,Tracking,Delivery,Transportation,Dispatch,Hub,Route Optimization,courier,parcel,package,Supply Chain">
     <title>Dashboard</title>
-
-
-    <!-- Bootstrap core CSS -->
-    
-    <link rel="stylesheet" href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}">
+    <link href="{% static 'img/favicon.png' %}" rel="icon">
+    <meta name="theme-color" content="#ffffff">
+    <!-- Vendors styles-->
+    <link rel="stylesheet" href="{% static 'css/dist/simplebar.css' %}">
+    <!-- Main styles for this application-->
+    <link href="{% static 'css/dist/dashboard_style.css' %}" rel="stylesheet">
+    <!-- styles to include icons -->
+    <link href="{% static '@coreui/icons/css/all.min.css' %}" rel="stylesheet">
 
     <script src="{% static 'js/jquery-3.3.1.min.js' %}"></script>
-
-    <!-- Custom styles for this template -->
-    <link href="{% static 'css/dashboard.css' %}" rel="stylesheet">
-
-    <!-- Favicons -->
-    <link href="{% static 'img/favicon.png' %}" rel="icon">
 
     <!--Add files for google address utocomplete-->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
@@ -36,373 +41,135 @@
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB5r4DsYYly-d272kJopRlb9FCclcWokrE&callback=initMap&libraries=places&language=en-AU"></script>
 
     
-
-    
-
-    <style>
-      .bd-placeholder-img {
-        font-size: 1.125rem;
-        text-anchor: middle;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        user-select: none;
-      }
-
-      
-      .nav-link:not(.active):hover {
-        color: rgb(0, 89, 255);
-      }
-
-
-      @media (min-width: 768px) {
-        .bd-placeholder-img-lg {
-          font-size: 3.5rem;
-        }
-      }
-
-      /* Styles for large screens */
-      @media (min-width: 992px) {
-          .package-table {
-              display: block;
-          }
-          
-          .package-card {
-              display: none;
-          }
-      }
-
-      /* Styles for medium screens (such as tablets) */
-      @media (min-width: 768px) and (max-width: 991px) {
-          .package-table {
-              display: block;
-          }
-          
-          .package-card {
-              display: none;
-          }
-      }
-
-      /* Styles for small screens */
-      @media (max-width: 767px) {
-          .package-table {
-              display: none;
-          }
-
-          .package-card {
-              display: block;
-          }
-      }
-
-      @media (min-width: 576px) {
-        .btn-25-on-lg {
-          width: 25% !important;
-        }
-      }
-
-      .custom-modal {
-      display: none;
-      position: fixed;
-      z-index: 9999;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      overflow: auto;
-      background-color: rgba(0, 0, 0, 0.5);
-    }
-
-    .custom-modal.active {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .custom-modal-content {
-      position: relative;
-      padding: 20px;
-      max-width: 500px;
-      background-color: #fff;
-      border-radius: 4px;
-    }
-
-    .custom-modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .custom-modal-title {
-      margin: 0;
-    }
-
-    .custom-modal-close {
-      background: none;
-      border: none;
-      font-size: 24px;
-      cursor: pointer;
-    }
-
-    .custom-modal-body {
-      margin-bottom: 20px;
-    }
-
-    .custom-modal-footer {
-      display: flex;
-      justify-content: flex-end;
-    }
-
-    .custom-modal-close,
-    .btn {
-      padding: 8px 16px;
-      font-size: 14px;
-      border-radius: 4px;
-    }
-
-    .btn-danger {
-      background-color: #dc3545;
-      color: #fff;
-    }
-
-    .btn-success {
-      background-color: #28a745;
-      color: #fff;
-    }
-
-    .text-white {
-      color: #fff;
-    }
-
-    </style>
-
-    
+    {% block static_links %}{% endblock %}
   </head>
   <body>
-    
-<header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
-  <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="{% url 'home' %}"><img src="{% static '/img/home.png' %}" alt="" width="45px" height="25px"></a>
-  <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-  <input class="form-control form-control-dark w-100" type="text" id="search" name="search" placeholder="Search" aria-label="Search">
-  <div class="navbar-nav">
-    <div class="nav-item text-nowrap">
-      <a class="nav-link px-3" href="{% url 'logout_user' %}">Sign out</a>
-    </div>
-
-  </div>
-</header>
-
-<div class="container-fluid">
-  <div class="row">
-    <nav id="sidebarMenu" class="col-md-3 col-lg-1 d-md-block bg-light sidebar collapse">
-      <div class="position-sticky pt-3">
-        <div class="container">
-          {% block profile_image %} {% endblock %}
-        </div>
-
-        <ul class="nav flex-column mt-3">
-          {% if request.user.role == 'courier' %}
-          <li class="nav-item">
-            <a class="nav-link" aria-current="page" href="{% url 'courier_dashboard' %}">
-              <span data-feather="home"></span>
-              Packages
-            </a>
-          </li>
-          {% elif request.user.role == 'sender' %}
-          <li class="nav-item">
-            <a class="nav-link" aria-current="page" href="{% url 'sender_dashboard' %}">
-              <span data-feather="home"></span>
-              Packages
-            </a>
-          </li>
-          {% elif request.user.role == 'drop_pick_zone' %}
-          <li class="nav-item">
-            <a class="nav-link" aria-current="page" href="{% url 'drop_pick_zone_dashboard' %}">
-              <span data-feather="home"></span>
-              Packages
-            </a>
-          </li>
-          {% elif request.user.role == 'warehouse' %}
-          <li class="nav-item">
-            <a class="nav-link" aria-current="page" href="{% url 'warehouse_dashboard' %}">
-              <span data-feather="home"></span>
-              Packages
-            </a>
-          </li>
-
-          <!-- <li class="nav-item">
-            <a class="nav-link" aria-current="page" href="{% url 'dpz_dispatch' %}">
-              <span data-feather="home"></span>
-              Dispatch
-            </a>
-          </li> -->
-
-          {% elif request.user.role == 'warehouse' %}
-          <li class="nav-item">
-            <a class="nav-link" aria-current="page" href="{% url 'warehouse_dashboard' %}">
-              <span data-feather="home"></span>
-              Packages
-            </a>
-          </li>
-
-
-          <li class="nav-item">
-            <a class="nav-link" aria-current="page" href="{% url 'assign_courier' %}">
-              <span data-feather="home"></span>
-              Dispatch
-            </a>
-          </li>
-
-          {% endif %}
-
-          {% if request.user.role == 'warehouse' %}
-          <li class="nav-item">
-            <a class="nav-link" aria-current="page" href="{% url 'new_arrivals' %}">
-              <span data-feather="home"></span>
-                New Arrivals
-            </a>
-          </li>
-
-          <li class="nav-item">
-            <a class="nav-link" aria-current="page" href="{% url 'ready_packages' %}">
-              <span data-feather="home"></span>
-                In House
-            </a>
-          </li>
-          {% endif %}
-
-
-          {% if request.user.role == 'courier' %}
-              <li class="nav-item">
-                  <a class="nav-link" href="{% url 'courier_history' %}">
-                      <span data-feather="users"></span>
-                      History
-                  </a>
-              </li>
-          {% elif request.user.role == 'sender' %}
-              <li class="nav-item">
-                  <a class="nav-link" href="{% url 'sender_history' %}">
-                      <span data-feather="users"></span>
-                      History
-                  </a>
-              </li>
-          {% endif %}
-          
-          {% if request.user.role == 'warehouse' %}
-          <li class="nav-item">
-            <a class="nav-link" href="#">
-              <span data-feather="users"></span>
-              Reports
-            </a>
-          </li>
-          {% endif %}
-
-         
-
-          {% if request.user.role == 'drop_pick_zone' %}
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'dpz_dispatch' %}">
-              <span data-feather="users"></span>
-              Received Packages
-            </a>
-          </li>
-
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'dispatched_packages' %}">
-              <span data-feather="users"></span>
-              Dispatched Packages
-            </a>
-          </li>
-
-          
-          {% endif %}
-
-          <li class="nav-item">
-            <a class="nav-link" href="#">
-              <span data-feather="users"></span>
-              Profile
-            </a>
-          </li>
-
-          {% if request.user.role == 'warehouse' %}
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'change_password' %}">
-              <span data-feather="users"></span>
-              Change Password
-            </a>
-          </li>
-          {% elif request.user.role == 'drop_pick_zone' %}
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'change_password' %}">
-              <span data-feather="users"></span>
-              Change Password
-            </a>
-          </li>
-          {% elif request.user.role == 'courier' %}
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'change_password' %}">
-              <span data-feather="users"></span>
-              Change Password
-            </a>
-          </li>
-          {% elif request.user.role == 'sender' %}
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'change_password' %}">
-              <span data-feather="users"></span>
-              Change Password
-            </a>
-          </li>
-          {% endif %}
-
-        </ul>
-
+    <!-- sidebar -->
+    <div class="sidebar sidebar-dark sidebar-fixed" id="sidebar">
+      <div class="sidebar-brand d-none d-md-flex">
+        <!-- <svg class="sidebar-brand-full" width="118" height="46" alt="CoreUI Logo">
+          <use xlink:href="/static/dist/assets/brand/coreui.svg#full"></use>
+        </svg>
+        <svg class="sidebar-brand-narrow" width="46" height="46" alt="CoreUI Logo">
+          <use xlink:href="/static/dist/assets/brand/coreui.svg#signet"></use>
+        </svg> -->
+        <p class="sidebar-brand-full fw-bold">LMS</p>
+        <p class="sidebar-brand-narrow fw-bold">LMS</p>
+        
       </div>
-    </nav>
 
+          {% if request.user.role == "admin" %}
+              {% include 'includes/admin_navigation.html' %}
 
-    <main class="col-md-9 ms-sm-auto col-lg-11 px-md-4">
+          {% elif request.user.role == "warehouse" %}
+              {% include 'includes/warehouse_navigation.html' %}
 
-        {% block content %}
+          {% elif request.user.role == "drop_pick_zone" %}
+              {% include 'includes/drop_pick_navigation.html' %}
 
-       
-       
-        {% endblock %}
+          {% elif request.user.role == "courier" %}
+              {% include 'includes/courier_navigation.html' %}
 
-    </main>
+          {% else %}
+              {% include 'includes/sender_navigation.html' %}
+          {% endif %}
 
+      <button class="sidebar-toggler" type="button" data-coreui-toggle="unfoldable"></button>
+    </div>
+    <!-- end of sidebar -->
 
+    <!-- wrapper --this contains the header and content -->
+    <div class="wrapper d-flex flex-column min-vh-100 bg-light">
 
-</div>
-</div>
+                                    <!-- header content  -->
+      <header class="header header-sticky mb-4">
+        <div class="container-fluid">
+          <button class="header-toggler px-md-0 me-md-3" type="button" onclick="coreui.Sidebar.getInstance(document.querySelector('#sidebar')).toggle()">
+            <i class="icon icon-lg cil-menu"></i>
+          </button><a class="header-brand d-md-none" href="#">
+            <!-- <svg width="118" height="46" alt="CoreUI Logo">
+              <use xlink:href="/static/dist/assets/brand/coreui.svg#full"></use>
+            </svg> -->LMS
+          </a>
+          <ul class="header-nav d-none d-md-flex">
+            <li class="nav-item"><a class="nav-link" href="#">Dashboard</a></li>
+            <li class="nav-item"><a class="nav-link" href="#">Users</a></li>
+            <li class="nav-item"><a class="nav-link" href="#">Settings</a></li>
+          </ul>
+          <ul class="header-nav ms-auto">
+            <li class="nav-item"><a class="nav-link" href="#"><i class="icon icon-lg cil-bell"></i></a></li>
+            <li class="nav-item"><a class="nav-link" href="#">
+                <svg class="icon icon-lg"><i class="icon icon-lg cil-list-rich"></i></a></li>
+            <li class="nav-item"><a class="nav-link" href="#"><i class="icon icon-lg cil-envelope-open"></i></a></li>
+          </ul>
+          <ul class="header-nav ms-3">
+            <li class="nav-item dropdown"><a class="nav-link py-0" data-coreui-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                <div class="avatar avatar-md"><img class="avatar-img" src="{% static 'dist/assets/img/avatars/8.jpg' %}" alt="user@email.com"></div></a>
+              <div class="dropdown-menu dropdown-menu-end pt-0">
+                <div class="dropdown-header bg-light py-2">
+                  <div class="fw-semibold">Account</div>
+                </div><a class="dropdown-item" href="#"><i class="icon me-2 cil-bell"></i>Updates<span class="badge badge-sm bg-info ms-2">42</span></a>
+                      <a class="dropdown-item" href="#"><i class="icon me-2 cil-envelope-open"></i>Messages<span class="badge badge-sm bg-success ms-2">42</span></a>
+                      <a class="dropdown-item" href="#"><i class="icon me-2 cil-task"></i>Tasks<span class="badge badge-sm bg-danger ms-2">42</span></a>
+                        <a class="dropdown-item" href="#"><i class="icon me-2 cil-comment-square"></i>Comments<span class="badge badge-sm bg-warning ms-2">42</span></a>
+                <div class="dropdown-header bg-light py-2">
+                  <div class="fw-semibold">Settings</div>
+                </div><a class="dropdown-item" href="#"><i class="icon me-2 cil-user"></i>Profile</a>
+                      <a class="dropdown-item" href="#"><i class="icon me-2 cil-settings"></i>Settings</a>
+                      <a class="dropdown-item" href="#"><i class="icon me-2 cil-credit-card"></i>Payments<span class="badge badge-sm bg-secondary ms-2">42</span></a>
+                      <a class="dropdown-item" href="#"><i class="icon me-2 cil-file"></i>Projects<span class="badge badge-sm bg-primary ms-2">42</span></a>
+                <div class="dropdown-divider"></div>
+                <!-- <a class="dropdown-item" href="#"><i class="icon me-2 cil-lock-locked"></i>Lock Account</a> -->
+                    <a class="dropdown-item" href="{% url 'logout_user' %}"><i class="icon me-2 cil-account-logout"></i>Logout</a>
+              </div>
+            </li>
+          </ul>
+        </div>
+        <div class="header-divider"></div>
+        <div class="container-fluid">
+          <nav aria-label="breadcrumb">
+            <ol class="breadcrumb my-0 ms-2">
+              <li class="breadcrumb-item">
+                <!-- if breadcrumb is single-->
+                <span><a href="/" class="nav-link" style="text-decoration: none;">
+                  Home</a></span>
+              </li>
+              <li class="breadcrumb-item active"><span>Dashboard</span></li>
+            </ol>
+          </nav>
+        </div>
+      </header>
+                                    <!-- header content ends here -->
+      <div class="body flex-grow-1 px-3">
 
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-  var modalTriggers = document.querySelectorAll('.custom-modal-trigger');
-  var modals = document.querySelectorAll('.custom-modal');
-  var modalCloses = document.querySelectorAll('.custom-modal-close');
+                                    <!-- body content is here -->
+        <!-- <div class="container-lg"> -->
+          <div class="container-fluid">
+           
+          {% block content %}{% endblock %}
+                                    
+        </div>
+                                <!-- body content ends here -->
+      <footer class="footer">
+        <div class="ms-auto"><p id="footer-info"></p></div>
+      </footer>
+    </div>
+    <!-- end of wrapper -->
 
-  modalTriggers.forEach(function(trigger) {
-    trigger.addEventListener('click', function() {
-      var target = this.getAttribute('data-target');
-      var modal = document.querySelector(target);
-      modal.classList.toggle('active');
-    });
-  });
+    <script>      
+        const currentYear = new Date().getFullYear();
+        const footerElement = document.getElementById("footer-info");
+        footerElement.textContent = `LMS ${currentYear} `;
+    </script>
+      
+    <!-- CoreUI and necessary plugins-->
+    <script src="{% static 'js/dist/coreui.bundle.min.js' %}"></script>
+    <script src="{% static 'js/dist/simplebar.min.js' %}"></script>
+    <!-- Plugins and scripts required by this view-->
+    <script src="{% static 'js/dist/chart.min.js' %}"></script>
+    <script src="{% static 'js/dist/coreui-chartjs.js' %}"></script>
+    <script src="{% static 'js/dist/coreui-utils.js' %}"></script>
+    <script src="{% static 'js/dist/main.js' %}"></script>
 
-  modalCloses.forEach(function(close) {
-    close.addEventListener('click', function() {
-      var target = this.getAttribute('data-target');
-      var modal = document.querySelector(target);
-      modal.classList.remove('active');
-    });
-  });
-});
-
-</script>
-
-  <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
-
-  <script src="{% static 'js/feather.min.js' %}" ></script>
-    
   </body>
 </html>

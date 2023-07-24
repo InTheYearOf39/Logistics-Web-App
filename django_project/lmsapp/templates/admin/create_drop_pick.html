@@ -1,4 +1,4 @@
-{% extends 'admin/admin_base.html' %}
+{% extends 'dashboard_base.html' %}
 
 {% load static %}
 
@@ -6,27 +6,26 @@
 {% block content %}
 
 
-<div class="container mb-5" style="margin-left: 4rem;">
-  <div class="row justify-content-center ml-5">
-    <div class="col-md-12">
+<div class="row">
+  <div class="container mb-3">
+      <div class="col-md-12">
     <form class="well form-horizontal" action=" " method="post"  id="contact_form">
       {% csrf_token %}
 
       {{ form.errors }}
 
-<fieldset>
 
 <!-- Form Name -->
-<legend class="my-4">CREATE DROP-PICK </legend>
+<h5>Create Drop-Pick </h5>
 
 <!-- Text input-->
 
 <div class="form-group mt-2">
-  <label class="col-md-8 control-label">Full Name</label>  
-  <div class="col-md-8 inputGroupContainer">
+  <label class="col-md-6 control-label">Full Name</label>  
+  <div class="col-md-6 inputGroupContainer">
   <div class="input-group">
   <span class="input-group-text">👤</span>
-  <input  name="name" placeholder="Name" class="form-control"  type="text">
+  <input  name="name" placeholder="Name" class="form-control form-control-sm"  type="text">
     </div>
   </div>
 </div>
@@ -34,11 +33,11 @@
 <!-- Text input-->
       
 <div class="form-group mt-2">
-  <label class="col-md-8 control-label">Address</label>  
-    <div class="col-md-8 inputGroupContainer">
+  <label class="col-md-6 control-label">Address</label>  
+    <div class="col-md-6 inputGroupContainer">
     <div class="input-group">
         <span class="input-group-text">📌</span>
-  <input id="address" name="address" placeholder="Address" class="form-control" type="text">
+  <input id="address" name="address" placeholder="Address" class="form-control form-control-sm" type="text">
     </div>
   </div>
 </div>
@@ -50,11 +49,11 @@
 <!-- Text input-->
        
 <div class="form-group mt-2">
-  <label class="col-md-8 control-label">Contact</label>  
-    <div class="col-md-8 inputGroupContainer">
+  <label class="col-md-6 control-label">Contact</label>  
+    <div class="col-md-6 inputGroupContainer">
     <div class="input-group">
         <span class="input-group-text">📞</span>
-  <input name="phone" placeholder="Phone number" class="form-control" type="text">
+  <input name="phone" placeholder="Phone number" class="form-control form-control-sm" type="text">
     </div>
   </div>
 </div>
@@ -62,11 +61,11 @@
 <!-- Select Basic -->
    
 <div class="form-group mt-2"> 
-  <label class="col-md-8 control-label">Warehouse</label>
-    <div class="col-md-8 selectContainer">
+  <label class="col-md-6 control-label">Warehouse</label>
+    <div class="col-md-6 selectContainer">
     <div class="input-group">
-        <span class="input-group-addon"><i class="glyphicon glyphicon-list"></i></span>
-        <select name="warehouse" class="form-control selectpicker">
+        <span class="input-group-text">🏬</span>
+        <select name="warehouse" class="form-control form-control-sm selectpicker">
           <option value="">Please select warehouse</option>  
           {% for warehouse in warehouses %}
             <option value="{{ warehouse.id }}">{{ warehouse.name }}</option>
@@ -78,11 +77,11 @@
 
 <!-- Text input-->
 <div class="form-group mt-2">
-    <label class="col-md-8 control-label">Tag</label>  
-      <div class="col-md-8 inputGroupContainer">
+    <label class="col-md-6 control-label">Tag</label>  
+      <div class="col-md-6 inputGroupContainer">
       <div class="input-group">
           <span class="input-group-text">🏷️</span>
-    <input name="tag" placeholder="Tag alias" class="form-control" type="text">
+    <input name="tag" placeholder="Tag alias" class="form-control form-control-sm" type="text">
       </div>
     </div>
   </div>
@@ -93,13 +92,12 @@
 
 <!-- Button -->
 <div class="form-group mt-2">
-  <label class="col-md-8 control-label"></label>
-  <div class="col-md-8">
-    <button type="submit" class="btn btn-info text-white" >Add <span class="glyphicon glyphicon-send"></span></button>
+  <label class="col-md-6 control-label"></label>
+  <div class="col-md-6">
+    <button type="submit" class="btn btn-primary btn-sm text-white" >Create<span class="glyphicon glyphicon-send"></span></button>
   </div>
 </div>
 
-</fieldset>
 </form>
     </div>
   </div>

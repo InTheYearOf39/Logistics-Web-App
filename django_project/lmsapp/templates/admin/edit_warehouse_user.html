@@ -1,51 +1,51 @@
 <!-- edit_warehouse_user.html -->
-{% extends 'admin/admin_base.html' %}
+{% extends 'dashboard_base.html' %}
 {% load static %}
 
 {% block content %}
 
-<div class="container mb-5" style="margin-left: 4rem;">
-  <div class="row justify-content-center ml-5">
+<div class="row">
+<div class="container mb-5">
     <div class="col-md-12">
       <form class="well form-horizontal" action="{% url 'edit_warehouse_user' user.id %}" method="post" id="contact_form">
         {% csrf_token %}
         {{ form.errors }}
 
-        <fieldset>
+
 
           <!-- Form Name -->
-          <legend class="my-4">EDIT USER</legend>
+          <h5>EDIT USER</h5>
 
           <!-- Text input -->
           <div class="form-group mt-2">
-            <label class="col-md-8 control-label">Name</label>
-            <div class="col-md-8 inputGroupContainer">
+            <label class="col-md-6 control-label">Name</label>
+            <div class="col-md-6 inputGroupContainer">
               <div class="input-group">
                 <span class="input-group-text">👤</span>
-                <input name="name" placeholder="Name" class="form-control" type="text" value="{{ user.name }}">
+                <input name="name" placeholder="Name" class="form-control form-control-sm" type="text" value="{{ user.name }}">
               </div>
             </div>
           </div>
 
           <!-- Text input -->
           <div class="form-group mt-2">
-            <label class="col-md-8 control-label">Username</label>
-            <div class="col-md-8 inputGroupContainer">
+            <label class="col-md-6 control-label">Username</label>
+            <div class="col-md-6 inputGroupContainer">
               <div class="input-group">
                 <span class="input-group-text">👤</span>
-                <input name="username" placeholder="Username" class="form-control" type="text" value="{{ user.username }}">
+                <input name="username" placeholder="Username" class="form-control form-control-sm" type="text" value="{{ user.username }}">
               </div>
             </div>
           </div>
 
           <!-- Select input -->
           <div class="form-group mt-2">
-            <label class="col-md-8 control-label">Warehouse</label>
-            <div class="col-md-8 selectContainer">
+            <label class="col-md-6 control-label">Warehouse</label>
+            <div class="col-md-6 selectContainer">
               <div class="input-group">
                 <span class="input-group-text">🏬</span>
                 <span class="input-group-addon"><i class="glyphicon glyphicon-list"></i></span>
-                <select name="warehouse" class="form-control selectpicker">
+                <select name="warehouse" class="form-control form-control-sm selectpicker">
                   <option value="">Please select warehouse</option>
                   {% for warehouse in warehouses %}
                     {% if user.warehouse == warehouse %}
@@ -60,13 +60,13 @@
           </div>
 
           <div class="form-group mt-2">
-            <label class="col-md-8 control-label"></label>
-            <div class="col-md-8">
-              <button type="submit" class="btn btn-info text-white">SAVE <span class="glyphicon glyphicon-send"></span></button>
+            <label class="col-md-6 control-label"></label>
+            <div class="col-md-6">
+              <button type="submit" class="btn btn-primary btn-sm text-white">SAVE <span class="glyphicon glyphicon-send"></span></button>
             </div>
           </div>
 
-        </fieldset>
+
       </form>
     </div>
   </div>

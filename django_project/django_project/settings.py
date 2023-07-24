@@ -156,7 +156,7 @@ STATIC_URL = '/static/'
 
 
 #uncomment to help collect statics
-STATIC_ROOT = os.path.join(BASE_DIR, 'site_static')
+# STATIC_ROOT = os.path.join(BASE_DIR, 'site_static')
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
