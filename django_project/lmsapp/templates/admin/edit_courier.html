@@ -54,7 +54,7 @@
 </div>
 
 <!-- Text input -->
-<div class="form-group mt-2">
+<!-- <div class="form-group mt-2">
     <label class="col-md-8 control-label">Address</label>  
     <div class="col-md-8 inputGroupContainer">
         <div class="input-group">
@@ -62,7 +62,23 @@
             <input name="address" placeholder="Address" class="form-control" type="text" value="{{ courier.address }}">
         </div>
     </div>
-</div>
+</div> -->
+
+<div class="form-group mt-2">
+    <label class="col-md-6 control-label">Address</label>  
+      <div class="col-md-6 inputGroupContainer">
+      <div class="input-group">
+          <span class="input-group-text">📌</span>
+    <input id="address" name="address" placeholder="Address" class="form-control form-control-sm" type="text">
+      </div>
+    </div>
+  </div>
+  
+  <input id="latitude" name="latitude" placeholder="latitude" class="form-control" type="text" hidden>
+  
+  <input id="longitude" name="longitude" placeholder="longitude" class="form-control" type="text" hidden>
+
+
 
 <!-- Text input-->
 <!-- Select Basic -->
@@ -84,6 +100,31 @@
   </div>
 </div>
     <!-- /.container -->
+
+<script>
+      //load after page loads
+      $(function() {
+  // Initialize the autocomplete
+  var addressInput = $("#address")[0];
+  var autocomplete = new google.maps.places.Autocomplete(addressInput, {});
+
+  // Set the current address as the default value in the input field
+  var currentAddress = "{{ courier.address }}";
+  if (currentAddress) {
+    addressInput.value = currentAddress;
+  }
+
+  // Event listener for place_changed
+  google.maps.event.addListener(autocomplete, 'place_changed', function() {
+    var place = autocomplete.getPlace();
+    if (place.geometry) {
+      $("#latitude").val(place.geometry.location.lat());
+      $("#longitude").val(place.geometry.location.lng());
+    }
+  });
+});
+
+    </script>
 
 
 {% endblock %}
