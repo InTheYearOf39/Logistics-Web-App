@@ -130,6 +130,7 @@ class Package(models.Model):
     sender_longitude = models.FloatField( null=True, blank=True)
     recipient_latitude = models.FloatField( null=True, blank=True)
     recipient_longitude = models.FloatField( null=True, blank=True)
+    delivery_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     genderType = models.CharField(max_length=20, choices=GENDER_CHOICES, verbose_name='Gender', null=False)
     package_number = models.CharField(max_length=50, unique=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='upcoming')  # default status is 'upcoming'

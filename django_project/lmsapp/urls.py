@@ -82,6 +82,7 @@ urlpatterns = [
     path('register_package/', sender_views.register_package, name='register_package'),
     path('api/', sender_views.api, name='api'),
     path('sender_history/', sender_views.sender_history, name='sender_history'),
+    path('api/calculate_delivery_fee/', sender_views.calculate_delivery_fee, name='calculate_delivery_fee'),
 
 
     # courier routes
