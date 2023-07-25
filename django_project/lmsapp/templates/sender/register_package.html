@@ -260,6 +260,7 @@
   }
 
   function populateRecipientLocation() {
+    console.log("populate triggered");
     // Function to populate recipient drop-off locations
     const recipientAddressInput = document.getElementById("recipientAddress");
     const recipientLatitudeInput = document.getElementById("recipient_latitude");
@@ -277,10 +278,7 @@
     }
   }
 
-  // Call the function when the recipient address input changes
-  const recipientAddressInput = document.getElementById("recipientAddress");
-  recipientAddressInput.addEventListener("change", populateRecipientLocation);
-
+  
   function redraw_recipient_dropoff_list(lat, lng) {
     // Function to redraw recipient drop-off locations based on recipient's latitude and longitude
     $.ajax({
@@ -312,6 +310,12 @@
       //set values into the feilds
       $("#recipient_latitude").val(place.geometry.location.lat());
       $("#recipient_longitude").val(place.geometry.location.lng());
+
+      console.log("new gps ready");
+      // Call the function when the recipient address input changes
+      populateRecipientLocation() 
+
+
 
     });
 
