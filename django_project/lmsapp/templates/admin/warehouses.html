@@ -42,13 +42,13 @@
                       <button class="btn btn-transparent p-0" type="button" data-coreui-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <i class="icon cil-options"></i>
                       </button>
-                      <div class="dropdown-menu dropdown-menu-end"><a class="dropdown-item" href="{% url 'edit_warehouse' warehouse.id %}">Edit</a>
-                        <a class="dropdown-item text-danger" href="#"><button type="button" class="btn btn-sm btn-warning text-white" data-coreui-toggle="modal" data-coreui-target="#staticBackdrop{{ warehouse.id }}">
+                      <div class="dropdown-menu dropdown-menu-end">
+                        <div class="col"><a class="dropdown-item" href="{% url 'edit_warehouse' warehouse.id %}"><button class="btn btn btn-transparent text-info" type="button">Edit</button></a></div>
+                          <div class="col"><a class="dropdown-item" href="#"><button type="button" class="btn btn-transparent text-danger" data-coreui-toggle="modal" data-coreui-target="#staticBackdrop{{ warehouse.id }}">
                           Delete
                         </button></a>
                       </div>
                     </div>
-
                 
                     <form action="{% url 'delete_warehouse' warehouse.id %}" method="post">
                       {% csrf_token %}
