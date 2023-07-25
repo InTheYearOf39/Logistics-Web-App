@@ -49,7 +49,7 @@ urlpatterns = [
     # admin routes
     path('admin_dashboard/', admin_views.admin, name='admin_dashboard'),
     path('users/', admin_views.users, name='users'),
-    path('riders/', admin_views.riders, name='riders'),
+    path('couriers/', admin_views.couriers, name='couriers'),
     path('warehouse_users/', admin_views.warehouse_users, name='warehouse_users'),
     path('drop_pick_users/', admin_views.drop_pick_users, name='drop_pick_users'),
     path('admin_history/', admin_views.admin_history, name='admin_history'),

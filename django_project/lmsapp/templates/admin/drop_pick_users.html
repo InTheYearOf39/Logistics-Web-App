@@ -41,10 +41,25 @@
                         <button class="btn btn-transparent p-0" type="button" data-coreui-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                           <i class="icon cil-options"></i>
                         </button>
-                        <div class="dropdown-menu dropdown-menu-end"><a class="dropdown-item" href="{% url 'edit_drop_pick_zone_user' drop_pick_zone_user_id=user.id %}">Edit</a>
+                        <div class="dropdown-menu dropdown-menu-end"><div><a class="dropdown-item" href="{% url 'edit_drop_pick_zone_user' drop_pick_zone_user_id=user.id %}"><button class="btn btn btn-transparent text-info" type="button">Edit</button></a></div>
                           <a class="dropdown-item text-danger" href="#"><button type="button" class="btn btn-sm btn-warning text-white" data-coreui-toggle="modal" data-coreui-target="#staticBackdrop{{ user.id }}">
                             Delete
                           </button></a>
+                        </div>
+                      </div>
+
+
+
+                      <div class="dropdown">
+                        <button class="btn btn-transparent p-0" type="button" data-coreui-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                          <i class="icon cil-options"></i>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-end">
+                          <div class="col"><a class="" href="{% url 'edit_courier' courier.id %}"><button class="btn btn btn-transparent text-info" type="button">Edit</button></a></div>
+                          <div class="col"><a class="" href="#"><button type="button" class="btn btn-transparent text-danger" data-coreui-toggle="modal" data-coreui-target="#staticBackdrop{{ courier.id }}">
+                            Delete
+                            </button></a>
+                          </div>
                         </div>
                       </div>
   
@@ -62,9 +77,9 @@
                             <div class="modal-body">
                               <b> Are you sure you want to delete the user {{ user.name }}?</b>
                           </div>
-                          <div class="d-flex justify-content-center mb-3">
-                            <button type="button" class="btn btn-danger btn-sm text-white" data-coreui-dismiss="modal">Cancel</button>
-                            <button type="submit" class="btn btn-info btn-md text-white">Confirm</button>
+                          <div class="modal-footer">        
+                            <button type="button" class="btn btn-primary btn-sm text-white" data-coreui-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-danger btn-sm text-white">Confirm</button>
                           </div>
                           </div>
                         </div>

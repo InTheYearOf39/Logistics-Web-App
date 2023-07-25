@@ -116,27 +116,13 @@
               </div>
             </div>
 
-            <div class="col-12">
-              <label for="recipientAddress" class="form-label">Recipient Address</label>
-              <input id="recipientAddress" name="recipientAddress" placeholder="Recipient Address" class="form-control" type="text">
+            <div class="col-md-6">
+              <label for="recipientAddress" class="form-label form-label-sm">Recipient Address</label>
+              <input id="recipientAddress" name="recipientAddress" placeholder="Recipient Address" class="form-control form-control-sm" type="text">
               <div class="invalid-feedback">
                 Please enter a valid email address for shipping updates.
               </div>
             </div>
-
-            <!-- Add this new <div> for the recipient drop-off location -->
-              <div class="col-12" id="recipientPickUpLocationContainer">
-                <label for="recipientPickUpLocation" class="form-label">Recipient Drop Off Location</label>
-                <select class="form-control" id="recipientPickUpLocation" name="recipientPickUpLocation" required>
-                  <option value="" selected disabled>-- Select Recipient Drop Off Location --</option>
-                  {% for drop_pick_zone in drop_pick_zones %}
-                    <option value="{{ drop_pick_zone.id }}">{{ drop_pick_zone.name }}</option>
-                  {% endfor %}
-                </select>
-                <div class="invalid-feedback">
-                  Please select a recipient drop-off location.
-                </div>
-              </div>
 
             <div class="col-md-4">
               <label for="recipientIdentification" class="form-label form-label-sm">National ID/Passport</label>
@@ -157,7 +143,26 @@
                 Please select a Gender.
               </div>
             </div>
-       
+
+            <!-- Add this new <div> for the recipient drop-off location -->
+              <div class="col-md-6" id="recipientPickUpLocationContainer">
+                <label for="recipientPickUpLocation" class="form-label form-label-sm">Recipient Pick-up Location</label>
+                <select class="form-control form-control-sm" id="recipientPickUpLocation" name="recipientPickUpLocation" required>
+                  <option value="" selected disabled>-- Select Recipient Pick-up Location --</option>
+                  {% for drop_pick_zone in drop_pick_zones %}
+                    <option value="{{ drop_pick_zone.id }}">{{ drop_pick_zone.name }}</option>
+                  {% endfor %}
+                </select>
+                <div class="invalid-feedback">
+                  Please select a recipient pick-up location.
+                </div>
+              </div>
+
+              <div class="col-md-6" id="deliveryFee">
+                <label for="deliveryFee" class="form-label form-label-sm">Delivery Fee</label>
+                <input id="deliveryFee" name="deliveryFee" placeholder="Enter Recipient Id" class="form-control form-control-sm" type="text" disabled >
+              </div>
+
           </div>
 
 
@@ -301,23 +306,7 @@
 <script>
   // Load after page loads
   $(function() {
-    // Initiate autocomplete for the recipient address field
-    var recipientAutocomplete = new google.maps.places.Autocomplete($("#recipientAddress")[0], {});
-
-    google.maps.event.addListener(recipientAutocomplete, 'place_changed', function() {
-      var place = recipientAutocomplete.getPlace();
-      // Log or process the selected place if needed
-      //set values into the feilds
-      $("#recipient_latitude").val(place.geometry.location.lat());
-      $("#recipient_longitude").val(place.geometry.location.lng());
-
-      console.log("new gps ready");
-      // Call the function when the recipient address input changes
-      populateRecipientLocation() 
-
-
-
-    });
+   
 
     // Initiate autocomplete for the sender's address field
     var senderAutocomplete = new google.maps.places.Autocomplete($("#senderAddress")[0], {});
@@ -333,6 +322,23 @@
       redraw_dropoff_list(place.geometry.location.lat(), place.geometry.location.lng());
 
     });
+
+     // Initiate autocomplete for the recipient address field
+    var recipientAutocomplete = new google.maps.places.Autocomplete($("#recipientAddress")[0], {});
+
+    google.maps.event.addListener(recipientAutocomplete, 'place_changed', function() {
+      var place = recipientAutocomplete.getPlace();
+      // Log or process the selected place if needed
+      //set values into the feilds
+      $("#recipient_latitude").val(place.geometry.location.lat());
+      $("#recipient_longitude").val(place.geometry.location.lng());
+
+      console.log("new gps ready");
+      // Call the function when the recipient address input changes
+      populateRecipientLocation() 
+
+    });
+
   });
 </script>
 

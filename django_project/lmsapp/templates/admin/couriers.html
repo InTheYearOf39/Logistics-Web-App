@@ -1,0 +1,125 @@
+{% extends 'dashboard_base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-md-12">
+          
+          <h5>Couriers</h5>
+          <!-- /.row--><br>          
+          <div class="table-responsive mb-4 bg-white">
+            <table class="table border mb-0">
+              <thead class="table-white fw-semibold">
+                <tr>
+                  <th>Name</th>
+                  <th>Username</th>
+                  <th>Status</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for courier in couriers %}
+                <tr class="align-middle">
+                  <td class="text-start">
+                    <div class="small text-medium-emphasis"><span>{{ courier.name }}</span></div>
+                  </td>
+                  <td class="text-start">
+                    <div class="small text-medium-emphasis"><span>{{ courier.username }}</span></div>
+                  </td>
+                  <td class="text-start">
+                    <div class="small text-medium-emphasis">
+                      <span>
+                        {% if courier.status == 'on-trip' %}
+                          On Trip
+                        {% else %}
+                          Available
+                        {% endif %}
+                      </span>
+                    </div>
+                  </td>
+                 
+                    <td>
+                      <div class="dropdown">
+                        <button class="btn btn-transparent p-0" type="button" data-coreui-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                          <i class="icon cil-options"></i>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-end">
+                          <div class="col"><a class="" href="{% url 'edit_courier' courier.id %}"><button class="btn btn btn-transparent text-info" type="button">Edit</button></a></div>
+                          <div class="col"><a class="" href="#"><button type="button" class="btn btn-transparent text-danger" data-coreui-toggle="modal" data-coreui-target="#staticBackdrop{{ courier.id }}">
+                            Delete
+                            </button></a>
+                          </div>
+                        </div>
+                      </div>
+  
+                  
+                      <form action="{% url 'delete_courier' courier_id=courier.id %}" method="post">
+                        {% csrf_token %}
+                      <!-- Modal -->
+                      <div class="modal fade" id="staticBackdrop{{ courier.id }}" data-coreui-backdrop="static" data-coreui-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                          <div class="modal-content">
+                            <div class="modal-header">
+                              <h5 class="modal-title fw-semibold" id="staticBackdropLabel">Confirm Delete</h5>
+                              <button type="button" class="btn-close" data-coreui-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                              <b>Are you sure you want to delete the courier {{ courier.name }}?</b>
+                          </div>
+
+                          <div class="modal-footer">        
+                            <button type="button" class="btn btn-primary btn-sm text-white" data-coreui-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-danger btn-sm text-white">Confirm</button>
+                          </div>
+
+                          </div>
+                        </div>
+                      </div>
+                    </form>
+                    </td>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                    
+                  
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        
+    </div>
+    <!-- /.col-->
+  </div>
+
+{% endblock %}

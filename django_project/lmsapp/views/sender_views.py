@@ -162,7 +162,7 @@ def get_closest_drop_off(lat, lng):
     closest_drop_pick_zones.sort(key=lambda x: x["distance"])
     closest_drop_pick_zones = closest_drop_pick_zones[:5]
     # dormulate html string for lookups
-    html = """<option value="" selected="" disabled="">-- Select Drop Off --</option>"""
+    html = """<option value="" selected="" disabled="">-- Select Location ⬇️ --</option>"""
     for x in closest_drop_pick_zones:
         html += "<option value='" + str(x["id"]) + "'>" + str(x["name"]) + " (" + str(round(x["distance"], 1)) + " Kms)</option>  "
 

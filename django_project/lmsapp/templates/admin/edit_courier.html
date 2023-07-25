@@ -5,50 +5,48 @@
 
 {% block content %}
 
-
-<div class="container mb-5" style="margin-left: 4rem;">
-  <div class="row justify-content-center ml-5">
+<div class="row"></div>
+<div class="container mb-5">
     <div class="col-md-12">
     <form class="well form-horizontal" action=" " method="post"  id="contact_form">
       {% csrf_token %}
 
       {{ form.errors }}
 
-<fieldset>
 
 <!-- Form Name -->
-<legend class="my-4">EDIT COURIER </legend>
+<h5>Edit Courier </h5>
 
 <!-- Text input-->
 
 <div class="form-group mt-2">
-    <label class="col-md-8 control-label">Full Name</label>  
-    <div class="col-md-8 inputGroupContainer">
+    <label class="col-md-6 control-label control-label-sm">Full Name</label>  
+    <div class="col-md-6 inputGroupContainer">
         <div class="input-group">
             <span class="input-group-text">👤</span>
-            <input name="name" placeholder="Name" class="form-control" type="text" value="{{ courier.name }}">
+            <input name="name" placeholder="Name" class="form-control form-control-sm" type="text" value="{{ courier.name }}">
         </div>
     </div>
 </div>
 
 <!-- Text input -->
 <div class="form-group mt-2">
-    <label class="col-md-8 control-label">Username</label> 
-    <div class="col-md-8 inputGroupContainer">
+    <label class="col-md-6 control-label control-label-sm">Username</label> 
+    <div class="col-md-6 inputGroupContainer">
         <div class="input-group">
             <span class="input-group-text">👤</span>
-            <input name="username" placeholder="Username" class="form-control" type="text" value="{{ courier.username }}">
+            <input name="username" placeholder="Username" class="form-control form-control-sm" type="text" value="{{ courier.username }}">
         </div>
     </div>
 </div>
 
 <!-- Text input -->
 <div class="form-group mt-2"> 
-    <label class="col-md-8 control-label">Contact</label>
-    <div class="col-md-8 inputGroupContainer">
+    <label class="col-md-6 control-label control-label-sm">Contact</label>
+    <div class="col-md-6 inputGroupContainer">
         <div class="input-group">
             <span class="input-group-text">📞</span>
-            <input name="phone" placeholder="Phone number" class="form-control" type="text" value="{{ courier.phone }}">
+            <input name="phone" placeholder="Phone number" class="form-control form-control-sm" type="text" value="{{ courier.phone }}">
         </div>
     </div>
 </div>
@@ -56,14 +54,14 @@
 <!-- Text input -->
   
 <div class="form-group mt-2">
-    <label class="col-md-6 control-label">Address</label>  
-      <div class="col-md-6 inputGroupContainer">
-      <div class="input-group">
-          <span class="input-group-text">📌</span>
-    <input id="address" name="address" placeholder="Address" class="form-control form-control-sm" type="text">
-      </div>
+  <label class="col-md-6 control-label">Address</label>  
+    <div class="col-md-6 inputGroupContainer">
+    <div class="input-group">
+      <span class="input-group-text">📌</span>
+  <input id="address" name="address" placeholder="Address" class="form-control form-control-sm" type="text">
     </div>
-  </div>
+    </div>
+</div>
   
   <input id="latitude" name="latitude" placeholder="latitude" class="form-control" type="text" hidden>
   
@@ -79,13 +77,13 @@
 
 <!-- Button -->
 <div class="form-group mt-2">
-  <label class="col-md-8 control-label"></label>
-  <div class="col-md-8">
-    <button type="submit" class="btn btn-info text-white" >Update <span class="glyphicon glyphicon-send"></span></button>
+  <label class="col-md-6 control-label control-label-sm"></label>
+  <div class="col-md-6">
+    <button type="submit" class="btn btn-primary btn-sm text-white" >Update <span class="glyphicon glyphicon-send"></span></button>
   </div>
 </div>
 
-</fieldset>
+
 </form>
     </div>
   </div>
