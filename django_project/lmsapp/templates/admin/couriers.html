@@ -46,8 +46,8 @@
                           <i class="icon cil-options"></i>
                         </button>
                         <div class="dropdown-menu dropdown-menu-end">
-                          <div class="col"><a class="" href="{% url 'edit_courier' courier.id %}"><button class="btn btn btn-transparent text-info" type="button">Edit</button></a></div>
-                          <div class="col"><a class="" href="#"><button type="button" class="btn btn-transparent text-danger" data-coreui-toggle="modal" data-coreui-target="#staticBackdrop{{ courier.id }}">
+                          <div class="col"><a class="dropdown-item" href="{% url 'edit_courier' courier.id %}"><button class="btn btn btn-transparent text-info" type="button">Edit</button></a></div>
+                          <div class="col"><a class="dropdown-item" href="#"><button type="button" class="btn btn-transparent text-danger" data-coreui-toggle="modal" data-coreui-target="#staticBackdrop{{ courier.id }}">
                             Delete
                             </button></a>
                           </div>
