@@ -369,7 +369,7 @@
         // Check if the API response contains the delivery_fee property
         if ('delivery_fee' in response) {
           // Populate the delivery fee input field with the calculated value
-          document.getElementById("deliveryFeeInput").value = response.delivery_fee.toFixed(2);
+          document.getElementById("deliveryFeeInput").value = (Math.round(response.delivery_fee / 100) * 100).toFixed(2);
         } else {
           console.log("Invalid API response: missing delivery_fee property.");
         }

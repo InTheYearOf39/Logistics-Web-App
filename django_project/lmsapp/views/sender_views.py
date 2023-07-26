@@ -25,20 +25,24 @@ def sender_dashboard(request):
     packages = Package.objects.filter(
         user=request.user
     ).order_by(
-        Case(
-            When(status='upcoming', then=0),
-            When(status='ongoing', then=1),
-            default=2,
-            output_field=IntegerField()
-        ),
-        '-created_at'  # Sort by creation day in descending order
+        # Your existing order_by logic here
     )
 
     greeting_message = get_time_of_day()
+
+    # Count the number of registered packages for the logged-in user
+    num_registered_packages = Package.objects.filter(user=request.user).count()
+
+    # Retrieve the upcoming packages for the logged-in user
+    upcoming_packages = Package.objects.filter(user=request.user, status='upcoming')
+
     context = {
         'greeting_message': greeting_message,
-        'packages': packages
+        'packages': packages,
+        'num_registered_packages': num_registered_packages,
+        'upcoming_packages': upcoming_packages,
     }
+
     return render(request, 'sender/sender_dashboard.html', context)
 
 def generate_package_number():
@@ -46,8 +50,14 @@ def generate_package_number():
     digits = ''.join(random.choices(string.digits, k=5))
     return f'{prefix}{digits}'
 
+# def sender_history(request):
+#     return render(request, 'sender/sender_history.html', {})
+
 def sender_history(request):
-    return render(request, 'sender/sender_history.html', {})
+    # Retrieve the completed packages from the database
+    completed_packages = Package.objects.filter(status='completed')
+
+    return render(request, 'sender/sender_history.html', {'packages': completed_packages})
     
 """  
 Handles the registration of new packages by senders, ensuring the form data is valid 
@@ -214,7 +224,7 @@ def calculate_delivery_fee(request):
         print("Distance (km):", distance_km)
 
         # Calculate the delivery fee (assuming 1000 per kilometer)
-        delivery_fee = distance_km * 1000
+        delivery_fee = distance_km * 500
 
         print("Delivery Fee:", delivery_fee)
 
