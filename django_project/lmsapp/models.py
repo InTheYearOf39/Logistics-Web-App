@@ -104,6 +104,10 @@ class Package(models.Model):
         ('premium', 'Premium'),
         ('express', 'Express'),
     )
+    GENDER_CHOICES = (
+        ('male', 'Male'),
+        ('female', 'Female'),
+    )
 
     PACKAGE_PREFIX = 'pn'
 
@@ -119,11 +123,15 @@ class Package(models.Model):
     recipientEmail = models.CharField(max_length=100)
     recipientTelephone = models.CharField(max_length=100)
     recipientAddress = models.CharField(max_length=200)
+    recipientIdentification = models.CharField(max_length=200)
     sendersAddress = models.CharField(max_length=200)
+    sendersContact = models.CharField(max_length=200)
     sender_latitude = models.FloatField( null=True, blank=True)
     sender_longitude = models.FloatField( null=True, blank=True)
     recipient_latitude = models.FloatField( null=True, blank=True)
     recipient_longitude = models.FloatField( null=True, blank=True)
+    deliveryFee = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    genderType = models.CharField(max_length=20, choices=GENDER_CHOICES, verbose_name='Gender', null=False)
     package_number = models.CharField(max_length=50, unique=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='upcoming')  # default status is 'upcoming'
     created_at = models.DateTimeField(default=timezone.now)
@@ -156,3 +164,9 @@ class Package(models.Model):
 
     def __str__(self):
         return self.packageName
+
+class Notification(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    message = models.TextField()
+    is_read = models.BooleanField(default=False)
+    timestamp = models.DateTimeField(auto_now_add=True)

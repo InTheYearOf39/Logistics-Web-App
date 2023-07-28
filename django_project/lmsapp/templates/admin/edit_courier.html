@@ -1,0 +1,119 @@
+{% extends 'dashboard_base.html' %}
+
+{% load static %}
+
+
+{% block content %}
+
+<div class="row"></div>
+<div class="container mb-5">
+    <div class="col-md-12">
+    <form class="well form-horizontal" action=" " method="post"  id="contact_form">
+      {% csrf_token %}
+
+      {{ form.errors }}
+
+
+<!-- Form Name -->
+<h5>Edit Courier </h5>
+
+<!-- Text input-->
+
+<div class="form-group mt-2">
+    <label class="col-md-6 control-label control-label-sm">Full Name</label>  
+    <div class="col-md-6 inputGroupContainer">
+        <div class="input-group">
+            <span class="input-group-text">👤</span>
+            <input name="name" placeholder="Name" class="form-control form-control-sm" type="text" value="{{ courier.name }}">
+        </div>
+    </div>
+</div>
+
+<!-- Text input -->
+<div class="form-group mt-2">
+    <label class="col-md-6 control-label control-label-sm">Username</label> 
+    <div class="col-md-6 inputGroupContainer">
+        <div class="input-group">
+            <span class="input-group-text">👤</span>
+            <input name="username" placeholder="Username" class="form-control form-control-sm" type="text" value="{{ courier.username }}">
+        </div>
+    </div>
+</div>
+
+<!-- Text input -->
+<div class="form-group mt-2"> 
+    <label class="col-md-6 control-label control-label-sm">Contact</label>
+    <div class="col-md-6 inputGroupContainer">
+        <div class="input-group">
+            <span class="input-group-text">📞</span>
+            <input name="phone" placeholder="Phone number" class="form-control form-control-sm" type="text" value="{{ courier.phone }}">
+        </div>
+    </div>
+</div>
+
+<!-- Text input -->
+  
+<div class="form-group mt-2">
+  <label class="col-md-6 control-label">Address</label>  
+    <div class="col-md-6 inputGroupContainer">
+    <div class="input-group">
+      <span class="input-group-text">📌</span>
+  <input id="address" name="address" placeholder="Address" class="form-control form-control-sm" type="text">
+    </div>
+    </div>
+</div>
+  
+  <input id="latitude" name="latitude" placeholder="latitude" class="form-control" type="text" hidden>
+  
+  <input id="longitude" name="longitude" placeholder="longitude" class="form-control" type="text" hidden>
+
+
+
+<!-- Text input-->
+<!-- Select Basic -->
+
+<!-- Success message -->
+<!-- <div class="alert alert-success" role="alert" id="success_message">Success <i class="glyphicon glyphicon-thumbs-up"></i> Thanks for contacting us, we will get back to you shortly.</div> -->
+
+<!-- Button -->
+<div class="form-group mt-2">
+  <label class="col-md-6 control-label control-label-sm"></label>
+  <div class="col-md-6">
+    <button type="submit" class="btn btn-primary btn-sm text-white" >Update <span class="glyphicon glyphicon-send"></span></button>
+  </div>
+</div>
+
+
+</form>
+    </div>
+  </div>
+</div>
+    <!-- /.container -->
+
+<script>
+      //load after page loads
+      $(function() {
+  // Initialize the autocomplete
+  var addressInput = $("#address")[0];
+  var autocomplete = new google.maps.places.Autocomplete(addressInput, {});
+
+  // Set the current address as the default value in the input field
+  var currentAddress = "{{ courier.address }}";
+  if (currentAddress) {
+    addressInput.value = currentAddress;
+  }
+
+  // Event listener for place_changed
+  google.maps.event.addListener(autocomplete, 'place_changed', function() {
+    var place = autocomplete.getPlace();
+    if (place.geometry) {
+      $("#latitude").val(place.geometry.location.lat());
+      $("#longitude").val(place.geometry.location.lng());
+    }
+  });
+});
+
+    </script>
+
+
+{% endblock %}

@@ -105,10 +105,10 @@ def assign_courier(request, package_id):
 """
 A function to update the status of couriers based on the status of their assigned packages. If a courier has assigned packages,
  their status is determined by the presence of 'ongoing' or 'arrived' packages. If a courier has no assigned packages, 
- their status is set to 'available'. The updated courier objects are saved in the database, and the 'admin/riders.html' 
+ their status is set to 'available'. The updated courier objects are saved in the database, and the 'admin/couriers.html' 
  template is rendered with the couriers queryset as context.
 """
-def riders(request):
+def couriers(request):
     couriers = User.objects.filter(role='courier')  
     
     for courier in couriers:
@@ -128,7 +128,7 @@ def riders(request):
     context = {
         'couriers': couriers
     }
-    return render(request, 'admin/riders.html', context)
+    return render(request, 'admin/couriers.html', context)
 
 def admin_history(request):
     packages = Package.objects.filter(
@@ -268,7 +268,7 @@ def drop_pick_zones(request):
 """
 A function to handle the creation of a courier user through a form 'CourierForm'. 
 The form data is validated, and if valid, a courier user is created, saved to the database
-and the user is redirected to the 'admin/riders.html' page. If the request method is not POST 
+and the user is redirected to the 'admin/couriers.html' page. If the request method is not POST 
 or the form is not valid, the form is displayed to the user for input.
 """
 def create_courier(request):
@@ -277,11 +277,18 @@ def create_courier(request):
         if form.is_valid():
             user = form.save(commit=False)
             user.role = 'courier'
-            # Set default password for the warehouse user
+            # Set default password for the courier user
             user.set_password('courier@courier')
+            
+            # Get the latitude and longitude from the form data
+            latitude = request.POST.get('latitude')
+            longitude = request.POST.get('longitude')
+            user.latitude = latitude
+            user.longitude = longitude
+            
             form.save()
             # Optionally, redirect to a success page
-            return redirect('riders')
+            return redirect('couriers')
     else:
         form = CourierForm()
     return render(request, 'admin/create_courier.html', {'form': form})
@@ -560,3 +567,36 @@ def drop_pick_users(request):
         'drop_pick_users': drop_pick_users
         }
     return render(request, 'admin/drop_pick_users.html', context)
+
+def edit_courier(request, courier_id):
+    courier = get_object_or_404(User, id=courier_id, role='courier')
+
+    if request.method == 'POST':
+        # Get form data
+        name = request.POST.get('name')
+        username = request.POST.get('username')
+        phone = request.POST.get('phone')
+        address = request.POST.get('address')
+
+        # Update the courier details
+        courier.name = name
+        courier.username = username
+        courier.phone = phone
+        courier.address = address
+        courier.save()
+
+        return redirect('couriers')  
+
+    context = {
+        'courier': courier,
+    }
+    return render(request, 'admin/edit_courier.html', context)
+
+def delete_courier(request, courier_id):
+    courier = get_object_or_404(User, id=courier_id, role='courier')
+
+    if request.method == 'POST':
+        courier.delete()
+        return redirect('couriers')
+
+    return redirect('couriers')

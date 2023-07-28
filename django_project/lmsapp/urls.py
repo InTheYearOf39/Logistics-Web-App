@@ -49,7 +49,7 @@ urlpatterns = [
     # admin routes
     path('admin_dashboard/', admin_views.admin, name='admin_dashboard'),
     path('users/', admin_views.users, name='users'),
-    path('riders/', admin_views.riders, name='riders'),
+    path('couriers/', admin_views.couriers, name='couriers'),
     path('warehouse_users/', admin_views.warehouse_users, name='warehouse_users'),
     path('drop_pick_users/', admin_views.drop_pick_users, name='drop_pick_users'),
     path('admin_history/', admin_views.admin_history, name='admin_history'),
@@ -61,6 +61,8 @@ urlpatterns = [
     path('create_drop_pick/', admin_views.create_drop_pick, name='create_drop_pick'),
     path('create_drop_pick_user/', admin_views.create_drop_pick_user, name='create_drop_pick_user'),
     path('create_courier/', admin_views.create_courier, name='create_courier'),
+    path('edit_courier/<int:courier_id>/', admin_views.edit_courier, name='edit_courier'),
+    path('delete_courier/<int:courier_id>/', admin_views.delete_courier, name='delete_courier'),
     path('warehouses/', admin_views.warehouses, name='warehouses'),
     path('edit_warehouse/<int:warehouse_id>/', admin_views.edit_warehouse, name='edit_warehouse'),
     path('delete_warehouse/<int:warehouse_id>/', admin_views.delete_warehouse, name='delete_warehouse'),
@@ -80,6 +82,8 @@ urlpatterns = [
     path('register_package/', sender_views.register_package, name='register_package'),
     path('api/', sender_views.api, name='api'),
     path('sender_history/', sender_views.sender_history, name='sender_history'),
+    path('api/calculate_delivery_fee/', sender_views.calculate_delivery_fee, name='calculate_delivery_fee'),
+    
 
 
     # courier routes
