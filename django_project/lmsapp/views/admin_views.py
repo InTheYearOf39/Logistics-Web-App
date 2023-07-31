@@ -1,3 +1,7 @@
+import calendar
+from datetime import timedelta
+from django.utils import timezone
+from django.db.models import Count
 from django.shortcuts import render, redirect, redirect, get_object_or_404
 from django.db.models import Q, Case, When, IntegerField, Count
 from lmsapp.utils import get_time_of_day
@@ -10,6 +14,7 @@ from lmsapp.forms import CourierForm
 from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
 from django.views.decorators.clickjacking import xframe_options_exempt
+from django.db.models.functions import ExtractDay, ExtractHour, ExtractMonth
 
 User = get_user_model()
 
@@ -600,3 +605,115 @@ def delete_courier(request, courier_id):
         return redirect('couriers')
 
     return redirect('couriers')
+
+def package_reports(request):
+    delivered_packages = Package.objects.filter(status='completed')
+    ready_packages = Package.objects.filter(status='ready_for_pickup')
+    # Get the datetime for the start of the current day
+    current_day_start = timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
+
+    hourly_totals = Package.objects.filter(
+        status__in=['ready_for_pickup'],
+        received_at__gte=current_day_start
+    ).annotate(hour=ExtractHour('received_at')).values('hour').annotate(total=Count('id')).order_by('hour')
+
+    # Initialize an array to hold the data for each hour of the day
+    chart_data = [0] * 24
+
+    for total in hourly_totals:
+        hour = total['hour']
+        chart_data[hour] = total['total']
+
+    # Get the number of days in the current month
+    current_month = timezone.now().month
+    days_in_month = calendar.monthrange(timezone.now().year, current_month)[1]
+
+    # Get the datetime for the start of the current month
+    current_month_start = timezone.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+
+    daily_totals = Package.objects.filter(
+        status__in=['completed'],
+        completed_at__gte=current_month_start
+    ).annotate(day=ExtractDay('completed_at')).values('day').annotate(total=Count('id')).order_by('day')
+
+    # Initialize an array to hold the data for each day of the month
+    chart_data_month = [0] * days_in_month
+
+    for total in daily_totals:
+        day = total['day'] - 1  # Adjust the day to match array indices (start from 0)
+        chart_data_month[day] = total['total']
+
+    # Get the datetime for the start of the current year
+    current_year_start = timezone.now().replace(month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
+
+    monthly_totals = Package.objects.filter(
+        status__in=['completed'],
+        completed_at__gte=current_year_start
+    ).annotate(month=ExtractMonth('completed_at')).values('month').annotate(total=Count('id')).order_by('month')
+
+    # Initialize an array to hold the data for each month of the year
+    chart_data_year = [0] * 12
+
+    for total in monthly_totals:
+        month = total['month'] - 1  # Adjust the month to match array indices (start from 0)
+        chart_data_year[month] = total['total']
+
+    # Get the year for the current year
+    current_year = timezone.now().year
+    month_name = current_month_start.strftime('%B')
+
+    context = {
+        'delivered_packages': delivered_packages,
+        'ready_packages': ready_packages,
+        'month_name': month_name,
+        'chart_data_packages': {
+            "chart_type": "bar",
+            "x_values": list(range(24)),  # Hours of the day (0 to 23)
+            "datasets": [
+                {
+                    "label": "packages received per hour",
+                    "data": chart_data,  # Use the dynamic data here
+                    "backgroundColor": 'red',
+                    "borderColor": 'red',
+                    "borderWidth": 1,
+                }
+            ],
+            "chart_title": 'Packages Per Hour',
+            "x_title": 'Hour of the Day',
+            "y_title": 'Packages'
+        },
+        'chart_data_month_packages': {
+            "chart_type": "bar",
+            "x_values": [day for day in range(1, days_in_month + 1)],  # Days of the month (1 to last day)
+            "datasets": [
+                {
+                    "label": f"packages delivered in {month_name}",
+                    "data": chart_data_month,  # Use the dynamic data here
+                    "backgroundColor": 'blue',
+                    "borderColor": 'blue',
+                    "borderWidth": 1,
+                }
+            ],
+            "chart_title": f"Packages Per Day in {current_month}",
+            "x_title": 'Day of the Month',
+            "y_title": 'Packages'
+        },
+        'chart_data_year_packages': {
+            "chart_type": "bar",
+            "x_values": [month for month in range(1, 13)],  # Months of the year (1 to 12)
+            "datasets": [
+                {
+                    "label": f"packages delivered in {current_year}",
+                    "data": chart_data_year,  # Use the dynamic data here
+                    "backgroundColor": 'green',
+                    "borderColor": 'green',
+                    "borderWidth": 1,
+                }
+            ],
+            "chart_title": f'Packages Per Month in {current_year}',
+            "x_title": 'Month of the Year',
+            "y_title": 'Packages'
+        }
+    }
+
+    return render (request, 'admin/package_reports.html', context)

@@ -1,0 +1,188 @@
+{% extends 'dashboard_base.html' %} {% block content %} {% load static %}
+
+<script src="{% static 'js/dist/chart.min.js' %}"></script>
+
+<div class="card mb-4">
+  <div class="card-body">
+    <div class="d-flex justify-content-between">
+      <div>
+        <h4 class="card-title mb-0">Packages(Received for pick-up per hour)</h4>
+      </div>
+    </div>
+    <div class="c-chart-wrapper" style="height: 300px; margin-top: 40px">
+      <canvas id="myChart" height="300"></canvas>
+    </div>
+  </div>
+</div>
+<div class="card mb-4">
+  <div class="card-body">
+    <div class="d-flex justify-content-between">
+      <div>
+        <h4 class="card-title mb-0">Packages Delivered Monthly</h4>
+        <div class="small text-medium-emphasis">{{ month_name }}</div>
+      </div>
+    </div>
+    <div class="c-chart-wrapper" style="height: 300px; margin-top: 40px">
+      <canvas id="myMonthChart" height="300"></canvas>
+    </div>
+  </div>
+</div>
+<div class="card mb-4">
+  <div class="card-body">
+    <div class="d-flex justify-content-between">
+      <div>
+        <h4 class="card-title mb-0">Packages Delivered Yearly</h4>
+        <div class="small text-medium-emphasis">{{ current_year }}</div>
+      </div>
+    </div>
+    <div class="c-chart-wrapper" style="height: 300px; margin-top: 40px">
+      <canvas id="myYearChart" height="300"></canvas>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-12">
+    <div class="d-flex justify-content-between">
+      <div>
+        <h4>Packages Delivered</h4>
+      </div>
+    </div> 
+    <!-- /.row--><br />
+    <div class="table-responsive mb-4 bg-white">
+      <table class="table border mb-0">
+        <thead class="table-white fw-semibold">
+          <tr>
+            <th>No</th>
+            <th>Package</th>
+            <th>Recipient</th>
+            <th>From</th>
+            <th>To</th>
+            <th>Package No</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for package in delivered_packages %}
+          <tr class="align-middle">
+            <td class="text-start">
+              <div class="small text-medium-emphasis">
+                <span>{{ forloop.counter }}</span>
+              </div>
+            </td>
+            <td class="text-start">
+              <div class="small text-medium-emphasis">
+                <span>{{ package.packageName }}</span>
+              </div>
+            </td>
+            <td class="text-start">
+              <div class="small text-medium-emphasis">
+                <span>{{ package.recipientName }}</span>
+              </div>
+            </td>
+            <td class="text-start">
+              <div class="small text-medium-emphasis">
+                <span>{{ package.sendersAddress }}</span>
+              </div>
+            </td>
+            <td class="text-start">
+              <div class="small text-medium-emphasis">
+                <span>{{ package.recipientAddress }}</span>
+              </div>
+            </td>
+            <td class="text-start">
+              <div class="small text-medium-emphasis">
+                <span>{{ package.package_number }}</span>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-12">
+    <div class="d-flex justify-content-between">
+      <div>
+        <h4>Packages Received</h4>
+      </div>
+    </div>
+    <!-- /.row--><br />
+    <div class="table-responsive mb-4 bg-white">
+      <table class="table border mb-0">
+        <thead class="table-white fw-semibold">
+          <tr>
+            <th>No</th>
+            <th>Package</th>
+            <th>Recipient</th>
+            <th>From</th>
+            <th>To</th>
+            <th>Package No</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for package in ready_packages %}
+          <tr class="align-middle">
+            <td class="text-start">
+              <div class="small text-medium-emphasis">
+                <span>{{ forloop.counter }}</span>
+              </div>
+            </td>
+            <td class="text-start">
+              <div class="small text-medium-emphasis">
+                <span>{{ package.packageName }}</span>
+              </div>
+            </td>
+            <td class="text-start">
+              <div class="small text-medium-emphasis">
+                <span>{{ package.recipientName }}</span>
+              </div>
+            </td>
+            <td class="text-start">
+              <div class="small text-medium-emphasis">
+                <span>{{ package.sendersAddress }}</span>
+              </div>
+            </td>
+            <td class="text-start">
+              <div class="small text-medium-emphasis">
+                <span>{{ package.recipientAddress }}</span>
+              </div>
+            </td>
+            <td class="text-start">
+              <div class="small text-medium-emphasis">
+                <span>{{ package.package_number }}</span>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+  <script>
+    function plotCharts() {
+        var mydata = {{ chart_data_packages|safe }};
+        draw_chartjs_chart(
+            mydata.chart_type, "myChart", mydata.x_values, mydata.datasets,
+            mydata.chart_title, mydata.x_title, mydata.y_title
+        );
+        var myMonthData = {{ chart_data_month_packages|safe }};
+        draw_chartjs_chart(
+            myMonthData.chart_type, "myMonthChart", myMonthData.x_values, myMonthData.datasets,
+            myMonthData.chart_title, myMonthData.x_title, myMonthData.y_title
+        );
+
+        var myYearData = {{ chart_data_year_packages|safe }};
+        draw_chartjs_chart(
+          myYearData.chart_type, "myYearChart", myYearData.x_values, myYearData.datasets,
+          myYearData.chart_title, myYearData.x_title, myYearData.y_title
+        );
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+        plotCharts();
+    });
+  </script>
+  {% endblock %}
+</div>

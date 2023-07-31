@@ -74,7 +74,7 @@ urlpatterns = [
     # path('edit_drop_pick_zones/<int:drop_pick_zone_id>/', views.edit_drop_pick_zones, name='edit_drop_pick_zones'),
     path('edit_drop_pick_zone_user/<int:drop_pick_zone_user_id>/', admin_views.edit_drop_pick_zone_user, name='edit_drop_pick_zone_user'),
     path('delete_drop_pick_zone_user/<int:drop_pick_zone_user_id>/', admin_views.delete_drop_pick_zone_user, name='delete_drop_pick_zone_user'),
-
+    path('package_reports/', admin_views.package_reports, name='package_reports'),
 
 
     # sender routes

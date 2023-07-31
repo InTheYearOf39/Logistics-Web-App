@@ -135,6 +135,8 @@ class Package(models.Model):
     package_number = models.CharField(max_length=50, unique=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='upcoming')  # default status is 'upcoming'
     created_at = models.DateTimeField(default=timezone.now)
+    received_at = models.DateTimeField(null=True, blank=True)
+    completed_at = models.DateTimeField(null=True, blank=True)
     assigned_at = models.DateTimeField(default=timezone.now)
     otp = models.CharField(max_length=6, null=True, blank=True)
 
