@@ -233,3 +233,56 @@ def calculate_delivery_fee(request):
 
     return JsonResponse({'error': 'Invalid request method.'}, status=400)
 
+@login_required
+@xframe_options_exempt
+def add_package(request):
+    # import json
+    from django.core.serializers.json import DjangoJSONEncoder
+    api_key = settings.API_KEY
+    drop_pick_zones = DropPickZone.objects.all().values()  # Retrieve users with the role of 'drop_pick_zone'
+
+    if request.method == 'POST':
+        form = PackageForm(request.POST)
+        if form.is_valid():
+            package = form.save(commit=False)
+            package.user = request.user
+            package.package_number = generate_package_number()
+            
+            sender_longitude = request.POST.get('sender_longitude') 
+            sender_latitude = request.POST.get('sender_latitude')
+
+            recipient_longitude = request.POST.get('recipient_longitude') 
+            recipient_latitude = request.POST.get('recipient_latitude')
+
+            package.recipient_latitude = recipient_latitude
+            package.recipient_longitude = recipient_longitude
+            package.sender_latitude = sender_latitude
+            package.sender_longitude = sender_longitude
+            
+            # Check if the selected courier is already assigned to a package
+            courier = package.courier
+            if courier and courier.assigned_packages.exists():
+                messages.error(request, 'Selected courier is already assigned to a package.')
+                return redirect('register_package')
+            
+            package.status = 'upcoming'
+            # Save the additional fields to the package object
+            package.recipientIdentification = form.cleaned_data['recipientIdentification']
+            package.genderType = form.cleaned_data['genderType']
+            package.save()
+
+            return redirect('sender_dashboard')
+        else:
+            error_message = 'Error processing your request'
+    else:
+        form = PackageForm()
+        error_message = None
+    
+    context = {
+        'form': form, 
+        'error_message': error_message, 
+        'drop_pick_zones': drop_pick_zones, 
+        'api_key': api_key
+    }
+
+    return render(request, 'sender/add_package.html', context)
