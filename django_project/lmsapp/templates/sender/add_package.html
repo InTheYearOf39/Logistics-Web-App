@@ -59,6 +59,32 @@
                 </div>
               </div>
 
+              <div class="form-group col-md-3">
+                <label for="deliveryType" class="form-label form-label-sm">Delivery Type</label>
+                <select class="form-select form-select-sm" id="deliveryType" name="deliveryType" required>
+                  <option value=""> -- Select Delivery Type -- </option>
+                  <option value="standard">Standard</option>
+                  <option value="premium">Premium</option>
+                  <option value="express">Express</option>
+                </select>
+                <div class="invalid-feedback">
+                  Please select a delivery type.
+                </div>
+              </div>
+
+              <div class="col-md-9" id="dropOffLocationContainer">
+                <label for="dropOffLocation" class="form-label form-label-sm">Drop Off Location</label>
+                <select class="form-control form-control-sm" id="dropOffLocation" name="dropOffLocation" required>
+                  <option value="" selected disabled>-- Select Drop Off Location --</option>
+                  {% for drop_pick_zone in drop_pick_zones %}
+                    <option value="{{ drop_pick_zone.id }}">{{ drop_pick_zone.name }}</option>
+                  {% endfor %}
+                </select>
+                <div class="invalid-feedback">
+                  Please select a delivery location.
+                </div>              
+              </div>
+
             </div>
 
 
@@ -165,19 +191,29 @@
   </div>
 
   <script>
+document.addEventListener("DOMContentLoaded", function() {
     const deliveryTypeSelect = document.getElementById("deliveryType");
-    const dropOffLocationContainer = document.getElementById("dropOffLocationContainer");
-  
-    deliveryTypeSelect.addEventListener("change", function() {
-      if (this.value === "standard") {
-        dropOffLocationContainer.style.display = "block";
-      } else {
-        dropOffLocationContainer.style.display = "none";
-      }
-    });
-  </script>
-  
+    const dropOffLocationInput = document.getElementById("dropOffLocation");
+    const recipientPickUpLocationInput = document.getElementById("recipientPickUpLocation");
 
+    dropOffLocationInput.disabled = true;
+    recipientPickUpLocationInput.disabled = true;
+
+    deliveryTypeSelect.addEventListener("change", function() {
+        if (this.value === "standard") {
+            dropOffLocationInput.disabled = false; 
+            recipientPickUpLocationInput.disabled = false; 
+        } else {
+            dropOffLocationInput.disabled = true; 
+            recipientPickUpLocationInput.disabled = true;
+        }
+    });
+});
+
+
+</script>
+
+  
   <script>
     
   function getGPS() {

@@ -64,7 +64,7 @@
                 </div>
               </div>
 
-              <div class="col-md-9" id="dropOffLocationContainer" style="display: none;">
+              <div class="col-md-9" id="dropOffLocationContainer">
                 <label for="dropOffLocation" class="form-label form-label-sm">Drop Off Location</label>
                 <select class="form-control form-control-sm" id="dropOffLocation" name="dropOffLocation" required>
                   <option value="" selected disabled>-- Select Drop Off Location --</option>
@@ -183,16 +183,24 @@
   </div>
 
   <script>
+    document.addEventListener("DOMContentLoaded", function() {
     const deliveryTypeSelect = document.getElementById("deliveryType");
-    const dropOffLocationContainer = document.getElementById("dropOffLocationContainer");
-  
+    const dropOffLocationInput = document.getElementById("dropOffLocation");
+    const recipientPickUpLocationInput = document.getElementById("recipientPickUpLocation");
+
+    dropOffLocationInput.disabled = true;
+    recipientPickUpLocationInput.disabled = true;
+
     deliveryTypeSelect.addEventListener("change", function() {
-      if (this.value === "standard") {
-        dropOffLocationContainer.style.display = "block";
-      } else {
-        dropOffLocationContainer.style.display = "none";
-      }
+        if (this.value === "standard") {
+            dropOffLocationInput.disabled = false; 
+            recipientPickUpLocationInput.disabled = false; 
+        } else {
+            dropOffLocationInput.disabled = true; 
+            recipientPickUpLocationInput.disabled = true;
+        }
     });
+});
   </script>
   
 
