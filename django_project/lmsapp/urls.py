@@ -74,7 +74,8 @@ urlpatterns = [
     # path('edit_drop_pick_zones/<int:drop_pick_zone_id>/', views.edit_drop_pick_zones, name='edit_drop_pick_zones'),
     path('edit_drop_pick_zone_user/<int:drop_pick_zone_user_id>/', admin_views.edit_drop_pick_zone_user, name='edit_drop_pick_zone_user'),
     path('delete_drop_pick_zone_user/<int:drop_pick_zone_user_id>/', admin_views.delete_drop_pick_zone_user, name='delete_drop_pick_zone_user'),
-
+    path('package_reports/', admin_views.package_reports, name='package_reports'),
+    path('user_reports/', admin_views.user_reports, name='user_reports'),
 
 
     # sender routes
@@ -82,6 +83,8 @@ urlpatterns = [
     path('register_package/', sender_views.register_package, name='register_package'),
     path('api/', sender_views.api, name='api'),
     path('sender_history/', sender_views.sender_history, name='sender_history'),
+    path('api/calculate_delivery_fee/', sender_views.calculate_delivery_fee, name='calculate_delivery_fee'),
+    
 
 
     # courier routes

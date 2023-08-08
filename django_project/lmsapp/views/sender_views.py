@@ -12,6 +12,9 @@ from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 import math
+import json
+from django.core.serializers.json import DjangoJSONEncoder
+from django.http import JsonResponse
 
 """
 Renders out a sender dashboard template and shows packages with the statuses 
@@ -22,23 +25,40 @@ def sender_dashboard(request):
     packages = Package.objects.filter(
         user=request.user
     ).order_by(
-        Case(
-            When(status='upcoming', then=0),
-            When(status='ongoing', then=1),
-            default=2,
-            output_field=IntegerField()
-        ),
-        '-created_at'  # Sort by creation day in descending order
+        # Your existing order_by logic here
     )
 
     greeting_message = get_time_of_day()
+
+    # Count the number of registered packages for the logged-in user
+    num_registered_packages = Package.objects.filter(user=request.user).count()
+
+    # Retrieve the upcoming packages for the logged-in user
+    upcoming_packages = Package.objects.filter(user=request.user, status='upcoming')
+
     context = {
         'greeting_message': greeting_message,
-        'packages': packages
+        'packages': packages,
+        'num_registered_packages': num_registered_packages,
+        'upcoming_packages': upcoming_packages,
     }
+
     return render(request, 'sender/sender_dashboard.html', context)
 
+def generate_package_number():
+    prefix = 'pn'
+    digits = ''.join(random.choices(string.digits, k=5))
+    return f'{prefix}{digits}'
 
+# def sender_history(request):
+#     return render(request, 'sender/sender_history.html', {})
+
+def sender_history(request):
+    # Retrieve the completed packages from the database
+    completed_packages = Package.objects.filter(status='completed')
+
+    return render(request, 'sender/sender_history.html', {'packages': completed_packages})
+    
 """  
 Handles the registration of new packages by senders, ensuring the form data is valid 
 and saving the package to the database with the appropriate details.
@@ -98,13 +118,6 @@ def register_package(request):
 
     return render(request, 'sender/register_package.html', context)
 
-def generate_package_number():
-    prefix = 'pn'
-    digits = ''.join(random.choices(string.digits, k=5))
-    return f'{prefix}{digits}'
-
-def sender_history(request):
-    return render(request, 'sender/sender_history.html', {})
 
 @xframe_options_exempt
 @csrf_exempt
@@ -134,6 +147,7 @@ def api(request):
             response["error"] = False
             response["error_msg"] = "completed successfully "
             response["data"] = get_closest_drop_off(params.get("lat"), params.get("lng"))
+    
     elif params.get("action","") == "print home":
         response["error"] = False
         response["error_msg"] = "completed successfully "
@@ -186,3 +200,36 @@ def calculate_distance(lat1, lon1, lat2, lon2):
     distance = 6371 * c  # Radius of the Earth in kilometers
 
     return distance
+
+@csrf_exempt
+def calculate_delivery_fee(request):
+    if request.method == 'POST':
+        params = dict(request.POST.items())
+        print("params")
+        print(params)
+        # Retrieve the coordinates from the POST data
+        sender_latitude = float(params.get('sender_latitude', 0))
+        sender_longitude = float(request.POST.get('sender_longitude', 0))
+        recipient_latitude = float(request.POST.get('recipient_latitude', 0))
+        recipient_longitude = float(request.POST.get('recipient_longitude', 0))
+
+        print("Sender Latitude:", sender_latitude)
+        print("Sender Longitude:", sender_longitude)
+        print("Recipient Latitude:", recipient_latitude)
+        print("Recipient Longitude:", recipient_longitude)
+
+        # Calculate the distance between sender and recipient coordinates (you can reuse your existing calculate_distance function)
+        distance_km = calculate_distance(sender_latitude, sender_longitude, recipient_latitude, recipient_longitude)
+
+        print("Distance (km):", distance_km)
+
+        # Calculate the delivery fee (assuming 1000 per kilometer)
+        delivery_fee = distance_km * 500
+
+        print("Delivery Fee:", delivery_fee)
+
+        # Return the calculated delivery fee as a JSON response
+        return JsonResponse({'delivery_fee': delivery_fee})
+
+    return JsonResponse({'error': 'Invalid request method.'}, status=400)
+

@@ -10,14 +10,14 @@
         <div>
           <!-- <h4 class="">Add Package</h4> -->
           
-          <form class="needs-validation" novalidate action="{% url 'register_package' %}" method="post" id="packageForm" onsubmit="populateLocation()">
+          <form class="needs-validation" novalidate action="{% url 'register_package' %}" method="post" id="packageForm">
             {% csrf_token %}
             <div class="row g-3 mb-3">
               
 
               <div class="col-md-4">
                 <label for="sendersAddress" class="form-label form-label-sm"> Sender's Address</label>
-                <input id="senderAddress" name="sendersAddress" placeholder="Sender's Address" class="form-control form-control-sm" type="text">
+                <input id="senderAddress" name="sendersAddress" placeholder="Sender's Address" class="form-control form-control-sm" type="text" onkeyup="calculateDeliveryFee()">
                 <div class="invalid-feedback">
                   Please enter your shipping address.
                 </div>
@@ -118,7 +118,7 @@
 
             <div class="col-md-6">
               <label for="recipientAddress" class="form-label form-label-sm">Recipient Address</label>
-              <input id="recipientAddress" name="recipientAddress" placeholder="Recipient Address" class="form-control form-control-sm" type="text">
+              <input id="recipientAddress" name="recipientAddress" placeholder="Recipient Address" class="form-control form-control-sm" type="text" onkeyup="calculateDeliveryFee()">
               <div class="invalid-feedback">
                 Please enter a valid email address for shipping updates.
               </div>
@@ -160,8 +160,8 @@
 
               <div class="col-md-6" id="deliveryFee">
                 <label for="deliveryFee" class="form-label form-label-sm">Delivery Fee</label>
-                <input id="deliveryFee" name="deliveryFee" placeholder="" class="form-control form-control-sm" type="text" disabled >
-              </div>
+                <input id="deliveryFeeInput" name="deliveryFee" placeholder="Delivery Fee" class="form-control form-control-sm" type="text">
+              </div>           
 
           </div>
 
@@ -198,7 +198,7 @@
 
   <script>
     
-    function getGPS() {
+  function getGPS() {
     // pick the location
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(function (position) {
@@ -208,6 +208,9 @@
         const sender_longitude = position.coords.longitude;
         document.getElementById("sender_latitude").value = sender_latitude;
         document.getElementById("sender_longitude").value = sender_longitude;
+
+        console.log("Sender Latitude:", sender_latitude);
+        console.log("Sender Longitude:", sender_longitude);
 
         //get human readable name for current GPS location
         //get cordinates
@@ -242,6 +245,7 @@
       console.log("Device does not support geolocation!");
       alert("Device does not support geolocation!");
     }
+    
   }
 
   //get drop lits in javacsript
@@ -272,6 +276,9 @@
     const recipientLongitudeInput = document.getElementById("recipient_longitude");
     const recipientPickUpLocationContainer = document.getElementById("recipientPickUpLocationContainer");
 
+    console.log("Recipient Latitude:", recipient_latitude);
+    console.log("Recipient Longitude:", recipient_longitude);
+
     if (recipientAddressInput.value !== "") {
       // Perform actions to populate recipient drop-off locations based on the recipient's address
       const recipient_latitude = recipientLatitudeInput.value;
@@ -281,6 +288,7 @@
     } else {
       recipientPickUpLocationContainer.style.display = "none";
     }
+    
   }
 
   
@@ -320,6 +328,7 @@
 
       // get new droplist
       redraw_dropoff_list(place.geometry.location.lat(), place.geometry.location.lng());
+      calculateDeliveryFee();
 
     });
 
@@ -335,11 +344,46 @@
 
       console.log("new gps ready");
       // Call the function when the recipient address input changes
-      populateRecipientLocation() 
+      populateRecipientLocation();
+      calculateDeliveryFee();
 
     });
 
   });
 </script>
+
+<script>
+  function calculateDeliveryFee() {
+  const sender_latitude = document.getElementById("sender_latitude").value;
+  const sender_longitude = document.getElementById("sender_longitude").value;
+  const recipient_latitude = document.getElementById("recipient_latitude").value;
+  const recipient_longitude = document.getElementById("recipient_longitude").value;
+
+  if (senderAddress && recipientAddress) {
+    // Perform AJAX request with sender and recipient addresses
+    $.ajax({
+      type: "POST",
+      url: "/api/calculate_delivery_fee/",
+      data: { sender_latitude: sender_latitude, sender_longitude: sender_longitude, recipient_latitude:recipient_latitude, recipient_longitude:recipient_longitude},
+      success: function (response) {
+        // Check if the API response contains the delivery_fee property
+        if ('delivery_fee' in response) {
+          // Populate the delivery fee input field with the calculated value
+          document.getElementById("deliveryFeeInput").value = (Math.round(response.delivery_fee / 100) * 100).toFixed(2);
+        } else {
+          console.log("Invalid API response: missing delivery_fee property.");
+        }
+      },
+      error: function (xhr, status, error) {
+        console.log("API error:", error); // Handle the error if necessary
+      },
+    });
+  }
+}
+
+
+</script>
+
+
 
 {% endblock %}

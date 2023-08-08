@@ -76,7 +76,9 @@
                                         <img src="{% static 'img/Arrived.png' %}" alt="" width="498px" height="498px">
                                       </div>
                                     {% elif package.status == 'completed' %}
-                                      <img src="{% static 'img/success.png' %}" alt="" width="498px" height="498px">
+                                    <div class="d-flex align-items-center justify-content-center">
+                                      <img src="{% static 'img/Complete.png' %}" alt="" width="498px" height="498px">
+                                    </div>
                                     {% endif %}
                             </div>
                           </div>
