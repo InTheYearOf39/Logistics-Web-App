@@ -81,7 +81,6 @@ urlpatterns = [
     # sender routes
     path('sender_dashboard/', sender_views.sender_dashboard, name='sender_dashboard'),
     path('register_package/', sender_views.register_package, name='register_package'),
-    path('add_package/', sender_views.add_package, name='add_package'),
     path('api/', sender_views.api, name='api'),
     path('sender_history/', sender_views.sender_history, name='sender_history'),
     path('api/calculate_delivery_fee/', sender_views.calculate_delivery_fee, name='calculate_delivery_fee'),
@@ -117,5 +116,7 @@ urlpatterns = [
     path('confirm_recipient_pickup/<int:package_id>/', drop_pick_zone_views.confirm_recipient_pickup, name='confirm_recipient_pickup'),
     # path('delivery_courier/<int:package_id>/', drop_pick_zone_views.delivery_courier, name='delivery_courier'),
     path('confirm_pickedup/<int:package_id>/', drop_pick_zone_views.confirm_pickedup, name='confirm_pickedup'),
+    path('add_package/', drop_pick_zone_views.add_package, name='add_package'),
+    path('calculate_distances/', drop_pick_zone_views.calculate_distances, name='calculate_distances'),
     
 ]
