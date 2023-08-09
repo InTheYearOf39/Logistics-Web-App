@@ -308,7 +308,7 @@ def add_package_droppick(request):
     # Get the drop_pick_zones data to populate the recipientPickUpLocation dropdown
     drop_pick_zones = DropPickZone.objects.all()  # Adjust this based on your model
     context = {'form': form, 'drop_pick_zones': drop_pick_zones, 'user_drop_pick_zone': user_drop_pick_zone}
-    return render(request, 'sender/add_package.html', context)
+    return render(request, 'drop_pick_zone/add_package.html', context)
 
 
 
