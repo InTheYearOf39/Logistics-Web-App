@@ -14,6 +14,7 @@ from django.views.decorators.clickjacking import xframe_options_exempt
 from django.contrib.auth.decorators import user_passes_test
 import random
 import string
+from datetime import datetime, timedelta
 
 
 """  
@@ -305,3 +306,34 @@ def add_package(request):
     warehouse = Warehouse.objects.all()  # Adjust this based on your model
     context = {'form': form, 'warehouse': warehouse, 'user_warehouse': user_warehouse}
     return render(request, 'warehouse/add_package.html', context)
+
+def warehouse_reports(request):
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+
+    packages_delivered = Package.objects.filter(status='completed')
+    packages_ready = Package.objects.filter(status='ready_for_pickup')
+    
+    if start_date and end_date:
+        start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
+        end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
+        
+        # Ensure that start_date is always before end_date
+        if start_date > end_date:
+            start_date, end_date = end_date, start_date
+        
+        # Adjust end_date to be inclusive of the entire day
+        end_date += timedelta(days=1)
+        
+        packages_delivered = packages_delivered.filter(completed_at__range=(start_date, end_date))
+    elif start_date:
+        start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
+        packages_delivered = packages_delivered.filter(completed_at__date=start_date)
+        
+    
+    context = {
+        'packages_delivered': packages_delivered,
+        'packages_ready': packages_ready,
+    }
+    
+    return render(request, 'warehouse/warehouse_reports.html', context )
