@@ -4,12 +4,16 @@ from django.shortcuts import render, redirect, redirect, get_object_or_404
 from lmsapp.models import Package, User,DropPickZone, Warehouse
 from django.contrib import messages
 from django.shortcuts import render, redirect
-from lmsapp.forms import ChangePasswordForm
+from lmsapp.forms import ChangePasswordForm, PackageForm
 from django.contrib.auth import update_session_auth_hash
 from django.shortcuts import redirect, get_object_or_404
 from django.contrib import messages
 from django.core.mail import send_mail
 from django.conf import settings
+from django.views.decorators.clickjacking import xframe_options_exempt
+from django.contrib.auth.decorators import user_passes_test
+import random
+import string
 
 
 """  
@@ -254,3 +258,50 @@ def new_arrivals(request):
         'arrived_packages': arrived_packages,
     }
     return render(request, 'warehouse/new_arrivals.html', context)
+
+def generate_package_number():
+    prefix = 'pn'
+    digits = ''.join(random.choices(string.digits, k=5))
+    return f'{prefix}{digits}'
+
+def is_warehouse_user(user):
+    return user.role == 'warehouse'
+
+@login_required
+@xframe_options_exempt 
+@user_passes_test(is_warehouse_user)
+def add_package(request):
+    if request.method == 'POST':
+        form = PackageForm(request.POST)
+
+        if form.is_valid():
+            package = form.save(commit=False)
+            package.user = request.user
+            package.package_number = generate_package_number()
+
+            # Automatically set the warehouse to the one the user belongs to
+            user_warehouse = request.user.warehouse
+            if user_warehouse:
+                package.warehouse = user_warehouse
+            else:
+                # Handle the case where the user does not have a drop_pick_zone
+                pass
+
+            recipient_latitude = request.POST.get('recipient_latitude')
+            recipient_longitude = request.POST.get('recipient_longitude')
+            package.recipient_latitude = recipient_latitude
+            package.recipient_longitude = recipient_longitude
+
+            package.status = 'in_house'
+            package.save()
+
+            return redirect('warehouse_dashboard')  # Redirect to a success page or wherever you want
+
+    else:
+        form = PackageForm()
+        user_warehouse = request.user.warehouse  # Get the user's drop_pick_zone
+
+    # Get the drop_pick_zones data to populate the recipientPickUpLocation dropdown
+    warehouse = Warehouse.objects.all()  # Adjust this based on your model
+    context = {'form': form, 'warehouse': warehouse, 'user_warehouse': user_warehouse}
+    return render(request, 'warehouse/add_package.html', context)

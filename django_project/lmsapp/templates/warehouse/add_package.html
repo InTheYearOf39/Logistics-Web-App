@@ -10,7 +10,7 @@
         <div>
           <!-- <h4 class="">Add Package</h4> -->
           
-          <form class="needs-validation" novalidate action="{% url 'add_package_droppick'  %}" method="post" id="packageForm">
+          <form class="needs-validation" novalidate action="{% url 'add_package' %}" method="post" id="packageForm">
             {% csrf_token %}
             <div class="row g-3 mb-3">
               
@@ -72,9 +72,9 @@
               </div>
 
               <div class="col-md-9">
-                <label for="dropOffLocation" class="form-label form-label-sm">Drop Off Location</label>
+                <label for="warehouse" class="form-label form-label-sm">Drop Off Location</label>
                 <div class="input-group has-validation">
-                    <input type="text" class="form-control form-control-sm" id="dropOffLocation" name="dropOffLocation" placeholder="Drop Off Location" value="{{ user_drop_pick_zone }}" disabled>
+                    <input type="text" class="form-control form-control-sm" id="warehouse" name="warehouse" placeholder="Drop Off Location" value="{{ user_warehouse }}" disabled>
                     <div class="invalid-feedback">
                         Drop Off Location.
                     </div>

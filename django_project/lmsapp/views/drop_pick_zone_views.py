@@ -273,7 +273,7 @@ def is_drop_pick_user(user):
 @login_required
 @xframe_options_exempt 
 @user_passes_test(is_drop_pick_user)
-def add_package(request):
+def add_package_droppick(request):
     if request.method == 'POST':
         form = PackageForm(request.POST)
 
@@ -295,7 +295,9 @@ def add_package(request):
             package.recipient_latitude = recipient_latitude
             package.recipient_longitude = recipient_longitude
 
+            package.status = 'dropped_off'
             package.save()
+
 
             return redirect('drop_pick_zone_dashboard')  # Redirect to a success page or wherever you want
 
