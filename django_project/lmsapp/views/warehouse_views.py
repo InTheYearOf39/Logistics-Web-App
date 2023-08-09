@@ -10,6 +10,7 @@ from django.shortcuts import redirect, get_object_or_404
 from django.contrib import messages
 from django.core.mail import send_mail
 from django.conf import settings
+from datetime import datetime, timedelta
 
 
 """  
@@ -254,3 +255,34 @@ def new_arrivals(request):
         'arrived_packages': arrived_packages,
     }
     return render(request, 'warehouse/new_arrivals.html', context)
+
+def warehouse_reports(request):
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+
+    packages_delivered = Package.objects.filter(status='completed')
+    packages_ready = Package.objects.filter(status='ready_for_pickup')
+    
+    if start_date and end_date:
+        start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
+        end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
+        
+        # Ensure that start_date is always before end_date
+        if start_date > end_date:
+            start_date, end_date = end_date, start_date
+        
+        # Adjust end_date to be inclusive of the entire day
+        end_date += timedelta(days=1)
+        
+        packages_delivered = packages_delivered.filter(completed_at__range=(start_date, end_date))
+    elif start_date:
+        start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
+        packages_delivered = packages_delivered.filter(completed_at__date=start_date)
+        
+    
+    context = {
+        'packages_delivered': packages_delivered,
+        'packages_ready': packages_ready,
+    }
+    
+    return render(request, 'warehouse/warehouse_reports.html', context )
