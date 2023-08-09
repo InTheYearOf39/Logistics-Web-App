@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from lmsapp.models import Package, User, DropPickZone
+from lmsapp.forms import PackageForm
 from lmsapp.utils import get_time_of_day
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, get_object_or_404
@@ -7,8 +8,16 @@ from django.core.mail import send_mail, EmailMessage
 from django.contrib.auth import get_user_model
 from django.contrib import messages
 import random
+import string
 from django.conf import settings
 import os
+from django.views.decorators.clickjacking import xframe_options_exempt
+from django.views.decorators.csrf import csrf_exempt
+import math
+from django.http import JsonResponse
+from django.contrib.auth.decorators import user_passes_test
+import math
+
 
 
 
@@ -247,3 +256,116 @@ def confirm_pickedup(request, package_id):
         package.save()
     
     return redirect('drop_pick_zone_dashboard')  # Replace with the appropriate URL for the warehouse dashboard
+
+
+
+def generate_package_number():
+    prefix = 'pn'
+    digits = ''.join(random.choices(string.digits, k=5))
+    return f'{prefix}{digits}'
+
+   
+
+
+def is_drop_pick_user(user):
+    return user.role == 'drop_pick_zone'
+
+@login_required
+@xframe_options_exempt 
+@user_passes_test(is_drop_pick_user)
+def add_package_droppick(request):
+    if request.method == 'POST':
+        form = PackageForm(request.POST)
+
+        if form.is_valid():
+            package = form.save(commit=False)
+            package.user = request.user
+            package.package_number = generate_package_number()
+
+            # Automatically set the dropOffLocation to the one the user belongs to
+            user_drop_pick_zone = request.user.drop_pick_zone
+            if user_drop_pick_zone:
+                package.dropOffLocation = user_drop_pick_zone
+            else:
+                # Handle the case where the user does not have a drop_pick_zone
+                pass
+
+            recipient_latitude = request.POST.get('recipient_latitude')
+            recipient_longitude = request.POST.get('recipient_longitude')
+            package.recipient_latitude = recipient_latitude
+            package.recipient_longitude = recipient_longitude
+
+            package.status = 'dropped_off'
+            package.save()
+
+
+            return redirect('drop_pick_zone_dashboard')  # Redirect to a success page or wherever you want
+
+    else:
+        form = PackageForm()
+        user_drop_pick_zone = request.user.drop_pick_zone  # Get the user's drop_pick_zone
+
+    # Get the drop_pick_zones data to populate the recipientPickUpLocation dropdown
+    drop_pick_zones = DropPickZone.objects.all()  # Adjust this based on your model
+    context = {'form': form, 'drop_pick_zones': drop_pick_zones, 'user_drop_pick_zone': user_drop_pick_zone}
+    return render(request, 'sender/add_package.html', context)
+
+
+
+
+# def add_package(request):
+#     sender = request.user
+
+#     if request.method == 'POST':
+#         form = PackageForm(request.POST)
+
+#         if form.is_valid():
+#             package = form.save(commit=False)
+#             package.sender = sender
+#             package.save()
+
+#             return redirect('drop_pick_zone_dashboard')  # Redirect to a success page or wherever you want
+
+#     else:
+#         form = PackageForm()
+
+#     # Get the drop_pick_zones data to populate the recipientPickUpLocation dropdown
+#     drop_pick_zones = DropPickZone.objects.all()  # Adjust this based on your model
+#     context = {'form': form, 'drop_pick_zones': drop_pick_zones}
+#     return render(request, 'sender/add_package.html', context)
+
+
+
+def calculate_distance(lat1, lon1, lat2, lon2):
+    # Radius of the Earth in kilometers
+    R = 6371.0
+
+    lat1_rad = math.radians(lat1)
+    lon1_rad = math.radians(lon1)
+    lat2_rad = math.radians(lat2)
+    lon2_rad = math.radians(lon2)
+
+    dlon = lon2_rad - lon1_rad
+    dlat = lat2_rad - lat1_rad
+
+    a = math.sin(dlat / 2)**2 + math.cos(lat1_rad) * math.cos(lat2_rad) * math.sin(dlon / 2)**2
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+
+    distance = R * c
+    return distance
+
+
+def calculate_distances(request):
+    if request.method == 'POST':
+        recipient_latitude = float(request.POST.get('recipient_latitude'))
+        recipient_longitude = float(request.POST.get('recipient_longitude'))
+        
+        drop_pick_zones = DropPickZone.objects.all()
+        
+        distances = []
+        for drop_pick_zone in drop_pick_zones:
+            distance = calculate_distance(drop_pick_zone.latitude, drop_pick_zone.longitude, recipient_latitude, recipient_longitude)
+            distances.append({'id': drop_pick_zone.id, 'name': drop_pick_zone.name, 'distance': distance})
+        
+        distances.sort(key=lambda x: x['distance'])
+        return JsonResponse({'distances': distances})

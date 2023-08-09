@@ -16,16 +16,24 @@
               
 
               <div class="col-md-4">
-                <label for="sendersAddress" class="form-label form-label-sm"> Sender's Address</label>
-                <input id="senderAddress" name="sendersAddress" placeholder="Sender's Address" class="form-control form-control-sm" type="text" onkeyup="calculateDeliveryFee()">
+                <label for="senderName" class="form-label form-label-sm"> Sender's Name</label>
+                <input id="senderName" name="senderName" placeholder="Sender Name" class="form-control form-control-sm" type="text" value="" required>
                 <div class="invalid-feedback">
-                  Please enter your shipping address.
+                  Please enter the sender email.
+                </div>
+              </div>
+
+              <div class="col-md-4">
+                <label for="senderEmail" class="form-label form-label-sm"> Sender's Email</label>
+                <input id="senderEmail" name="sendersEmail" placeholder="Sender's Email" class="form-control form-control-sm" value="" type="email">
+                <div class="invalid-feedback">
+                  Please enter the sender email.
                 </div>
               </div>
 
               <div class="col-md-4">
                 <label for="sendersContact" class="form-label form-label-sm"> Sender's Contact</label>
-                <input id="senderContact" name="sendersContact" placeholder="Sender Contact" class="form-control form-control-sm" type="tel">
+                <input id="senderContact" name="sendersContact" placeholder="Sender contact" class="form-control form-control-sm" type="tel">
                 <div class="invalid-feedback">
                   Please enter your Contact.
                 </div>
@@ -39,7 +47,7 @@
                 </div>
               </div>
 
-              <div class="col-md-12">
+              <div class="col-md-8">
                 <label for="packageDescripton" class="form-label form-label-sm">Package Description</label>
                 <div class="input-group has-validation">
                   <!-- <input type="text" class="form-control form-control-sm" id="packageDescription" name="packageDescription" placeholder="Enter Description" required> -->
@@ -54,7 +62,7 @@
               <div class="form-group col-md-3">
                 <label for="deliveryType" class="form-label form-label-sm">Delivery Type</label>
                 <select class="form-select form-select-sm" id="deliveryType" name="deliveryType" required>
-                  <option value="" selected disabled> -- Select Delivery Type -- </option>
+                  <option value=""> -- Select Delivery Type -- </option>
                   <option value="standard">Standard</option>
                   <option value="premium">Premium</option>
                   <option value="express">Express</option>
@@ -183,7 +191,7 @@
   </div>
 
   <script>
-    document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function() {
     const deliveryTypeSelect = document.getElementById("deliveryType");
     const dropOffLocationInput = document.getElementById("dropOffLocation");
     const recipientPickUpLocationInput = document.getElementById("recipientPickUpLocation");
@@ -201,9 +209,11 @@
         }
     });
 });
-  </script>
-  
 
+
+</script>
+
+  
   <script>
     
   function getGPS() {

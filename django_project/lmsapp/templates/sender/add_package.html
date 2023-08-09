@@ -10,22 +10,30 @@
         <div>
           <!-- <h4 class="">Add Package</h4> -->
           
-          <form class="needs-validation" novalidate action="{% url 'register_package' %}" method="post" id="packageForm">
+          <form class="needs-validation" novalidate action="{% url 'add_package_droppick'  %}" method="post" id="packageForm">
             {% csrf_token %}
             <div class="row g-3 mb-3">
               
 
               <div class="col-md-4">
-                <label for="sendersAddress" class="form-label form-label-sm"> Sender's Address</label>
-                <input id="senderAddress" name="sendersAddress" placeholder="Sender's Address" class="form-control form-control-sm" type="text" onkeyup="calculateDeliveryFee()">
+                <label for="sendersName" class="form-label form-label-sm"> Sender's Name</label>
+                <input id="sendersName" name="sendersName" placeholder="Sender Name" class="form-control form-control-sm" type="text" value="" required>
                 <div class="invalid-feedback">
-                  Please enter your shipping address.
+                  Please enter the sender email.
+                </div>
+              </div>
+
+              <div class="col-md-4">
+                <label for="senderEmail" class="form-label form-label-sm"> Sender's Email</label>
+                <input id="senderEmail" name="sendersEmail" placeholder="Sender's Email" class="form-control form-control-sm" value="" type="email">
+                <div class="invalid-feedback">
+                  Please enter the sender email.
                 </div>
               </div>
 
               <div class="col-md-4">
                 <label for="sendersContact" class="form-label form-label-sm"> Sender's Contact</label>
-                <input id="senderContact" name="sendersContact" placeholder="Sender Contact" class="form-control form-control-sm" type="tel">
+                <input id="senderContact" name="sendersContact" placeholder="Sender contact" class="form-control form-control-sm" type="tel">
                 <div class="invalid-feedback">
                   Please enter your Contact.
                 </div>
@@ -39,7 +47,7 @@
                 </div>
               </div>
 
-              <div class="col-md-12">
+              <div class="col-md-8">
                 <label for="packageDescripton" class="form-label form-label-sm">Package Description</label>
                 <div class="input-group has-validation">
                   <!-- <input type="text" class="form-control form-control-sm" id="packageDescription" name="packageDescription" placeholder="Enter Description" required> -->
@@ -54,28 +62,24 @@
               <div class="form-group col-md-3">
                 <label for="deliveryType" class="form-label form-label-sm">Delivery Type</label>
                 <select class="form-select form-select-sm" id="deliveryType" name="deliveryType" required>
-                  <option value="" selected disabled> -- Select Delivery Type -- </option>
+                  <option value=""> -- Select Delivery Type -- </option>
                   <option value="standard">Standard</option>
                   <option value="premium">Premium</option>
-                  <option value="express">Express</option>
                 </select>
                 <div class="invalid-feedback">
                   Please select a delivery type.
                 </div>
               </div>
 
-              <div class="col-md-9" id="dropOffLocationContainer">
+              <div class="col-md-9">
                 <label for="dropOffLocation" class="form-label form-label-sm">Drop Off Location</label>
-                <select class="form-control form-control-sm" id="dropOffLocation" name="dropOffLocation" required>
-                  <option value="" selected disabled>-- Select Drop Off Location --</option>
-                  {% for drop_pick_zone in drop_pick_zones %}
-                    <option value="{{ drop_pick_zone.id }}">{{ drop_pick_zone.name }}</option>
-                  {% endfor %}
-                </select>
-                <div class="invalid-feedback">
-                  Please select a delivery location.
-                </div>              
-              </div>
+                <div class="input-group has-validation">
+                    <input type="text" class="form-control form-control-sm" id="dropOffLocation" name="dropOffLocation" placeholder="Drop Off Location" value="{{ user_drop_pick_zone }}" disabled>
+                    <div class="invalid-feedback">
+                        Drop Off Location.
+                    </div>
+                </div>
+            </div>            
 
             </div>
 
@@ -147,21 +151,23 @@
             <!-- Add this new <div> for the recipient drop-off location -->
               <div class="col-md-6" id="recipientPickUpLocationContainer">
                 <label for="recipientPickUpLocation" class="form-label form-label-sm">Recipient Pick-up Location</label>
-                <select class="form-control form-control-sm" id="recipientPickUpLocation" name="recipientPickUpLocation" required>
+                <select class="form-select form-select-sm" id="recipientPickUpLocation" name="recipientPickUpLocation" required>
                   <option value="" selected disabled>-- Select Recipient Pick-up Location --</option>
                   {% for drop_pick_zone in drop_pick_zones %}
                     <option value="{{ drop_pick_zone.id }}">{{ drop_pick_zone.name }}</option>
                   {% endfor %}
                 </select>
                 <div class="invalid-feedback">
-                  Please select a recipient pick-up location.
+                    Recipient Pick-up Location is required.
                 </div>
-              </div>
+            </div>           
+              
 
               <div class="col-md-6" id="deliveryFee">
                 <label for="deliveryFee" class="form-label form-label-sm">Delivery Fee</label>
                 <input id="deliveryFeeInput" name="deliveryFee" placeholder="Delivery Fee" class="form-control form-control-sm" type="text" disabled>
-              </div>           
+              </div>   
+            </div>        
 
           </div>
 
@@ -178,105 +184,25 @@
           </div>
             
           </form>
+          {% if form.errors %}
+          <div class="alert alert-danger mt-3">
+              <ul>
+                  {% for field in form %}
+                      {% if field.errors %}
+                          <li>{{ field.label }}: {{ field.errors|join:", " }}</li>
+                      {% endif %}
+                  {% endfor %}
+              </ul>
+          </div>
+          {% endif %}
         </div>
       </div>
   </div>
 
   <script>
-    document.addEventListener("DOMContentLoaded", function() {
-    const deliveryTypeSelect = document.getElementById("deliveryType");
-    const dropOffLocationInput = document.getElementById("dropOffLocation");
-    const recipientPickUpLocationInput = document.getElementById("recipientPickUpLocation");
 
-    dropOffLocationInput.disabled = true;
-    recipientPickUpLocationInput.disabled = true;
 
-    deliveryTypeSelect.addEventListener("change", function() {
-        if (this.value === "standard") {
-            dropOffLocationInput.disabled = false; 
-            recipientPickUpLocationInput.disabled = false; 
-        } else {
-            dropOffLocationInput.disabled = true; 
-            recipientPickUpLocationInput.disabled = true;
-        }
-    });
-});
-  </script>
-  
-
-  <script>
-    
-  function getGPS() {
-    // pick the location
-    if ("geolocation" in navigator) {
-      navigator.geolocation.getCurrentPosition(function (position) {
-        //console.log(position.coords);
-        //set the GPS into feilds
-        const sender_latitude = position.coords.latitude;
-        const sender_longitude = position.coords.longitude;
-        document.getElementById("sender_latitude").value = sender_latitude;
-        document.getElementById("sender_longitude").value = sender_longitude;
-
-        console.log("Sender Latitude:", sender_latitude);
-        console.log("Sender Longitude:", sender_longitude);
-
-        //get human readable name for current GPS location
-        //get cordinates
-
-        var request = new XMLHttpRequest();
-        var g_key= '{{ api_key }}';
-        var method = 'GET';
-        var url = 'https://maps.googleapis.com/maps/api/geocode/json?latlng='+sender_latitude+','+sender_longitude+'&sensor=true'+'&key='+g_key;
-        var async = true;
-
-        request.open(method, url, async);
-        request.onreadystatechange = function(){
-          if(request.readyState == 4 && request.status == 200){
-            var data = JSON.parse(request.responseText);
-            var address = data.results[0];
-            //console.log(address.formatted_address);
-            document.getElementById("senderAddress").value = address.formatted_address;
-          }
-
-        };
-        request.send();
-
-        // get new droplist
-        redraw_dropoff_list(sender_latitude, sender_longitude);
-
-      }, function (error) {
-        console.log("Failed to get location");
-        alert("Failed to get your GPS location. Please enable GPS.");
-        console.log(error);
-      }, { maximumAge: 0, enableHighAccuracy: true });
-    } else {
-      console.log("Device does not support geolocation!");
-      alert("Device does not support geolocation!");
-    }
-    
-  }
-
-  //get drop lits in javacsript
-  /*
-  var drop_lists = {{ drop_pick_zones_json|safe }};
-  */
-
-  function redraw_dropoff_list(lat, lng)
-  {
-
-    $.ajax({
-        method: "POST",
-        url: "/api",
-        data: { action: "get_closest_drop_pick_locations", lat: lat, lng: lng }
-    }).done(function( response ) {
-        //console.log(response);
-        //overide options
-        $("#dropOffLocation").html(response.data);
-    });
-
-  }
-
-  function populateRecipientLocation() {
+    function populateRecipientLocation() {
     console.log("populate triggered");
     // Function to populate recipient drop-off locations
     const recipientAddressInput = document.getElementById("recipientAddress");
@@ -299,7 +225,6 @@
     
   }
 
-  
   function redraw_recipient_dropoff_list(lat, lng) {
     // Function to redraw recipient drop-off locations based on recipient's latitude and longitude
     $.ajax({
@@ -317,81 +242,30 @@
 
   // Call the function once when the page loads
   getGPS();
-</script>
 
-<script>
-  // Load after page loads
-  $(function() {
-   
+  </script>
 
-    // Initiate autocomplete for the sender's address field
-    var senderAutocomplete = new google.maps.places.Autocomplete($("#senderAddress")[0], {});
+  <script>
+   $(function() {
 
-    google.maps.event.addListener(senderAutocomplete, 'place_changed', function() {
-      var place = senderAutocomplete.getPlace();
-      // Log or process the selected place if needed
-      //set values into the feilds
-      document.getElementById("sender_latitude").value = place.geometry.location.lat();
-      document.getElementById("sender_longitude").value = place.geometry.location.lng();
+   // Initiate autocomplete for the recipient address field
+   var recipientAutocomplete = new google.maps.places.Autocomplete($("#recipientAddress")[0], {});
 
-      // get new droplist
-      redraw_dropoff_list(place.geometry.location.lat(), place.geometry.location.lng());
-      calculateDeliveryFee();
+   google.maps.event.addListener(recipientAutocomplete, 'place_changed', function() {
+     var place = recipientAutocomplete.getPlace();
+     // Log or process the selected place if needed
+     //set values into the feilds
+     $("#recipient_latitude").val(place.geometry.location.lat());
+     $("#recipient_longitude").val(place.geometry.location.lng());
 
-    });
+     console.log("new gps ready");
+     // Call the function when the recipient address input changes
+     populateRecipientLocation();
 
-     // Initiate autocomplete for the recipient address field
-    var recipientAutocomplete = new google.maps.places.Autocomplete($("#recipientAddress")[0], {});
+   });
 
-    google.maps.event.addListener(recipientAutocomplete, 'place_changed', function() {
-      var place = recipientAutocomplete.getPlace();
-      // Log or process the selected place if needed
-      //set values into the feilds
-      $("#recipient_latitude").val(place.geometry.location.lat());
-      $("#recipient_longitude").val(place.geometry.location.lng());
-
-      console.log("new gps ready");
-      // Call the function when the recipient address input changes
-      populateRecipientLocation();
-      calculateDeliveryFee();
-
-    });
-
-  });
-</script>
-
-<script>
-  function calculateDeliveryFee() {
-  const sender_latitude = document.getElementById("sender_latitude").value;
-  const sender_longitude = document.getElementById("sender_longitude").value;
-  const recipient_latitude = document.getElementById("recipient_latitude").value;
-  const recipient_longitude = document.getElementById("recipient_longitude").value;
-
-  if (senderAddress && recipientAddress) {
-    // Perform AJAX request with sender and recipient addresses
-    $.ajax({
-      type: "POST",
-      url: "/api/calculate_delivery_fee/",
-      data: { sender_latitude: sender_latitude, sender_longitude: sender_longitude, recipient_latitude:recipient_latitude, recipient_longitude:recipient_longitude},
-      success: function (response) {
-        // Check if the API response contains the delivery_fee property
-        if ('delivery_fee' in response) {
-          // Populate the delivery fee input field with the calculated value
-          document.getElementById("deliveryFeeInput").value = (Math.round(response.delivery_fee / 100) * 100).toFixed(2);
-        } else {
-          console.log("Invalid API response: missing delivery_fee property.");
-        }
-      },
-      error: function (xhr, status, error) {
-        console.log("API error:", error); // Handle the error if necessary
-      },
-    });
-  }
-}
-
-
-</script>
-
+ });
+    </script>
 
 
 {% endblock %}

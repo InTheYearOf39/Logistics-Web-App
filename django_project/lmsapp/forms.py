@@ -107,11 +107,11 @@ class PackageForm(forms.ModelForm):
     
     class Meta:
         model = Package
-        fields = ['packageName', 'deliveryType', 'dropOffLocation', 'packageDescription', 'recipientName', 'recipientAddress', 'sendersAddress', 'recipientEmail', 'recipientTelephone', 'recipientPickUpLocation', 'recipientIdentification', 'genderType', 'sendersContact', 'deliveryFee']
+        fields = ['packageName', 'deliveryType', 'dropOffLocation', 'packageDescription', 'recipientName', 'recipientAddress', 'sendersAddress', 'recipientEmail', 'recipientTelephone', 'recipientPickUpLocation', 'recipientIdentification', 'genderType', 'sendersContact', 'deliveryFee', 'sendersName', 'sendersEmail', 'warehouse']
         widgets = {
             'packageName': forms.TextInput(attrs={'class': 'form-control'}),
             'deliveryType': forms.TextInput(attrs={'class': 'form-control'}),
-            'dropOffLocation': forms.TextInput(attrs={'class': 'form-control'}),
+            'dropOffLocation': forms.TextInput(attrs={'class': 'form-control form-control-sm'}),
             'recipientPickUpLocation': forms.TextInput(attrs={'class': 'form-control'}),
             'packageDescription': forms.TextInput(attrs={'class': 'form-control'}),
             'recipientName': forms.TextInput(attrs={'class': 'form-control'}),
@@ -119,10 +119,13 @@ class PackageForm(forms.ModelForm):
             'recipientTelephone': forms.TextInput(attrs={'class': 'form-control'}),
             'recipientAddress': forms.TextInput(attrs={'class': 'form-control'}),
             'recipientIdentification': forms.TextInput(attrs={'class': 'form-control'}),
-            'deliveryFee': forms.TextInput(attrs={'class': 'form-control'}),
+            'deliveryFee': forms.TextInput(attrs={'class': 'form-control form-control-sm'}),
             'genderType': forms.TextInput(attrs={'class': 'form-control'}),
-            'sendersAddress': forms.TextInput(attrs={'class': 'form-control'}),
+            'sendersName': forms.TextInput(attrs={'class': 'form-control form-control-sm'}),
+            'sendersEmail': forms.TextInput(attrs={'class': 'form-control'}),
+            'sendersAddress': forms.TextInput(attrs={'class': 'form-control form-control-sm'}),
             'sendersContact': forms.TextInput(attrs={'class': 'form-control'}),
+            'warehouse': forms.TextInput(attrs={'class': 'form-control form-control-sm'}),
         }
 
 class WarehouseForm(forms.ModelForm):
