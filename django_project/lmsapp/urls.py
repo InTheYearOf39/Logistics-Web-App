@@ -17,9 +17,6 @@ urlpatterns = [
     path('services/', site_views.services, name='services'),
     path('about/', site_views.about, name='about'),
     path('contact/', site_views.contact, name='contact'),
-    path('home/', site_views.home, name='dashboard_home'),
-    path('home_register/', site_views.home_register, name='home_register'),
-    path('master_dashboard/', site_views.master_dashboard, name='master_dashboard'),
 
 
     # authentication routes
@@ -52,6 +49,7 @@ urlpatterns = [
     path('couriers/', admin_views.couriers, name='couriers'),
     path('warehouse_users/', admin_views.warehouse_users, name='warehouse_users'),
     path('drop_pick_users/', admin_views.drop_pick_users, name='drop_pick_users'),
+    path('master_dashboard/', admin_views.master_dashboard, name='master_dashboard'),
     path('admin_history/', admin_views.admin_history, name='admin_history'),
     path('admin_dashboard/assign_courier/<int:package_id>/', admin_views.assign_courier, name='admin_assign_courier'),
     path('dropoffs/', admin_views.dropoffs, name='dropoffs'),
