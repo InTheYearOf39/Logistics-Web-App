@@ -172,8 +172,8 @@ class Package(models.Model):
     recipientTelephone = models.CharField(max_length=100)
     recipientAddress = models.CharField(max_length=200)
     recipientIdentification = models.CharField(max_length=200)
-    sendersName = models.CharField(max_length=200)
-    sendersEmail = models.CharField(max_length=200)
+    sendersName = models.CharField(max_length=200, null=True, blank=True)
+    sendersEmail = models.CharField(max_length=200, null=True, blank=True)
     sendersAddress = models.CharField(max_length=200, null=True, blank=True)
     sendersContact = models.CharField(max_length=200)
     sender_latitude = models.FloatField( null=True, blank=True)
@@ -181,7 +181,7 @@ class Package(models.Model):
     recipient_latitude = models.FloatField( null=True, blank=True)
     recipient_longitude = models.FloatField( null=True, blank=True)
     deliveryFee = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, null=True, blank=True)
-    genderType = models.CharField(max_length=20, choices=GENDER_CHOICES, verbose_name='Gender', null=False)
+    genderType = models.CharField(max_length=20, choices=GENDER_CHOICES, verbose_name='Gender', null=True, blank=True)
     package_number = models.CharField(max_length=50, unique=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='upcoming')  # default status is 'upcoming'
     
