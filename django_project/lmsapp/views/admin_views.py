@@ -206,6 +206,8 @@ If the request method is not POST or the form is not valid, the form is displaye
 @xframe_options_exempt
 def create_warehouse(request):
     if request.method == 'POST':
+        user=request.user
+
         name = request.POST.get('name')
         address = request.POST.get('address')
         phone = request.POST.get('phone')
@@ -214,7 +216,8 @@ def create_warehouse(request):
         latitude = request.POST.get('latitude')
 
         warehouse = Warehouse(name=name, address=address, phone=phone, tag=tag, latitude=latitude, longitude=longitude)
-        warehouse.save()
+        # warehouse.created_by = user
+        warehouse.save(user=user)
 
         return redirect('warehouses')
 
@@ -250,6 +253,7 @@ the form is displayed to the user for input.
 @xframe_options_exempt
 def create_drop_pick(request):
     if request.method == 'POST':
+        user=request.user
         name = request.POST.get('name')
         address = request.POST.get('address')
         phone = request.POST.get('phone')
@@ -262,7 +266,7 @@ def create_drop_pick(request):
 
         drop_pick_zone = DropPickZone(name=name, address=address, phone=phone, tag=tag, warehouse=warehouse,
                                       longitude=longitude, latitude=latitude)
-        drop_pick_zone.save()
+        drop_pick_zone.save(user=user)
 
         return redirect('drop_pick_zones')
 
@@ -311,6 +315,7 @@ def create_courier(request):
             longitude = request.POST.get('longitude')
             user.latitude = latitude
             user.longitude = longitude
+            user.created_by = request.user
 
             form.save()
             # Optionally, redirect to a success page
@@ -332,9 +337,10 @@ def create_warehouse_user(request):
             # Create the user with the role "warehouse"
             user = User.objects.create_user(username=username, password='warehouse@warehouse', role='warehouse',
                                             name=name, warehouse=warehouse)
+            user.created_by = request.user
             user.save()
 
-            return redirect('create_warehouse_user')
+            return redirect('warehouse_users')
 
     # Retrieve the warehouses
     warehouses = Warehouse.objects.all()
@@ -357,9 +363,11 @@ def create_drop_pick_user(request):
             # Create the user with the role "drop_pick_zone"
             user = User.objects.create_user(username=username, password='droppick@droppick', role='drop_pick_zone',
                                             name=name, drop_pick_zone=drop_pick_zone)
+            
+            user.created_by = request.user
             user.save()
 
-            return redirect('create_drop_pick_user')
+            return redirect('drop_pick_users')
 
     # Retrieve the drop pick zones
     drop_pick_zones = DropPickZone.objects.all()
@@ -375,6 +383,7 @@ def edit_warehouse(request, warehouse_id):
     warehouse = get_object_or_404(Warehouse, id=warehouse_id)
 
     if request.method == 'POST':
+        user = request.user
         # Get the form data from the request.POST dictionary
         name = request.POST['name']
         address = request.POST['address']
@@ -392,7 +401,7 @@ def edit_warehouse(request, warehouse_id):
         warehouse.longitude = longitude
 
         # Save the updated warehouse details to the database
-        warehouse.save()
+        warehouse.save(user=user)
 
         # Redirect to the warehouses list page after editing
         return redirect('warehouses')
@@ -433,9 +442,10 @@ def edit_warehouse_user(request, user_id):
             user.name = name
             user.username = username
             user.warehouse = warehouse
+            user.modified_by = request.user
             user.save()
 
-            return redirect('warehouses')
+            return redirect('warehouse_users')
 
     # Retrieve the warehouses
     warehouses = Warehouse.objects.all()
@@ -453,7 +463,7 @@ def delete_warehouse_user(request, user_id):
     if request.method == 'POST':
         # Delete the warehouse user
         user.delete()
-        return redirect('warehouses')
+        return redirect('warehouse_users')
 
     # If the request method is not POST, show the confirmation modal
     return render(request, 'admin/delete_warehouse_user.html', {'user': user})
@@ -464,6 +474,7 @@ def edit_drop_pick_zones(request, drop_pick_zone_id):
 
     if request.method == 'POST':
         # Get form data
+        user = request.user
         name = request.POST.get('name')
         address = request.POST.get('address')
         phone = request.POST.get('phone')
@@ -479,7 +490,7 @@ def edit_drop_pick_zones(request, drop_pick_zone_id):
             drop_pick_zone.phone = phone
             drop_pick_zone.tag = tag
             drop_pick_zone.warehouse = warehouse
-            drop_pick_zone.save()
+            drop_pick_zone.save(user=user)
 
             return redirect('drop_pick_zones')
 
@@ -507,40 +518,10 @@ def edit_drop_pick_zone_user(request, drop_pick_zone_user_id):
     drop_pick_zone_user = get_object_or_404(User, id=drop_pick_zone_user_id, role='drop_pick_zone')
 
     if request.method == 'POST':
-        # Get form data
-        name = request.POST.get('name')
-        username = request.POST.get('username')
-        drop_pick_zone_id = request.POST.get('drop_pick_zone')
-
-        if drop_pick_zone_id:
-            drop_pick_zone = get_object_or_404(DropPickZone, id=drop_pick_zone_id)
-
-            # Update the drop-pick zone user details
-            drop_pick_zone_user.name = name
-            drop_pick_zone_user.username = username
-            drop_pick_zone_user.drop_pick_zone = drop_pick_zone
-            drop_pick_zone_user.save()
-
-            return redirect('drop_pick_zones')
-
-    # Retrieve the drop pick zones
-    drop_pick_zones = DropPickZone.objects.all()
-
-    context = {
-        'drop_pick_zone_user': drop_pick_zone_user,
-        'drop_pick_zones': drop_pick_zones,
-    }
-    return render(request, 'admin/edit_drop_pick_zone_user.html', context)
-
-
-def edit_drop_pick_zone_user(request, drop_pick_zone_user_id):
-    drop_pick_zone_user = get_object_or_404(User, id=drop_pick_zone_user_id, role='drop_pick_zone')
-
-    if request.method == 'POST':
         if 'delete' in request.POST:
             # Delete the drop-pick zone user
             drop_pick_zone_user.delete()
-            return redirect('drop_pick_zones')
+            return redirect('drop_pick_users')
 
         # If 'delete' was not in the request.POST, it means we're updating the user details
         # Get form data
@@ -555,9 +536,10 @@ def edit_drop_pick_zone_user(request, drop_pick_zone_user_id):
             drop_pick_zone_user.name = name
             drop_pick_zone_user.username = username
             drop_pick_zone_user.drop_pick_zone = drop_pick_zone
+            drop_pick_zone_user.modified_by = request.user
             drop_pick_zone_user.save()
 
-            return redirect('drop_pick_zones')
+            return redirect('drop_pick_users')
 
     # Retrieve the drop pick zones
     drop_pick_zones = DropPickZone.objects.all()
@@ -575,14 +557,14 @@ def delete_drop_pick_zone_user(request, drop_pick_zone_user_id):
     if request.method == 'POST':
         # Delete the drop-pick zone user
         drop_pick_zone_user.delete()
-        return redirect('drop_pick_zones')
+        return redirect('drop_pick_users')
 
     # Since there's no separate template, we don't need to render anything here.
     # The confirmation modal will handle the user's decision.
 
     # You can also add extra context here if required.
 
-    return redirect('drop_pick_zones')  # Redirect back to the drop_pick_zones page.
+    return redirect('drop_pick_users')  # Redirect back to the drop_pick_zones page.
 
 
 def warehouse_users(request):
@@ -616,6 +598,7 @@ def edit_courier(request, courier_id):
         courier.username = username
         courier.phone = phone
         courier.address = address
+        courier.modified_by = request.user
         courier.save()
 
         return redirect('couriers')

@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser, UserManager
 from django.utils import timezone
 import random
 import string
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.utils.crypto import get_random_string
 
@@ -16,6 +17,7 @@ class CustomUserManager(UserManager):
         admin.save()
         return admin
 
+
 class Warehouse(models.Model):
     name = models.CharField(max_length=40)
     address = models.CharField(max_length=40)
@@ -24,7 +26,23 @@ class Warehouse(models.Model):
     latitude = models.FloatField( null=True, blank=True)
     longitude = models.FloatField( null=True, blank=True)
     
+    created_on = models.DateTimeField(default=timezone.now)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT
+                                   , related_name='warehouse_created_by', null=True)
+    modified_on = models.DateTimeField(auto_now=True)
+    modified_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT
+                                   , related_name='warehouse_modified_by', null=True)
+    
 
+    def save(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        if not self.pk:
+            self.created_by = user
+            super(Warehouse, self).save(*args, **kwargs)
+        else:
+            self.modified_by = user
+            super(Warehouse, self).save(*args, **kwargs)
+    
     def __str__(self):
         return self.name
 
@@ -32,13 +50,31 @@ class DropPickZone(models.Model):
     name = models.CharField(max_length=40)
     address = models.CharField(max_length=40)
     phone = models.CharField(max_length=20, null=True, blank=True)
-    warehouse = models.ForeignKey(Warehouse, on_delete=models.CASCADE, related_name='drop_pick_zones')
+    warehouse = models.ForeignKey(Warehouse, on_delete=models.PROTECT, related_name='drop_pick_zones')
     tag = models.CharField(max_length=20, null=True, blank=True)
     latitude = models.FloatField( null=True, blank=True)
     longitude = models.FloatField( null=True, blank=True)
+    
+    created_on = models.DateTimeField(default=timezone.now)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT
+                                   , related_name='drop_pick_zones_created_by', null=True)
+    modified_on = models.DateTimeField(auto_now=True)
+    modified_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT
+                                   , related_name='drop_pick_zones_modified_by', null=True)
+    
+    def save(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        if not self.pk:
+            self.created_by = user
+            super(DropPickZone, self).save(*args, **kwargs)
+        else:
+            self.modified_by = user
+            super(DropPickZone, self).save(*args, **kwargs)
+ 
 
     def __str__(self):
         return self.name
+
 
 class User(AbstractUser):
     ROLE_CHOICES = (
@@ -61,11 +97,22 @@ class User(AbstractUser):
     # Add warehouse-specific fields
     tag = models.CharField(max_length=20, null=True, blank=True)
     phone = models.CharField(max_length=20, null=True, blank=True)
-    drop_pick_zone = models.ForeignKey(DropPickZone, related_name='users', on_delete=models.CASCADE, null=True, blank=True)
+    drop_pick_zone = models.ForeignKey(DropPickZone, related_name='users', on_delete=models.PROTECT, null=True, blank=True)
     address = models.CharField(max_length=200, null=True, blank=True)
 
     # Add drop_pick_zone-specific fields
-    warehouse = models.ForeignKey(Warehouse, related_name='users', on_delete=models.CASCADE, null=True, blank=True)
+    warehouse = models.ForeignKey(Warehouse, related_name='users', on_delete=models.PROTECT, null=True, blank=True)
+
+
+    created_on = models.DateTimeField(default=timezone.now)
+    created_by = models.ForeignKey('self', on_delete=models.PROTECT,
+                                   related_name='user_created_by', null=True)
+    modified_on = models.DateTimeField(auto_now=True)
+    modified_by = models.ForeignKey('self', on_delete=models.PROTECT,
+                                    related_name='user_modified_by', null=True)
+    
+    
+
 
     def generate_verification_token(self, length=64):
         token = get_random_string(length)
@@ -80,6 +127,7 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.username
+    
 
 
 class Package(models.Model):
@@ -111,13 +159,13 @@ class Package(models.Model):
 
     PACKAGE_PREFIX = 'pn'
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='packages', null=True)
+    user = models.ForeignKey(User, on_delete=models.PROTECT, related_name='packages', null=True)
     courier = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='assigned_packages', null=True, blank=True)
     packageName = models.CharField(max_length=100)
     deliveryType = models.CharField(max_length=20, choices=DELIVERY_CHOICES)
-    dropOffLocation = models.ForeignKey(DropPickZone, on_delete=models.CASCADE, null=True, blank=True, default=None, related_name='packages_dropped_off')
-    recipientPickUpLocation = models.ForeignKey(DropPickZone, on_delete=models.CASCADE, null=True, blank=True, default=None, related_name='packages_picked_up')
-    warehouse = models.ForeignKey(Warehouse, on_delete=models.CASCADE, null=True, blank=True, related_name='packages_in_house')
+    dropOffLocation = models.ForeignKey(DropPickZone, on_delete=models.PROTECT, null=True, blank=True, default=None, related_name='packages_dropped_off')
+    recipientPickUpLocation = models.ForeignKey(DropPickZone, on_delete=models.PROTECT, null=True, blank=True, default=None, related_name='packages_picked_up')
+    warehouse = models.ForeignKey(Warehouse, on_delete=models.PROTECT, null=True, blank=True, related_name='packages_in_house')
     packageDescription = models.TextField()
     recipientName = models.CharField(max_length=100)
     recipientEmail = models.CharField(max_length=100)
@@ -130,13 +178,20 @@ class Package(models.Model):
     sender_longitude = models.FloatField( null=True, blank=True)
     recipient_latitude = models.FloatField( null=True, blank=True)
     recipient_longitude = models.FloatField( null=True, blank=True)
-    deliveryFee = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    deliveryFee = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, blank=True, null=True)
     genderType = models.CharField(max_length=20, choices=GENDER_CHOICES, verbose_name='Gender', null=False)
     package_number = models.CharField(max_length=50, unique=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='upcoming')  # default status is 'upcoming'
-    created_at = models.DateTimeField(default=timezone.now)
+    
+    created_on = models.DateTimeField(default=timezone.now)
+    created_by = models.ForeignKey(User, on_delete=models.PROTECT, related_name='packages_created_by', null=True)
+    modified_on = models.DateTimeField(auto_now=True)
+    modified_by = models.ForeignKey(User, on_delete=models.PROTECT, related_name='packages_modified_by', null=True)
+    
     received_at = models.DateTimeField(null=True, blank=True)
     completed_at = models.DateTimeField(null=True, blank=True)
+    in_house_at = models.DateTimeField(null=True, blank=True)
+    dispatched_at = models.DateTimeField(null=True, blank=True)
     assigned_at = models.DateTimeField(default=timezone.now)
     otp = models.CharField(max_length=6, null=True, blank=True)
 
@@ -168,7 +223,7 @@ class Package(models.Model):
         return self.packageName
 
 class Notification(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.PROTECT)
     message = models.TextField()
     is_read = models.BooleanField(default=False)
     timestamp = models.DateTimeField(auto_now_add=True)
