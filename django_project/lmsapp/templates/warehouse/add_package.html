@@ -200,6 +200,23 @@
   </div>
 
   <script>
+    document.addEventListener("DOMContentLoaded", function() {
+    const deliveryTypeSelect = document.getElementById("deliveryType");
+    const recipientPickUpLocationInput = document.getElementById("recipientPickUpLocation");
+
+    recipientPickUpLocationInput.disabled = true;
+
+    deliveryTypeSelect.addEventListener("change", function() {
+        if (this.value === "standard") {
+            recipientPickUpLocationInput.disabled = false; 
+        } else { 
+            recipientPickUpLocationInput.disabled = true;
+        }
+    });
+});
+  </script>
+
+  <script>
 
 
     function populateRecipientLocation() {

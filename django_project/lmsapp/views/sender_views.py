@@ -100,6 +100,7 @@ def register_package(request):
             # Save the additional fields to the package object
             package.recipientIdentification = form.cleaned_data['recipientIdentification']
             package.genderType = form.cleaned_data['genderType']
+            package.created_by = request.user
             package.save()
 
             return redirect('sender_dashboard')
