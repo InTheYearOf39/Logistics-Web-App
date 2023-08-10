@@ -75,17 +75,26 @@ def master_dashboard(request):
     total_delayed_packages_day = sum(chart_data_week_ready_for_pickup)
     total_packages_day = total_delivered_packages_day + total_delayed_packages_day
 
-    percentage_delivered_day = (total_delivered_packages_day / total_packages_day) * 100
-    percentage_delayed_day = (total_delayed_packages_day / total_packages_day) * 100
+    # percentage_delivered_day = (total_delivered_packages_day / total_packages_day) * 100
+    if total_packages_day != 0:
+        percentage_delivered_day = (total_delivered_packages_day / total_packages_day) * 100
+        percentage_delayed_day = (total_delayed_packages_day / total_packages_day) * 100
+    else:
+        percentage_delivered_day = 0  # or any other appropriate value
+        percentage_delayed_day = 0
 
     # Calculate the average percentage of delivered and delayed packages for the week
     total_delivered_packages_week = sum(chart_data_week_completed)
     total_delayed_packages_week = sum(chart_data_week_ready_for_pickup)
     total_packages_week = total_delivered_packages_week + total_delayed_packages_week
 
-    percentage_delivered_week = (total_delivered_packages_week / total_packages_week) * 100
-    percentage_delayed_week = (total_delayed_packages_week / total_packages_week) * 100
-
+    if total_packages_week != 0:
+        percentage_delivered_week = (total_delivered_packages_week / total_packages_week) * 100
+        percentage_delayed_week = (total_delayed_packages_week / total_packages_week) * 100
+    else:
+        percentage_delivered_week = 0
+        percentage_delayed_week = 0
+    
     context = {
         # Your existing context data
         'total_packages': total_packages,
