@@ -78,10 +78,13 @@ select packages and assign them to available couriers
 @login_required
 def warehouse_dashboard(request):
     greeting_message = get_time_of_day()
-    warehouse_user = request.user
-    warehouse = warehouse_user.warehouse
+    # warehouse_user = request.user
+    # warehouse = warehouse_user.warehouse
 
-    packages = Package.objects.filter(dropOffLocation__warehouse=warehouse, status='dropped_off').select_related('dropOffLocation').order_by('dropOffLocation__tag')
+    packages = Package.objects.filter(
+        # dropOffLocation__warehouse=warehouse,
+        status='dropped_off'
+    ).select_related('dropOffLocation').order_by('dropOffLocation__tag')
 
     if request.method == 'POST':
         selected_packages = request.POST.getlist('selected_packages')
@@ -109,6 +112,17 @@ def warehouse_dashboard(request):
     }
 
     return render(request, 'warehouse/warehouse_dashboard.html', context)
+
+# def warehouse_dashboard(request):
+#     # Assuming you have the warehouse information from the user or some other source
+#     # Replace this with the correct warehouse ID
+#     packages = Package.objects.all()
+
+#     context = {
+#         'packages': packages,
+#     }
+
+#     return render(request, 'warehouse/warehouse_dashboard.html', context)
 
 
 """

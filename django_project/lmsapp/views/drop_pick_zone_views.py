@@ -61,13 +61,13 @@ def confirm_drop_off(request, package_id):
         email = EmailMessage(subject, message, settings.EMAIL_HOST_USER, [sender_email])
 
         # Get the path to the image
-        image_path = os.path.join(settings.STATIC_ROOT, 'img', 'DroppedOff.png')
+        # image_path = os.path.join(settings.STATIC_ROOT, 'img', 'DroppedOff.png')
 
-        # Check if the image file exists
-        if os.path.isfile(image_path):
-            # Attach the image to the email
-            with open(image_path, 'rb') as image_file:
-                email.attach_file(image_path, 'image/png')
+        # # Check if the image file exists
+        # if os.path.isfile(image_path):
+        #     # Attach the image to the email
+        #     with open(image_path, 'rb') as image_file:
+        #         email.attach_file(image_path, 'image/png')
 
         # Send the email
         email.send()
