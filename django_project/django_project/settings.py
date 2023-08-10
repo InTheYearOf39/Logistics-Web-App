@@ -71,6 +71,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django_session_timeout.middleware.SessionTimeoutMiddleware',
 ]
 
 ROOT_URLCONF = 'django_project.urls'
@@ -203,3 +205,10 @@ X_FRAME_OPTIONS = 'ALLOW-FROM https://maps.googleapis.com/'
 
 # google API KEY
 API_KEY = config('API_KEY')
+
+
+# Django Session timeout
+SESSION_EXPIRE_SECONDS = 1800  # 30 minutes
+SESSION_EXPIRE_AFTER_LAST_ACTIVITY = True
+SESSION_EXPIRE_AFTER_LAST_ACTIVITY_GRACE_PERIOD = 1800 # group by 30 minutes
+SESSION_TIMEOUT_REDIRECT = '/login'
