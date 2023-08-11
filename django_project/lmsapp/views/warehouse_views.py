@@ -15,6 +15,7 @@ from django.contrib.auth.decorators import user_passes_test
 import random
 import string
 from datetime import datetime, timedelta
+from django.core.mail import send_mail, BadHeaderError
 
 
 """  
@@ -232,31 +233,27 @@ def ready_for_pickup(request):
     if request.method == 'POST':
         selected_packages = request.POST.getlist('selected_packages')
         courier_id = request.POST.get('courier')
-        drop_pick_zone_id = request.POST.get('drop_pick_zone')
 
-        if selected_packages and courier_id and drop_pick_zone_id:
+        if selected_packages and courier_id:
             courier = get_object_or_404(User, id=courier_id, role='courier')
-            drop_pick_zone = get_object_or_404(DropPickZone, id=drop_pick_zone_id)
 
             # Update the packages with the assigned courier and change their status
-            packages = Package.objects.filter(id__in=selected_packages)
-            packages.update(courier=courier, dropOffLocation=drop_pick_zone, status='in_transit')
+            packages = Package.objects.filter(id__in=selected_packages, deliveryType='premium')
+            packages.update(courier=courier, status='in_transit')
             
             courier.status = 'on-trip'
             courier.save()
 
-            messages.success(request, 'Packages successfully assigned to courier.')
+            messages.success(request, 'Premium packages successfully assigned to courier.')
 
             return redirect('warehouse_dashboard')
 
-    ready_packages = Package.objects.filter(status='in_transit')
+    ready_packages = Package.objects.filter(status='in_transit', deliveryType='premium')
     available_couriers = User.objects.filter(role='courier', status='available')
-    available_drop_pick_zones = DropPickZone.objects.all()
 
     context = {
         'ready_packages': ready_packages,
-        'available_couriers': available_couriers,
-        'available_drop_pick_zones': available_drop_pick_zones
+        'available_couriers': available_couriers
     }
     return render(request, 'warehouse/ready_for_pickup.html', context)
 
@@ -285,8 +282,48 @@ def is_warehouse_user(user):
 @login_required
 @xframe_options_exempt 
 @user_passes_test(is_warehouse_user)
-def add_package(request):
+# def add_package(request):
 
+#     senders = User.objects.filter(role='sender')
+#     if request.method == 'POST':
+#         form = PackageForm(request.POST)
+
+#         if form.is_valid():
+#             package = form.save(commit=False)
+#             package.user = request.user
+#             package.package_number = generate_package_number()
+
+#             # Automatically set the warehouse to the one the user belongs to
+#             user_warehouse = request.user.warehouse
+#             if user_warehouse:
+#                 package.warehouse = user_warehouse
+#             else:
+#                 # Handle the case where the user does not have a drop_pick_zone
+#                 pass
+
+#             recipient_latitude = request.POST.get('recipient_latitude')
+#             recipient_longitude = request.POST.get('recipient_longitude')
+#             package.recipient_latitude = recipient_latitude
+#             package.recipient_longitude = recipient_longitude
+
+#             package.status = 'in_house'
+#             package.save()
+
+#             return redirect('warehouse_dashboard')  # Redirect to a success page or wherever you want
+
+#     else:
+#         form = PackageForm()
+#         user_warehouse = request.user.warehouse  # Get the user's drop_pick_zone
+
+#     # Get the drop_pick_zones data to populate the recipientPickUpLocation dropdown
+#     warehouse = Warehouse.objects.all()  # Adjust this based on your model
+#     context = {'form': form, 'warehouse': warehouse, 'user_warehouse': user_warehouse, 'senders': senders }
+#     return render(request, 'warehouse/add_package.html', context)
+
+def add_package(request):
+    msg = None
+    user_warehouse = None  # Initialize user_warehouse
+    
     senders = User.objects.filter(role='sender')
     if request.method == 'POST':
         form = PackageForm(request.POST)
@@ -301,7 +338,7 @@ def add_package(request):
             if user_warehouse:
                 package.warehouse = user_warehouse
             else:
-                # Handle the case where the user does not have a drop_pick_zone
+                # Handle the case where the user does not have a warehouse
                 pass
 
             recipient_latitude = request.POST.get('recipient_latitude')
@@ -312,15 +349,42 @@ def add_package(request):
             package.status = 'in_house'
             package.save()
 
-            return redirect('warehouse_dashboard')  # Redirect to a success page or wherever you want
+            # Send an email to the sender
+            subject = 'Package Registered'
+            message = f"Dear sender, your package has been successfully registered.\n\n"\
+                      f"If you have any questions, please contact our customer support team.\n"\
+                      f"Package Number: {package.package_number}\n"\
+                      f"Recipient: {package.recipientName}\n"\
+                      f"Recipient Address: {package.recipientAddress}\n"
 
+            if package.dropOffLocation:
+                message += f"Drop-off Location: {package.dropOffLocation.name}\n"
+
+            message += f"Status: {package.status}"
+            
+            from_email = settings.DEFAULT_FROM_EMAIL
+            recipient_list = [package.recipientEmail]
+            
+            try:
+                send_mail(subject, message, from_email, recipient_list, fail_silently=False)
+            except BadHeaderError as e:
+                # Handle the BadHeaderError
+                print("Error: BadHeaderError:", str(e))
+            except Exception as e:
+                # Handle other exceptions
+                print("Error:", str(e))
+
+            msg = 'Package registered'
+            return redirect('warehouse_dashboard')  # Redirect to a success page or wherever you want
+        else:
+            msg = 'Form is not valid'
     else:
         form = PackageForm()
-        user_warehouse = request.user.warehouse  # Get the user's drop_pick_zone
+        user_warehouse = request.user.warehouse
 
-    # Get the drop_pick_zones data to populate the recipientPickUpLocation dropdown
+    # Get the warehouse data to populate the warehouse dropdown
     warehouse = Warehouse.objects.all()  # Adjust this based on your model
-    context = {'form': form, 'warehouse': warehouse, 'user_warehouse': user_warehouse, 'senders': senders }
+    context = {'form': form, 'warehouse': warehouse, 'user_warehouse': user_warehouse, 'senders': senders}
     return render(request, 'warehouse/add_package.html', context)
 
 def warehouse_reports(request):
