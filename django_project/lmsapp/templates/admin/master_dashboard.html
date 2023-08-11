@@ -5,6 +5,7 @@
 <script src="{% static 'js/dist/chart.min.js' %}"></script>
 <script src="{% static 'js/dist/main.js' %}"></script>
 {% endblock %} {% block content %}
+<a href="{% url 'data-export' %}" class="btn btn-primary">Export Data to Excel</a>
 
 <!-- statistics-summary cards  -->
 <div class="row">

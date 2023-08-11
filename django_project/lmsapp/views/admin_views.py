@@ -149,6 +149,57 @@ def master_dashboard(request):
     }
     return render(request, 'admin/master_dashboard.html', context)
 
+import pandas as pd
+from django.http import HttpResponse
+
+def data_export(request):
+    total_packages = Package.objects.all().count()      
+    # Get the datetime for the start of the current week
+    current_week_start = timezone.now().replace(hour=0, minute=0, second=0, microsecond=0) - timedelta(days=timezone.now().weekday())
+    current_week_end = current_week_start + timedelta(days=7)
+    
+    weekly_totals = Package.objects.filter(
+        status__in=['completed'],
+        completed_at__range=(current_week_start, current_week_end)
+    ).annotate(day=ExtractDay('completed_at')).values('day').annotate(total=Count('id')).order_by('day')
+    
+    weekly_ready_for_pickup_totals = Package.objects.filter(
+        status='ready_for_pickup',
+        received_at__range=(current_week_start, current_week_end)
+    ).annotate(day=ExtractDay('received_at')).values('day').annotate(total=Count('id')).order_by('day')
+
+    # Initialize arrays to hold the data for each day of the current week
+    chart_data_week_completed = [0] * 7
+    chart_data_week_ready_for_pickup = [0] * 7
+
+    for total in weekly_totals:
+        day = total['day'] - current_week_start.day  # Adjust the day to match array indices (start from 0)
+        chart_data_week_completed[day] = total['total']
+    
+    for total in weekly_ready_for_pickup_totals:
+        day = total['day'] - current_week_start.day  # Adjust the day to match array indices (start from 0)
+        chart_data_week_ready_for_pickup[day] = total['total']
+
+    excel_data = {
+        'Total Packages': total_packages,
+        'Day of the Week': ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+        'Packages Delivered': chart_data_week_completed,
+        'Packages Delayed': chart_data_week_ready_for_pickup
+    }
+
+    # Create a Pandas DataFrame from the data
+    df = pd.DataFrame(excel_data)
+
+    # Create a response with the Excel file
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = 'attachment; filename="dashboard_data.xlsx"'
+
+    # Save the DataFrame to the Excel response
+    df.to_excel(response, index=False, engine='openpyxl')
+
+    return response
+
+
 def users(request):
     users = User.objects.all()  # Retrieve all users from the database
 
