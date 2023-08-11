@@ -23,7 +23,25 @@
             {% csrf_token %}
             <div class="row g-3 mb-3">
               
-
+              <div class="form-group col-md-12">
+                <div class="form-check pb-3">
+                  <input class="form-check-input" type="checkbox" id="userCheckbox">
+                  <label class="form-check-label" for="userCheckbox">Tag to Existing User</label>
+                </div>
+                <div id="userSelectContainer" style="display: none;">
+                  <label for="user" class="form-label form-label-sm">Select User</label>
+                  <select class="form-select form-select-sm col-md-5" id="user" name="user">
+                    <option value=""> -- Select User -- </option>
+                    {% for sender in senders %}
+                    <option value="{{sender.id}}">{{sender.username}} - {{sender.email}}</option>
+                    {% endfor %}
+                  </select>
+                  <div class="invalid-feedback">
+                    No User Match.
+                  </div>
+                </div>
+              </div>
+              
               <div class="col-md-4">
                 <label for="sendersName" class="form-label form-label-sm"> Sender's Name</label>
                 <input id="sendersName" name="sendersName" placeholder="Sender Name" class="form-control form-control-sm" type="text" value="" required>
@@ -80,7 +98,7 @@
                 </div>
               </div>
 
-              <div class="col-md-6">
+              <div class="col-md-9">
                 <label for="warehouse" class="form-label form-label-sm">Drop Off Location</label>
                 <div class="input-group has-validation">
                     <input type="text" class="form-control form-control-sm" id="warehouse" name="warehouse" placeholder="Drop Off Location" value="{{ user_warehouse }}" disabled>
@@ -89,19 +107,6 @@
                     </div>
                 </div>
             </div>   
-
-            <div class="col-md-3">
-              <label for="userSearch" class="form-label form-label-sm">Existing User</label>
-              <select class="form-select form-select-sm" id="userSearch" name="userSearch">
-                <option value=""> -- Select User -- </option>
-                {% for sender in senders %}
-                <option value="{{sender.id}}">{{sender.username}} {{sender.email}}</option>
-                {% endfor %}
-              </select>
-              <div class="invalid-feedback">
-                No User Match.
-              </div>
-            </div>  
 
             </div>
 
@@ -241,8 +246,22 @@
   <script>
     // Initialize Select2 for the user search input field
     $(document).ready(function() {
-      $('#userSearch').select2();
-      });
+      $('#user').select2(
+        {
+          width: '40%'
+        }
+          );
+        });
+
+    // Handle checkbox change event
+    $('#userCheckbox').change(function() {
+      $('#userSelectContainer').toggle(this.checked);
+      $('#sendersName, #senderEmail, #sendersContact').prop('disabled', this.checked);
+      // Clear Select2 input when hidden
+      if (!this.checked) {
+        $('#user').val(null).trigger('change');
+      }
+    });
   </script>
 
   <script>

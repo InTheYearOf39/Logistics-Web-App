@@ -274,6 +274,7 @@ def is_drop_pick_user(user):
 @xframe_options_exempt 
 @user_passes_test(is_drop_pick_user)
 def add_package_droppick(request):
+    senders = User.objects.filter(role='sender')
     if request.method == 'POST':
         form = PackageForm(request.POST)
 
@@ -307,7 +308,7 @@ def add_package_droppick(request):
 
     # Get the drop_pick_zones data to populate the recipientPickUpLocation dropdown
     drop_pick_zones = DropPickZone.objects.all()  # Adjust this based on your model
-    context = {'form': form, 'drop_pick_zones': drop_pick_zones, 'user_drop_pick_zone': user_drop_pick_zone}
+    context = {'form': form, 'drop_pick_zones': drop_pick_zones, 'user_drop_pick_zone': user_drop_pick_zone, 'senders': senders}
     return render(request, 'drop_pick_zone/add_package.html', context)
 
 

@@ -353,14 +353,3 @@ def warehouse_reports(request):
     }
     
     return render(request, 'warehouse/warehouse_reports.html', context )
-
-from django.http import JsonResponse
-from django.db.models import Q
-
-def search_users(request):
-    term = request.GET.get('q', '')  # Get the search term from the query parameter
-    users = User.objects.filter(Q(username__icontains=term))  # Search for users with matching usernames
-
-    user_data = [{'id': user.id, 'text': user.username} for user in users]
-
-    return JsonResponse(user_data, safe=False)
