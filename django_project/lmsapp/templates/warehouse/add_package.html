@@ -2,6 +2,15 @@
 
 {% load static %}
 
+
+{% block static_links %}
+
+<link href="{% static 'select2/css/select2.min.css' %}" rel="stylesheet" />
+<script src="{% static 'select2/js/select2.min.js' %}"></script>
+
+{% endblock %}
+
+
 {% block content %}
 
 <div class="container my-2" data-aos="fade-up">
@@ -71,7 +80,7 @@
                 </div>
               </div>
 
-              <div class="col-md-9">
+              <div class="col-md-6">
                 <label for="warehouse" class="form-label form-label-sm">Drop Off Location</label>
                 <div class="input-group has-validation">
                     <input type="text" class="form-control form-control-sm" id="warehouse" name="warehouse" placeholder="Drop Off Location" value="{{ user_warehouse }}" disabled>
@@ -79,7 +88,20 @@
                         Drop Off Location.
                     </div>
                 </div>
-            </div>            
+            </div>   
+
+            <div class="col-md-3">
+              <label for="userSearch" class="form-label form-label-sm">Existing User</label>
+              <select class="form-select form-select-sm" id="userSearch" name="userSearch">
+                <option value=""> -- Select User -- </option>
+                {% for sender in senders %}
+                <option value="{{sender.id}}">{{sender.username}} {{sender.email}}</option>
+                {% endfor %}
+              </select>
+              <div class="invalid-feedback">
+                No User Match.
+              </div>
+            </div>  
 
             </div>
 
@@ -213,12 +235,17 @@
             recipientPickUpLocationInput.disabled = true;
         }
     });
-});
+  });
   </script>
 
   <script>
+    // Initialize Select2 for the user search input field
+    $(document).ready(function() {
+      $('#userSearch').select2();
+      });
+  </script>
 
-
+  <script>
     function populateRecipientLocation() {
     console.log("populate triggered");
     // Function to populate recipient drop-off locations
@@ -257,9 +284,6 @@
     });
   }
 
-  // Call the function once when the page loads
-  getGPS();
-
   </script>
 
   <script>
@@ -282,7 +306,7 @@
    });
 
  });
-    </script>
+  </script>
 
 
 {% endblock %}

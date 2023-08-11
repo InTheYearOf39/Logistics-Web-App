@@ -103,6 +103,7 @@ urlpatterns = [
     path('to_pickup/<int:package_id>/', warehouse_views.to_pickup, name='to_pickup'),
     path('warehouse_reports/', warehouse_views.warehouse_reports, name='warehouse_reports'),
     path('add_package/', warehouse_views.add_package, name='add_package'),
+    path('search_users/', warehouse_views.search_users, name='search_users'),
 
 
     # Drop off and Pick up routes

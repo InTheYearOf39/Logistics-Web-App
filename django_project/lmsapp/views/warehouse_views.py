@@ -286,6 +286,8 @@ def is_warehouse_user(user):
 @xframe_options_exempt 
 @user_passes_test(is_warehouse_user)
 def add_package(request):
+
+    senders = User.objects.filter(role='sender')
     if request.method == 'POST':
         form = PackageForm(request.POST)
 
@@ -318,7 +320,7 @@ def add_package(request):
 
     # Get the drop_pick_zones data to populate the recipientPickUpLocation dropdown
     warehouse = Warehouse.objects.all()  # Adjust this based on your model
-    context = {'form': form, 'warehouse': warehouse, 'user_warehouse': user_warehouse}
+    context = {'form': form, 'warehouse': warehouse, 'user_warehouse': user_warehouse, 'senders': senders }
     return render(request, 'warehouse/add_package.html', context)
 
 def warehouse_reports(request):
@@ -351,3 +353,14 @@ def warehouse_reports(request):
     }
     
     return render(request, 'warehouse/warehouse_reports.html', context )
+
+from django.http import JsonResponse
+from django.db.models import Q
+
+def search_users(request):
+    term = request.GET.get('q', '')  # Get the search term from the query parameter
+    users = User.objects.filter(Q(username__icontains=term))  # Search for users with matching usernames
+
+    user_data = [{'id': user.id, 'text': user.username} for user in users]
+
+    return JsonResponse(user_data, safe=False)
