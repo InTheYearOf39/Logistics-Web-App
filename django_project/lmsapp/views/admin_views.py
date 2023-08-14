@@ -151,6 +151,8 @@ def master_dashboard(request):
 
 import pandas as pd
 from django.http import HttpResponse
+# from django.db.models.functions import ExtractDay
+# from django.db.models import Count
 
 def data_export(request):
     total_packages = Package.objects.all().count()      
@@ -187,12 +189,15 @@ def data_export(request):
         'Packages Delayed': chart_data_week_ready_for_pickup
     }
 
+    # Get the current date
+    current_date = datetime.now().strftime('%Y-%m-%d')
+
     # Create a Pandas DataFrame from the data
     df = pd.DataFrame(excel_data)
 
     # Create a response with the Excel file
     response = HttpResponse(content_type='application/ms-excel')
-    response['Content-Disposition'] = 'attachment; filename="dashboard_data.xlsx"'
+    response['Content-Disposition'] = f'attachment; filename="Package_data_{current_date}.xlsx"'
 
     # Save the DataFrame to the Excel response
     df.to_excel(response, index=False, engine='openpyxl')
