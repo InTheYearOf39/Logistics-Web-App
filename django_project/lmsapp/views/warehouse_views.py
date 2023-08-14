@@ -6,7 +6,6 @@ from django.contrib import messages
 from django.shortcuts import render, redirect
 from lmsapp.forms import ChangePasswordForm, PackageForm
 from django.contrib.auth import update_session_auth_hash
-from django.shortcuts import redirect, get_object_or_404
 from django.contrib import messages
 from django.core.mail import send_mail
 from django.conf import settings
