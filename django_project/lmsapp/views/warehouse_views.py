@@ -16,6 +16,8 @@ import random
 import string
 from datetime import datetime, timedelta
 from django.core.mail import send_mail, BadHeaderError
+import pandas as pd
+from django.http import HttpResponse
 
 
 """  
@@ -417,3 +419,43 @@ def warehouse_reports(request):
     }
     
     return render(request, 'warehouse/warehouse_reports.html', context )
+
+def package_reports_export(request):
+    start_datetime = request.GET.get('start_datetime')
+    end_datetime = request.GET.get('end_datetime')
+
+    packages_delivered = Package.objects.filter(status='completed')
+    packages_ready = Package.objects.filter(status='ready_for_pickup')
+    
+    if start_datetime and end_datetime:
+        start_datetime = datetime.strptime(start_datetime, '%Y-%m-%dT%H:%M')
+        end_datetime = datetime.strptime(end_datetime, '%Y-%m-%dT%H:%M')
+        
+        # Ensure that start_datetime is always before end_datetime
+        if start_datetime > end_datetime:
+            start_datetime, end_datetime = end_datetime, start_datetime
+        
+        packages_delivered = packages_delivered.filter(completed_at__range=(start_datetime, end_datetime))
+    elif start_datetime:
+        start_datetime = datetime.strptime(start_datetime, '%Y-%m-%dT%H:%M')
+        packages_delivered = packages_delivered.filter(completed_at__gte=start_datetime)
+        
+    context = {
+        'packages_delivered': packages_delivered,
+        'packages_ready': packages_ready,
+    }
+
+    # Get the current date and time
+    current_datetime = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+
+    # Create a Pandas DataFrame from the data
+    df = pd.DataFrame(context)
+
+    # Create a response with the Excel file
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = f'attachment; filename="Package_summary_data_{current_datetime}.xlsx"'
+
+    # Save the DataFrame to the Excel response
+    df.to_excel(response, index=False, engine='openpyxl')
+    
+    return response

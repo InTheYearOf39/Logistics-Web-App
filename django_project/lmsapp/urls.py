@@ -103,6 +103,7 @@ urlpatterns = [
     path('ready_for_pickup/', warehouse_views.ready_for_pickup, name='ready_for_pickup'),
     path('to_pickup/<int:package_id>/', warehouse_views.to_pickup, name='to_pickup'),
     path('warehouse_reports/', warehouse_views.warehouse_reports, name='warehouse_reports'),
+    path('package_reports_export/', warehouse_views.package_reports_export, name='package_reports_export'),
     path('add_package/', warehouse_views.add_package, name='add_package'),
 
 
