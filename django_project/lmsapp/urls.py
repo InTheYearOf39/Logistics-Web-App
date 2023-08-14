@@ -82,6 +82,7 @@ urlpatterns = [
     path('register_package/', sender_views.register_package, name='register_package'),
     path('api/', sender_views.api, name='api'),
     path('sender_history/', sender_views.sender_history, name='sender_history'),
+    path('delivery_orders/mordercoast/', sender_views.receive_data_view, name='receive_data_view'),
     path('api/calculate_delivery_fee/', sender_views.calculate_delivery_fee, name='calculate_delivery_fee'),
     
 
@@ -103,6 +104,7 @@ urlpatterns = [
     path('ready_for_pickup/', warehouse_views.ready_for_pickup, name='ready_for_pickup'),
     path('to_pickup/<int:package_id>/', warehouse_views.to_pickup, name='to_pickup'),
     path('warehouse_reports/', warehouse_views.warehouse_reports, name='warehouse_reports'),
+    path('package_reports_export/', warehouse_views.package_reports_export, name='package_reports_export'),
     path('add_package/', warehouse_views.add_package, name='add_package'),
 
 

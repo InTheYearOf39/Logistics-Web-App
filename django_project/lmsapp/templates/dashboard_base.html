@@ -100,12 +100,11 @@
             <li class="nav-item"><a class="nav-link" href="#">Settings</a></li>
           </ul>
           <ul class="header-nav ms-auto">
-            {% if user.role == "admin" %}
-            <li class="nav-item"><a class="nav-link" href="{% url 'data_export' %}">
-              <img src="https://icons.iconarchive.com/icons/carlosjj/microsoft-office-2013/256/Excel-icon.png" width="20px" height="20px">
-              </a>
-            </li>
-         {% endif %}
+            {% if request.path == '/warehouse_reports/' %}
+            <li class="nav-item"><button class="btn btn-primary text-white" type="button">         
+              <a class="text-white" href="{% url 'package_reports_export' %}"><i class="icon cil-cloud-download"></i></a>
+            </button></li>         
+            {% endif %}
 
             <li class="nav-item">
               
