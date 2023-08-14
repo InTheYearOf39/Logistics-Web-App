@@ -100,10 +100,15 @@
             <li class="nav-item"><a class="nav-link" href="#">Settings</a></li>
           </ul>
           <ul class="header-nav ms-auto">
+            {% if user.role == "admin" %}
+            <li class="nav-item"><a class="nav-link" href="{% url 'data_export' %}">
+              <img src="https://icons.iconarchive.com/icons/carlosjj/microsoft-office-2013/256/Excel-icon.png" width="20px" height="20px">
+              </a>
+            </li>
+         {% endif %}
 
             <li class="nav-item">
               
-
               <div class="dropdown">
                 <button class="btn btn btn-transparent m-0 dropdown-toggle" type="button" data-coreui-toggle="dropdown" aria-expanded="false">
                   <i class="icon icon-lg cil-bell"></i>
