@@ -6,6 +6,8 @@ from django.shortcuts import redirect, get_object_or_404
 from django.contrib import messages
 from django.core.mail import send_mail
 from django.conf import settings
+from django.core.mail import send_mail, BadHeaderError
+from django.http import HttpResponse
 
 
 
@@ -28,26 +30,46 @@ A function to handle the notification of package arrival at the warehouse. When 
 the package is retrieved by it's package id and then the package status is updated to 'warehouse_arrival', An email notification is sent to the sender and the warehouse. If the request method is not POST, it displays an error message. Finally, the user is redirected to the courier dashboard.
  """
 def notify_arrival(request, package_id):
-    if request.method == 'POST':
-        package = Package.objects.get(pk=package_id)
-        package.status = 'warehouse_arrival'
-        package.save()
+    try:
+        if request.method == 'POST':
+            package = get_object_or_404(Package, pk=package_id)
+            package.status = 'warehouse_arrival'
+            package.save()
 
-        # Send email to sender
-        sender_email = package.recipientEmail
-        sender_message = f"Your package with ID {package.package_number} has arrived at the warehouse."
-        send_mail('Package Arrival Notification', sender_message, settings.EMAIL_HOST_USER, [sender_email])
+            # Send an email notification if recipientEmail is available
+            if package.recipientEmail:
+                subject = 'Package Warehouse Arrival'
+                message = f"Dear sender, your package has been successfully arrived at the warehouse.\n\n"\
+                            f"If you have any questions, please contact our customer support team.\n"\
+                            f"Package Number: {package.package_number}\n"\
+                            f"Recipient: {package.recipientName}\n"\
+                            f"Recipient Address: {package.recipientAddress}\n"
 
-        # Send email to warehouse
-        warehouse_email = 'warehouse@example.com'  # Replace with actual warehouse email
-        warehouse_message = f"A package with ID {package.package_number} has arrived at the warehouse."
-        send_mail('Package Arrival Notification', warehouse_message, settings.EMAIL_HOST_USER, [warehouse_email])
+                if package.dropOffLocation:
+                    message += f"Drop-off Location: {package.dropOffLocation.name}\n"
 
-        messages.success(request, "Package arrival notified successfully.")
-    else:
-        messages.error(request, "Invalid request.")
+                message += f"Status: {package.status}"
+                
+                from_email = settings.DEFAULT_FROM_EMAIL
+                recipient_list = [package.recipientEmail]
 
-    return redirect('courier_dashboard')  # Replace with the appropriate URL
+                # Try sending the email
+                try:
+                    send_mail(subject, message, from_email, recipient_list, fail_silently=False)
+                    messages.success(request, "Package arrival notified successfully.")
+                except BadHeaderError as e:
+                    messages.error(request, f"Error: BadHeaderError - {str(e)}")
+                except Exception as e:
+                    messages.error(request, f"Error: {str(e)}")
+            else:
+                messages.warning(request, "Recipient email not available. Notification not sent.")
+        else:
+            messages.error(request, "Invalid request.")
+
+    except Exception as e:
+        messages.error(request, f"An error occurred: {str(e)}")
+
+    return HttpResponse("Notification attempted.") # Replace with the appropriate URL
 
 
 """
@@ -57,13 +79,49 @@ def notify_dropoff(request, package_id):
     package = get_object_or_404(Package, id=package_id)
 
     if request.method == 'POST':
-        # Update the package status to 'at_pickup'
-        package.status = 'at_pickup'
+        # Check if the package deliveryType is premium
+        if package.deliveryType in ['premium', 'express']:
+         # Update the package status to 'arrived' for 'premium' and 'express' delivery types
+           package.status = 'arrived'
+        else:
+        # Update the package status to 'at_pickup' for other delivery types
+           package.status = 'at_pickup'
+
+        # Generate OTP
+        otp = random.randint(100000, 999999)
+
+        # Save the OTP in the package
+        package.otp = otp
         package.save()
 
-        # Add any additional functionality or notifications here
+        subject = 'Package Arrival'
+        message = f"Dear sender, your package has arrived. Please find the One Time Password (OTP) for your package below:\n\n"\
+                  f"OTP: {package.otp}\n\n"\
+                  f"If you have any questions, please contact our customer support team.\n"\
+                  f"Package Number: {package.package_number}\n"\
+                  f"Recipient: {package.recipientName}\n"\
+                  f"Recipient Address: {package.recipientAddress}\n"
 
-        messages.success(request, "Package drop-off notified successfully.")
+        if package.dropOffLocation:
+            message += f"Drop-off Location: {package.dropOffLocation.name}\n"
+
+        message += f"Status: {package.status}"
+        message += f"OTP: {package.otp}"
+
+        from_email = settings.DEFAULT_FROM_EMAIL
+        recipient_list = [package.recipientEmail]
+
+        try:
+            send_mail(subject, message, from_email, recipient_list, fail_silently=False)
+            messages.success(request, "Package drop-off notified successfully.")
+        except BadHeaderError as e:
+            # Handle the BadHeaderError
+            messages.error(request, f"Error: BadHeaderError - {str(e)}")
+        except Exception as e:
+            # Handle other exceptions
+            messages.error(request, f"Error: {str(e)}")
+
+        # Add any additional functionality or notifications here
         return redirect('courier_dashboard')
 
     return render(request, 'notify_dropoff.html', {'package': package})

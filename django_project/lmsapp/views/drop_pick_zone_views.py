@@ -17,7 +17,7 @@ import math
 from django.http import JsonResponse
 from django.contrib.auth.decorators import user_passes_test
 import math
-
+from django.core.mail import send_mail, BadHeaderError
 
 
 
@@ -300,7 +300,32 @@ def add_package_droppick(request):
             package.save()
 
 
-            return redirect('drop_pick_zone_dashboard')  # Redirect to a success page or wherever you want
+            subject = 'Package Registered'
+            message = f"Dear sender, your package has been successfully registered.\n\n"\
+                      f"If you have any questions, please contact our customer support team.\n"\
+                      f"Package Number: {package.package_number}\n"\
+                      f"Recipient: {package.recipientName}\n"\
+                      f"Recipient Address: {package.recipientAddress}\n"
+
+            if package.dropOffLocation:
+                message += f"Drop-off Location: {package.dropOffLocation.name}\n"
+
+            message += f"Status: {package.status}"
+            
+            from_email = settings.DEFAULT_FROM_EMAIL
+            recipient_list = [package.recipientEmail]
+            
+            try:
+                send_mail(subject, message, from_email, recipient_list, fail_silently=False)
+            except BadHeaderError as e:
+                # Handle the BadHeaderError
+                print("Error: BadHeaderError:", str(e))
+            except Exception as e:
+                # Handle other exceptions
+                print("Error:", str(e))
+
+
+            return redirect('received_packages')  # Redirect to a success page or wherever you want
 
     else:
         form = PackageForm()

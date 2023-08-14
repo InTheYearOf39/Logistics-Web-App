@@ -16,6 +16,7 @@ import random
 import string
 from datetime import datetime, timedelta
 from django.core.mail import send_mail, BadHeaderError
+from django.db.models import Q
 
 
 """  
@@ -83,8 +84,7 @@ def warehouse_dashboard(request):
     # warehouse = warehouse_user.warehouse
 
     packages = Package.objects.filter(
-        # dropOffLocation__warehouse=warehouse,
-        status='dropped_off'
+        Q(status='dropped_off') | Q(deliveryType='premium') | Q(deliveryType='express')
     ).select_related('dropOffLocation').order_by('dropOffLocation__tag')
 
     if request.method == 'POST':
@@ -93,7 +93,16 @@ def warehouse_dashboard(request):
         if selected_packages and courier_id:
             courier = get_object_or_404(User, id=courier_id, role='courier', status='available')
             packages = Package.objects.filter(id__in=selected_packages)
-            packages.update(courier=courier, status='dispatched')
+            
+            for package in packages:
+                if package.deliveryType == 'premium':
+                    package.status = 'en_route'
+                elif package.deliveryType == 'express':
+                    package.status = 'in_transit'
+                else:
+                    package.status = 'dispatched'
+                package.courier = courier
+                package.save()
 
             courier_status = Package.objects.filter(courier=courier, status='dispatched').exists()
 
@@ -113,6 +122,7 @@ def warehouse_dashboard(request):
     }
 
     return render(request, 'warehouse/warehouse_dashboard.html', context)
+
 
 # def warehouse_dashboard(request):
 #     # Assuming you have the warehouse information from the user or some other source
@@ -375,7 +385,7 @@ def add_package(request):
                 print("Error:", str(e))
 
             msg = 'Package registered'
-            return redirect('warehouse_dashboard')  # Redirect to a success page or wherever you want
+            return redirect('in_house')  # Redirect to a success page or wherever you want
         else:
             msg = 'Form is not valid'
     else:
