@@ -54,8 +54,14 @@
                   <div class="small text-medium-emphasis"><span>{{ package.recipientName }}</span></div>
                 </td>
                 <td class="text-start">
-                  <div class="small text-medium-emphasis"><span>{{ package.sendersAddress }}</span></div>
-                </td>
+                  <div class="small text-medium-emphasis">
+                    {% if package.sendersAddress %}
+                      <span>{{ package.sendersAddress }}</span>
+                    {% else %}
+                      <span>{{ package.dropOffLocation.address }}</span>
+                    {% endif %}
+                  </div>
+                </td>                
                 <td class="text-start">
                   <div class="small text-medium-emphasis"><span>{{ package.recipientAddress }}</span></div>
                 </td>

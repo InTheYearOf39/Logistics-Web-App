@@ -436,6 +436,9 @@ def is_warehouse_user(user):
 #     warehouse = Warehouse.objects.all()  # Adjust this based on your model
 #     context = {'form': form, 'warehouse': warehouse, 'user_warehouse': user_warehouse, 'senders': senders }
 #     return render(request, 'warehouse/add_package.html', context)
+@login_required
+@xframe_options_exempt 
+@user_passes_test(is_warehouse_user)
 
 def add_package(request):
     msg = None
@@ -447,7 +450,7 @@ def add_package(request):
 
         if form.is_valid():
             package = form.save(commit=False)
-            package.user = request.user
+            package.created_by = request.user
             package.package_number = generate_package_number()
 
             # Automatically set the warehouse to the one the user belongs to
@@ -464,11 +467,32 @@ def add_package(request):
             package.recipient_longitude = recipient_longitude
 
             package.status = 'in_house'
+
+            selected_user_id = request.POST.get('user')
+            if selected_user_id:
+                selected_user = User.objects.get(id=selected_user_id)
+
+                package.sendersEmail = selected_user.email
+                package.sendersName = selected_user.username
             package.save()
+
+            
+            # if 'userCheckbox' in request.POST:
+            #     selected_user_id = request.POST.get('user')
+            #     if selected_user_id:
+            #         selected_user = User.objects.get(id=selected_user_id)
+            #         print(selected_user)
+            #         package.sendersEmail = selected_user.email
+            #         package.sendersName = selected_user.username
+
+            # # Save the package after updating the fields
+            # # print("Form Data:", request.POST)  # Print the form data
+            # package.save()
+
 
             # Send an email to the sender
             subject = 'Package Registered'
-            message = f"Dear sender, your package has been successfully registered.\n\n"\
+            message = f"Dear User, your package has been successfully registered.\n\n"\
                       f"If you have any questions, please contact our customer support team.\n"\
                       f"Package Number: {package.package_number}\n"\
                       f"Recipient: {package.recipientName}\n"\
@@ -480,7 +504,7 @@ def add_package(request):
             message += f"Status: {package.status}"
             
             from_email = settings.DEFAULT_FROM_EMAIL
-            recipient_list = [package.recipientEmail]
+            recipient_list = [package.recipientEmail, package.sendersEmail]
             
             try:
                 send_mail(subject, message, from_email, recipient_list, fail_silently=False)

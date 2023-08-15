@@ -280,7 +280,7 @@ def add_package_droppick(request):
 
         if form.is_valid():
             package = form.save(commit=False)
-            package.user = request.user
+            package.created_by = request.user
             package.package_number = generate_package_number()
 
             # Automatically set the dropOffLocation to the one the user belongs to
@@ -297,11 +297,18 @@ def add_package_droppick(request):
             package.recipient_longitude = recipient_longitude
 
             package.status = 'dropped_off'
+
+            selected_user_id = request.POST.get('user')
+            if selected_user_id:
+                selected_user = User.objects.get(id=selected_user_id)
+
+                package.sendersEmail = selected_user.email
+                package.sendersName = selected_user.username
             package.save()
 
 
             subject = 'Package Registered'
-            message = f"Dear sender, your package has been successfully registered.\n\n"\
+            message = f"Dear User, your package has been successfully registered.\n\n"\
                       f"If you have any questions, please contact our customer support team.\n"\
                       f"Package Number: {package.package_number}\n"\
                       f"Recipient: {package.recipientName}\n"\
@@ -313,7 +320,7 @@ def add_package_droppick(request):
             message += f"Status: {package.status}"
             
             from_email = settings.DEFAULT_FROM_EMAIL
-            recipient_list = [package.recipientEmail]
+            recipient_list = [package.recipientEmail, package.sendersEmail]
             
             try:
                 send_mail(subject, message, from_email, recipient_list, fail_silently=False)
