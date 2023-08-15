@@ -17,6 +17,7 @@ from django.core.mail import send_mail, BadHeaderError
 from django.db.models import Q
 import pandas as pd
 from django.http import HttpResponse
+from lmsapp.utils import send_sms
 
 
 
@@ -80,7 +81,6 @@ select packages and assign them to available couriers
 
 @login_required
 def warehouse_dashboard(request):
-    greeting_message = get_time_of_day()
     # warehouse_user = request.user
     # warehouse = warehouse_user.warehouse
 
@@ -118,7 +118,6 @@ def warehouse_dashboard(request):
 
     context = {
         'packages': packages,
-        'greeting_message': greeting_message,
         'available_couriers': available_couriers
     }
 
@@ -362,11 +361,14 @@ def add_package(request):
 
             # Send an email to the sender
             subject = 'Package Registered'
-            message = f"Dear sender, your package has been successfully registered.\n\n"\
-                      f"If you have any questions, please contact our customer support team.\n"\
-                      f"Package Number: {package.package_number}\n"\
-                      f"Recipient: {package.recipientName}\n"\
-                      f"Recipient Address: {package.recipientAddress}\n"
+            message = (
+                f"Dear sender, your package has been successfully registered.\n\n"
+                f"Package Number: {package.package_number}\n"
+                f"Recipient: {package.recipientName}\n"
+                f"Recipient Address: {package.recipientAddress}\n"
+                f"If you have any questions, please contact our customer support team.\n"
+            )
+
 
             if package.dropOffLocation:
                 message += f"Drop-off Location: {package.dropOffLocation.name}\n"
@@ -374,8 +376,17 @@ def add_package(request):
             message += f"Status: {package.status}"
             
             from_email = settings.DEFAULT_FROM_EMAIL
-            recipient_list = [package.recipientEmail]
-            
+            recipient_list = [package.recipientEmail, package.sendersEmail]
+                           
+            sender_contact = str(package.sendersContact).strip()
+
+            if len(sender_contact) == 10 and sender_contact.startswith('0'):
+                sender_contact = '+256' + sender_contact[1:]
+    
+            print(sender_contact)
+
+            send_sms([sender_contact], message, settings.AFRICASTALKING_SENDER)
+           
             try:
                 send_mail(subject, message, from_email, recipient_list, fail_silently=False)
             except BadHeaderError as e:

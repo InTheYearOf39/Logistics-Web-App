@@ -236,6 +236,10 @@ def receive_data_view(request):
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
+
+            # for x in ["sender", "reecvev"]:
+            #     if data.get(x, "") == "":
+            #         return JsonResponse({'error': x+ " is required"}, status=400)
             
             recipient_name = data.get('recipientName')
             recipient_email = data.get('recipientEmail')
@@ -253,11 +257,10 @@ def receive_data_view(request):
 
             user = get_object_or_404(
                 User,
-                username='mordernCoast',  
+                username='muhumuza',  
                 role='sender'
             )
             
-            # Create a new package entry in the database associated with "muhumuza"
             package = Package(
                 user=user,
                 packageName=package_name,

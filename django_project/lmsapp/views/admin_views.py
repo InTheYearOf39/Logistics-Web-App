@@ -41,8 +41,6 @@ def admin(request):
         '-assigned_at'  # Sort by assignment day in descending order
     )
 
-    greeting_message = get_time_of_day()
-
     if request.method == 'POST':
         package_id = request.POST.get('package_id')
         delivery_type = request.POST.get('delivery_type')
@@ -56,7 +54,6 @@ def admin(request):
             return redirect('assign_courier', package_id=package.id)
 
     context = {
-        'greeting_message': greeting_message,
         'packages': packages
     }
     return render(request, 'admin/admin_dashboard.html', context)

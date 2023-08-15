@@ -7,12 +7,15 @@ def send_sms(recipients, message, sender):
 
     africastalking.initialize(africastalking_username, africastalking_api_key)
     sms = africastalking.SMS
+   
     try:
         response = sms.send(message, recipients, sender)
         print(response)
+        print(recipients)
     except Exception as e:
         print(f'Ooooops!!!, we have a problem: {e}')
 
-send_sms(["+256754891512"], "Your package-PN9876 has arrived congs: OTP is - 98765! Thanks for choosing Pudonet", "LASTMILE-PUDONET")
+# sender_number = "+256754891512"
+# send_sms([sender_number], "Your package-PN9876 has arrived congs: OTP is - 98765! Thanks for choosing Pudonet", "LASTMILE-PUDONET")
 
 

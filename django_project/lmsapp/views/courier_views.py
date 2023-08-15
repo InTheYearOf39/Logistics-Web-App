@@ -7,6 +7,7 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.core.mail import send_mail, BadHeaderError
 from django.http import HttpResponse
+from lmsapp.utils import send_sms
 
 
 
@@ -17,9 +18,7 @@ to the courier on their dashboard.
 """
 def courier_dashboard(request):
     assigned_packages = Package.objects.filter(courier=request.user, status__in=['dispatched', 'ongoing', 'arrived', 'en_route', 'warehouse_arrival', 'in_transit', 'at_pickup'])
-    greeting_message = get_time_of_day()
     context = {
-        'greeting_message': greeting_message,
         'assigned_packages': assigned_packages,
     }
     return render(request, 'courier/courier_dashboard.html', context)
@@ -110,6 +109,16 @@ def notify_dropoff(request, package_id):
         from_email = settings.DEFAULT_FROM_EMAIL
         recipient_list = [package.recipientEmail]
 
+
+        recipient_telephone = str(package.recipientTelephone).strip()
+
+        if len(recipient_telephone) == 10 and recipient_telephone.startswith('0'):
+            recipient_telephone = '+256' + recipient_telephone[1:]
+
+        print(recipient_telephone)
+
+        send_sms([recipient_telephone], message, settings.AFRICASTALKING_SENDER)
+        
         try:
             send_mail(subject, message, from_email, recipient_list, fail_silently=False)
             messages.success(request, "Package drop-off notified successfully.")
@@ -191,9 +200,7 @@ A function to retrieve the completed packages assigned to the current courier an
 """
 def courier_history(request):
     assigned_packages = Package.objects.filter(courier=request.user, status__in=['completed'])
-    greeting_message = get_time_of_day()
     context = {
-        'greeting_message': greeting_message,
         'assigned_packages': assigned_packages,
     }
     return render(request, 'courier/courier_history.html', context)
