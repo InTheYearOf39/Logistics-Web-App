@@ -5,7 +5,6 @@ from lmsapp.forms import PackageForm
 from lmsapp.models import Package, User,Warehouse,DropPickZone
 import random
 import string
-from lmsapp.utils import get_time_of_day
 from django.shortcuts import redirect
 from django.contrib import messages
 from django.views.decorators.clickjacking import xframe_options_exempt
@@ -28,8 +27,6 @@ def sender_dashboard(request):
         # Your existing order_by logic here
     )
 
-    greeting_message = get_time_of_day()
-
     # Count the number of registered packages for the logged-in user
     num_registered_packages = Package.objects.filter(user=request.user).count()
 
@@ -37,7 +34,6 @@ def sender_dashboard(request):
     upcoming_packages = Package.objects.filter(user=request.user, status='upcoming')
 
     context = {
-        'greeting_message': greeting_message,
         'packages': packages,
         'num_registered_packages': num_registered_packages,
         'upcoming_packages': upcoming_packages,

@@ -12,7 +12,6 @@ from django.views.decorators.clickjacking import xframe_options_exempt
 
 from lmsapp.forms import CourierForm
 from lmsapp.models import Package, User, Warehouse, DropPickZone
-from lmsapp.utils import get_time_of_day
 
 from calendar import monthrange
 from datetime import datetime, timedelta

@@ -1,7 +1,6 @@
 from django.shortcuts import render, redirect
 from lmsapp.models import Package, User, DropPickZone
 from lmsapp.forms import PackageForm
-from lmsapp.utils import get_time_of_day
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, get_object_or_404
 from django.core.mail import send_mail, EmailMessage
@@ -30,9 +29,7 @@ The view displays the dashboard for a drop pick zone. It retrieves the packages 
 def drop_pick_zone_dashboard(request):
     drop_pick_zone = DropPickZone.objects.get(users=request.user)
     packages = Package.objects.filter(dropOffLocation=drop_pick_zone, status__in=['upcoming', 'in_transit', 'at_pickup', 'ready_for_pickup'])
-    greeting_message = get_time_of_day()
     context = {
-        'greeting_message': greeting_message,
         'packages': packages,
     }
     return render(request, 'drop_pick_zone/drop_pick_zone_dashboard.html', context)

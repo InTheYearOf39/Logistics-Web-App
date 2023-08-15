@@ -1,12 +1,18 @@
-import datetime
-import secrets
+from django.conf import settings
+import africastalking
 
-def get_time_of_day():
-    current_hour = datetime.datetime.now().hour
+def send_sms(recipients, message, sender):
+    africastalking_username = settings.AFRICASTALKING_USERNAME
+    africastalking_api_key = settings.AFRICASTALKING_API_KEY
 
-    if 5 <= current_hour < 12:
-        return "Good Morning"
-    elif 12 <= current_hour < 18:
-        return "Good Afternoon"
-    else:
-        return "Good Evening"
+    africastalking.initialize(africastalking_username, africastalking_api_key)
+    sms = africastalking.SMS
+    try:
+        response = sms.send(message, recipients, sender)
+        print(response)
+    except Exception as e:
+        print(f'Ooooops!!!, we have a problem: {e}')
+
+send_sms(["+256754891512"], "Your package-PN9876 has arrived congs: OTP is - 98765! Thanks for choosing Pudonet", "LASTMILE-PUDONET")
+
+

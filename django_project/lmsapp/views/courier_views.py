@@ -1,7 +1,6 @@
 from django.shortcuts import render, redirect, redirect
 from lmsapp.models import Package, User
 import random
-from lmsapp.utils import get_time_of_day
 from django.shortcuts import redirect, get_object_or_404
 from django.contrib import messages
 from django.core.mail import send_mail

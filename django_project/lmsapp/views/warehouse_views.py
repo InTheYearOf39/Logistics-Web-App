@@ -1,4 +1,3 @@
-from lmsapp.utils import get_time_of_day
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, redirect, get_object_or_404
 from lmsapp.models import Package, User,DropPickZone, Warehouse
