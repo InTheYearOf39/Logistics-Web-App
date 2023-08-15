@@ -16,7 +16,7 @@ import math
 from django.http import JsonResponse
 from django.contrib.auth.decorators import user_passes_test
 import math
-
+from django.core.mail import send_mail, BadHeaderError
 
 
 
@@ -271,6 +271,7 @@ def is_drop_pick_user(user):
 @xframe_options_exempt 
 @user_passes_test(is_drop_pick_user)
 def add_package_droppick(request):
+    senders = User.objects.filter(role='sender')
     if request.method == 'POST':
         form = PackageForm(request.POST)
 
@@ -296,7 +297,32 @@ def add_package_droppick(request):
             package.save()
 
 
-            return redirect('drop_pick_zone_dashboard')  # Redirect to a success page or wherever you want
+            subject = 'Package Registered'
+            message = f"Dear sender, your package has been successfully registered.\n\n"\
+                      f"If you have any questions, please contact our customer support team.\n"\
+                      f"Package Number: {package.package_number}\n"\
+                      f"Recipient: {package.recipientName}\n"\
+                      f"Recipient Address: {package.recipientAddress}\n"
+
+            if package.dropOffLocation:
+                message += f"Drop-off Location: {package.dropOffLocation.name}\n"
+
+            message += f"Status: {package.status}"
+            
+            from_email = settings.DEFAULT_FROM_EMAIL
+            recipient_list = [package.recipientEmail]
+            
+            try:
+                send_mail(subject, message, from_email, recipient_list, fail_silently=False)
+            except BadHeaderError as e:
+                # Handle the BadHeaderError
+                print("Error: BadHeaderError:", str(e))
+            except Exception as e:
+                # Handle other exceptions
+                print("Error:", str(e))
+
+
+            return redirect('received_packages')  # Redirect to a success page or wherever you want
 
     else:
         form = PackageForm()
@@ -304,7 +330,7 @@ def add_package_droppick(request):
 
     # Get the drop_pick_zones data to populate the recipientPickUpLocation dropdown
     drop_pick_zones = DropPickZone.objects.all()  # Adjust this based on your model
-    context = {'form': form, 'drop_pick_zones': drop_pick_zones, 'user_drop_pick_zone': user_drop_pick_zone}
+    context = {'form': form, 'drop_pick_zones': drop_pick_zones, 'user_drop_pick_zone': user_drop_pick_zone, 'senders': senders}
     return render(request, 'drop_pick_zone/add_package.html', context)
 
 

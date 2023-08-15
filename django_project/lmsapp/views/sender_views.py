@@ -230,3 +230,56 @@ def calculate_delivery_fee(request):
 
     return JsonResponse({'error': 'Invalid request method.'}, status=400)
 
+
+@csrf_exempt
+def receive_data_view(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            
+            recipient_name = data.get('recipientName')
+            recipient_email = data.get('recipientEmail')
+            recipient_address = data.get('recipientAddress')
+            recipient_contact = data.get('recipientContact')
+            recipient_ID = data.get('recipientIdentification')
+            package_name = data.get('packageName')
+            package_description = data.get('packageDescription')
+            package_number = data.get('packageNumber')
+            
+            customer_name = data.get('sendersName')
+            customer_email = data.get('sendersEmail')
+            customer_address = data.get('sendersAddress')
+            customer_contact = data.get('sendersContact')
+
+            user = get_object_or_404(
+                User,
+                username='mordernCoast',  
+                role='sender'
+            )
+            
+            # Create a new package entry in the database associated with "muhumuza"
+            package = Package(
+                user=user,
+                packageName=package_name,
+                deliveryType='premium',  
+                packageDescription=package_description,
+                recipientName=recipient_name,
+                recipientEmail=recipient_email,
+                recipientTelephone=recipient_contact,
+                recipientAddress=recipient_address,
+                recipientIdentification=recipient_ID,
+                sendersName=customer_name,
+                sendersEmail=customer_email,
+                sendersAddress=customer_address,
+                sendersContact=customer_contact,
+                package_number=package_number,
+                status='warehouse_arrival'  
+            )
+            
+            package.save() 
+            
+            return JsonResponse({'success': True})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+    else:
+        return JsonResponse({'error': 'Only POST requests are allowed.'}, status=405)

@@ -15,6 +15,8 @@ from lmsapp.models import Package, User, Warehouse, DropPickZone
 
 from calendar import monthrange
 from datetime import datetime, timedelta
+import pandas as pd
+from django.http import HttpResponse
 
 User = get_user_model()
 
@@ -148,11 +150,6 @@ def master_dashboard(request):
     }
     return render(request, 'admin/master_dashboard.html', context)
 
-import pandas as pd
-from django.http import HttpResponse
-# from django.db.models.functions import ExtractDay
-# from django.db.models import Count
-
 def data_export(request):
     total_packages = Package.objects.all().count()      
     # Get the datetime for the start of the current week
@@ -189,7 +186,7 @@ def data_export(request):
     }
 
     # Get the current date
-    current_date = datetime.now().strftime('%Y-%m-%d')
+    current_date = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
 
     # Create a Pandas DataFrame from the data
     df = pd.DataFrame(excel_data)

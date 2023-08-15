@@ -159,7 +159,7 @@ class Package(models.Model):
 
     PACKAGE_PREFIX = 'pn'
 
-    user = models.ForeignKey(User, on_delete=models.PROTECT, related_name='packages', null=True)
+    user = models.ForeignKey(User, on_delete=models.PROTECT, related_name='packages', null=True, blank=True)
     courier = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='assigned_packages', null=True, blank=True)
     packageName = models.CharField(max_length=100)
     deliveryType = models.CharField(max_length=20, choices=DELIVERY_CHOICES)

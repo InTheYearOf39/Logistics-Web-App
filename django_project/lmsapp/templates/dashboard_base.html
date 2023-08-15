@@ -19,14 +19,6 @@
     <title>Dashboard</title>
     <link href="{% static 'img/favicon.png' %}" rel="icon">
     <meta name="theme-color" content="#ffffff">
-    <!-- Vendors styles-->
-    <link rel="stylesheet" href="{% static 'css/dist/simplebar.css' %}">
-    <!-- Main styles for this application-->
-    <link href="{% static 'css/dist/dashboard_style.css' %}" rel="stylesheet">
-    <!-- styles to include icons -->
-    <link href="{% static '@coreui/icons/css/all.min.css' %}" rel="stylesheet">
-
-    <script src="{% static 'js/jquery-3.3.1.min.js' %}"></script>
 
     <!--Add files for google address utocomplete-->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
@@ -40,6 +32,17 @@
 
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB5r4DsYYly-d272kJopRlb9FCclcWokrE&callback=initMap&libraries=places&language=en-AU"></script>
 
+
+    <!-- Vendors styles-->
+    <link rel="stylesheet" href="{% static 'css/dist/simplebar.css' %}">
+    <!-- Main styles for this application-->
+    <link href="{% static 'css/dist/dashboard_style.css' %}" rel="stylesheet">
+    <!-- styles to include icons -->
+    <link href="{% static '@coreui/icons/css/all.min.css' %}" rel="stylesheet">
+
+    <script src="{% static 'js/jquery-3.3.1.min.js' %}"></script>
+
+    
     
     {% block static_links %}{% endblock %}
   </head>
@@ -97,12 +100,11 @@
             <li class="nav-item"><a class="nav-link" href="#">Settings</a></li>
           </ul>
           <ul class="header-nav ms-auto">
-            {% if user.role == "admin" %}
-            <li class="nav-item"><a class="nav-link" href="{% url 'data_export' %}">
-              <img src="https://icons.iconarchive.com/icons/carlosjj/microsoft-office-2013/256/Excel-icon.png" width="20px" height="20px">
-              </a>
-            </li>
-         {% endif %}
+            {% if request.path == '/warehouse_reports/' %}
+            <li class="nav-item"><button class="btn btn-primary text-white" type="button">         
+              <a class="text-white" href="{% url 'package_reports_export' %}"><i class="icon cil-cloud-download"></i></a>
+            </button></li>         
+            {% endif %}
 
             <li class="nav-item">
               

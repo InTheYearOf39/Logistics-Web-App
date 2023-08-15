@@ -5,7 +5,6 @@ from django.contrib import messages
 from django.shortcuts import render, redirect
 from lmsapp.forms import ChangePasswordForm, PackageForm
 from django.contrib.auth import update_session_auth_hash
-from django.shortcuts import redirect, get_object_or_404
 from django.contrib import messages
 from django.core.mail import send_mail
 from django.conf import settings
@@ -14,6 +13,11 @@ from django.contrib.auth.decorators import user_passes_test
 import random
 import string
 from datetime import datetime, timedelta
+from django.core.mail import send_mail, BadHeaderError
+from django.db.models import Q
+import pandas as pd
+from django.http import HttpResponse
+
 
 
 """  
@@ -81,8 +85,7 @@ def warehouse_dashboard(request):
     # warehouse = warehouse_user.warehouse
 
     packages = Package.objects.filter(
-        # dropOffLocation__warehouse=warehouse,
-        status='dropped_off'
+        Q(status='dropped_off') | Q(deliveryType='premium') | Q(deliveryType='express')
     ).select_related('dropOffLocation').order_by('dropOffLocation__tag')
 
     if request.method == 'POST':
@@ -91,7 +94,16 @@ def warehouse_dashboard(request):
         if selected_packages and courier_id:
             courier = get_object_or_404(User, id=courier_id, role='courier', status='available')
             packages = Package.objects.filter(id__in=selected_packages)
-            packages.update(courier=courier, status='dispatched')
+            
+            for package in packages:
+                if package.deliveryType == 'premium':
+                    package.status = 'en_route'
+                elif package.deliveryType == 'express':
+                    package.status = 'in_transit'
+                else:
+                    package.status = 'dispatched'
+                package.courier = courier
+                package.save()
 
             courier_status = Package.objects.filter(courier=courier, status='dispatched').exists()
 
@@ -111,6 +123,7 @@ def warehouse_dashboard(request):
     }
 
     return render(request, 'warehouse/warehouse_dashboard.html', context)
+
 
 # def warehouse_dashboard(request):
 #     # Assuming you have the warehouse information from the user or some other source
@@ -231,31 +244,27 @@ def ready_for_pickup(request):
     if request.method == 'POST':
         selected_packages = request.POST.getlist('selected_packages')
         courier_id = request.POST.get('courier')
-        drop_pick_zone_id = request.POST.get('drop_pick_zone')
 
-        if selected_packages and courier_id and drop_pick_zone_id:
+        if selected_packages and courier_id:
             courier = get_object_or_404(User, id=courier_id, role='courier')
-            drop_pick_zone = get_object_or_404(DropPickZone, id=drop_pick_zone_id)
 
             # Update the packages with the assigned courier and change their status
-            packages = Package.objects.filter(id__in=selected_packages)
-            packages.update(courier=courier, dropOffLocation=drop_pick_zone, status='in_transit')
+            packages = Package.objects.filter(id__in=selected_packages, deliveryType='premium')
+            packages.update(courier=courier, status='in_transit')
             
             courier.status = 'on-trip'
             courier.save()
 
-            messages.success(request, 'Packages successfully assigned to courier.')
+            messages.success(request, 'Premium packages successfully assigned to courier.')
 
             return redirect('warehouse_dashboard')
 
-    ready_packages = Package.objects.filter(status='in_transit')
+    ready_packages = Package.objects.filter(status='in_transit', deliveryType='premium')
     available_couriers = User.objects.filter(role='courier', status='available')
-    available_drop_pick_zones = DropPickZone.objects.all()
 
     context = {
         'ready_packages': ready_packages,
-        'available_couriers': available_couriers,
-        'available_drop_pick_zones': available_drop_pick_zones
+        'available_couriers': available_couriers
     }
     return render(request, 'warehouse/ready_for_pickup.html', context)
 
@@ -284,7 +293,49 @@ def is_warehouse_user(user):
 @login_required
 @xframe_options_exempt 
 @user_passes_test(is_warehouse_user)
+# def add_package(request):
+
+#     senders = User.objects.filter(role='sender')
+#     if request.method == 'POST':
+#         form = PackageForm(request.POST)
+
+#         if form.is_valid():
+#             package = form.save(commit=False)
+#             package.user = request.user
+#             package.package_number = generate_package_number()
+
+#             # Automatically set the warehouse to the one the user belongs to
+#             user_warehouse = request.user.warehouse
+#             if user_warehouse:
+#                 package.warehouse = user_warehouse
+#             else:
+#                 # Handle the case where the user does not have a drop_pick_zone
+#                 pass
+
+#             recipient_latitude = request.POST.get('recipient_latitude')
+#             recipient_longitude = request.POST.get('recipient_longitude')
+#             package.recipient_latitude = recipient_latitude
+#             package.recipient_longitude = recipient_longitude
+
+#             package.status = 'in_house'
+#             package.save()
+
+#             return redirect('warehouse_dashboard')  # Redirect to a success page or wherever you want
+
+#     else:
+#         form = PackageForm()
+#         user_warehouse = request.user.warehouse  # Get the user's drop_pick_zone
+
+#     # Get the drop_pick_zones data to populate the recipientPickUpLocation dropdown
+#     warehouse = Warehouse.objects.all()  # Adjust this based on your model
+#     context = {'form': form, 'warehouse': warehouse, 'user_warehouse': user_warehouse, 'senders': senders }
+#     return render(request, 'warehouse/add_package.html', context)
+
 def add_package(request):
+    msg = None
+    user_warehouse = None  # Initialize user_warehouse
+    
+    senders = User.objects.filter(role='sender')
     if request.method == 'POST':
         form = PackageForm(request.POST)
 
@@ -298,7 +349,7 @@ def add_package(request):
             if user_warehouse:
                 package.warehouse = user_warehouse
             else:
-                # Handle the case where the user does not have a drop_pick_zone
+                # Handle the case where the user does not have a warehouse
                 pass
 
             recipient_latitude = request.POST.get('recipient_latitude')
@@ -309,15 +360,42 @@ def add_package(request):
             package.status = 'in_house'
             package.save()
 
-            return redirect('warehouse_dashboard')  # Redirect to a success page or wherever you want
+            # Send an email to the sender
+            subject = 'Package Registered'
+            message = f"Dear sender, your package has been successfully registered.\n\n"\
+                      f"If you have any questions, please contact our customer support team.\n"\
+                      f"Package Number: {package.package_number}\n"\
+                      f"Recipient: {package.recipientName}\n"\
+                      f"Recipient Address: {package.recipientAddress}\n"
 
+            if package.dropOffLocation:
+                message += f"Drop-off Location: {package.dropOffLocation.name}\n"
+
+            message += f"Status: {package.status}"
+            
+            from_email = settings.DEFAULT_FROM_EMAIL
+            recipient_list = [package.recipientEmail]
+            
+            try:
+                send_mail(subject, message, from_email, recipient_list, fail_silently=False)
+            except BadHeaderError as e:
+                # Handle the BadHeaderError
+                print("Error: BadHeaderError:", str(e))
+            except Exception as e:
+                # Handle other exceptions
+                print("Error:", str(e))
+
+            msg = 'Package registered'
+            return redirect('in_house')  # Redirect to a success page or wherever you want
+        else:
+            msg = 'Form is not valid'
     else:
         form = PackageForm()
-        user_warehouse = request.user.warehouse  # Get the user's drop_pick_zone
+        user_warehouse = request.user.warehouse
 
-    # Get the drop_pick_zones data to populate the recipientPickUpLocation dropdown
+    # Get the warehouse data to populate the warehouse dropdown
     warehouse = Warehouse.objects.all()  # Adjust this based on your model
-    context = {'form': form, 'warehouse': warehouse, 'user_warehouse': user_warehouse}
+    context = {'form': form, 'warehouse': warehouse, 'user_warehouse': user_warehouse, 'senders': senders}
     return render(request, 'warehouse/add_package.html', context)
 
 def warehouse_reports(request):
@@ -350,3 +428,43 @@ def warehouse_reports(request):
     }
     
     return render(request, 'warehouse/warehouse_reports.html', context )
+
+def package_reports_export(request):
+    start_datetime = request.GET.get('start_datetime')
+    end_datetime = request.GET.get('end_datetime')
+
+    packages_delivered = Package.objects.filter(status='completed')
+    packages_ready = Package.objects.filter(status='ready_for_pickup')
+    
+    if start_datetime and end_datetime:
+        start_datetime = datetime.strptime(start_datetime, '%Y-%m-%dT%H:%M')
+        end_datetime = datetime.strptime(end_datetime, '%Y-%m-%dT%H:%M')
+        
+        # Ensure that start_datetime is always before end_datetime
+        if start_datetime > end_datetime:
+            start_datetime, end_datetime = end_datetime, start_datetime
+        
+        packages_delivered = packages_delivered.filter(completed_at__range=(start_datetime, end_datetime))
+    elif start_datetime:
+        start_datetime = datetime.strptime(start_datetime, '%Y-%m-%dT%H:%M')
+        packages_delivered = packages_delivered.filter(completed_at__gte=start_datetime)
+        
+    context = {
+        'packages_delivered': packages_delivered,
+        'packages_ready': packages_ready,
+    }
+
+    # Get the current date and time
+    current_datetime = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+
+    # Create a Pandas DataFrame from the data
+    df = pd.DataFrame(context)
+
+    # Create a response with the Excel file
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = f'attachment; filename="Package_summary_data_{current_datetime}.xlsx"'
+
+    # Save the DataFrame to the Excel response
+    df.to_excel(response, index=False, engine='openpyxl')
+    
+    return response
