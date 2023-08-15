@@ -1,0 +1,85 @@
+{% extends 'dashboard_base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+
+
+<div class="row">
+  <h5>Dropped Off Items</h5>
+  
+  <form action="" method="POST">
+    {% csrf_token %}
+
+    <div class="col-md-12">
+
+      <div class="form-group col-md-3 mb-4">
+        <!-- <label for="selectCourier" class="form-label form-label-sm">Select courier</label> -->
+        <select class="form-select form-select-sm" id="selectCourier" name="selectCourier" required>
+          <option value="" selected disabled> -- Select Courier -- </option>
+          {% for courier in available_couriers %}
+            <option value="{{ courier.id }}">{{ courier.name }}</option>
+          {% endfor %}
+        </select>
+        <div class="invalid-feedback">
+          Please select a courier.
+        </div>
+      </div>
+
+      <div class="table-responsive mb-4 bg-white">
+        <table class="table border mb-0">
+          <thead class="table-white fw-semibold">
+            <tr>
+              <th>No</th>
+              <th>Package</th>
+              <th>Recipient</th>
+              <th>From</th>
+              <th>To</th>
+              <th>Package No</th>
+              <th>Drop</th>
+              <th>Select</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for package in packages %}
+              <tr class="align-middle">
+                <td class="text-start">
+                  <div class="small text-medium-emphasis"><span>{{ forloop.counter }}</span></div>
+                </td>
+                <td class="text-start">
+                  <div class="small text-medium-emphasis"><span>{{ package.packageName }}</span></div>
+                </td>
+                <td class="text-start">
+                  <div class="small text-medium-emphasis"><span>{{ package.recipientName }}</span></div>
+                </td>
+                <td class="text-start">
+                  <div class="small text-medium-emphasis"><span>{{ package.sendersAddress }}</span></div>
+                </td>
+                <td class="text-start">
+                  <div class="small text-medium-emphasis"><span>{{ package.recipientAddress }}</span></div>
+                </td>
+                <td class="text-start">
+                  <div class="small text-medium-emphasis"><span>{{ package.package_number }}</span></div>
+                </td>
+                <td class="text-start">
+                  <div class="small text-medium-emphasis"><span>{{ package.dropOffLocation.tag }}</span></div>
+                </td>
+                <td class="text-start">
+                  <input type="checkbox" name="selected_packages" value="{{ package.id }}">
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <!-- /.col-->
+
+    <button type="submit" class="btn btn-primary btn-sm text-white mb-3">Assign Courier</button>
+  </form>
+
+</div>
+
+  
+{% endblock %}

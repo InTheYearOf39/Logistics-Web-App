@@ -15,6 +15,7 @@ import math
 import json
 from django.core.serializers.json import DjangoJSONEncoder
 from django.http import JsonResponse
+from geopy.distance import geodesic
 
 """
 Renders out a sender dashboard template and shows packages with the statuses 
@@ -67,8 +68,6 @@ and saving the package to the database with the appropriate details.
 @login_required
 @xframe_options_exempt
 def register_package(request):
-    # import json
-    from django.core.serializers.json import DjangoJSONEncoder
     api_key = settings.API_KEY
     drop_pick_zones = DropPickZone.objects.all().values()  # Retrieve users with the role of 'drop_pick_zone'
 
@@ -78,7 +77,7 @@ def register_package(request):
             package = form.save(commit=False)
             package.user = request.user
             package.package_number = generate_package_number()
-            
+
             sender_longitude = request.POST.get('sender_longitude') 
             sender_latitude = request.POST.get('sender_latitude')
 
@@ -95,7 +94,22 @@ def register_package(request):
             if courier and courier.assigned_packages.exists():
                 messages.error(request, 'Selected courier is already assigned to a package.')
                 return redirect('register_package')
-            
+
+            # Determine eligible warehouse based on delivery type and user's location
+            user_coordinates = (float(sender_latitude), float(sender_longitude))
+            warehouses = Warehouse.objects.all()
+
+            eligible_warehouses = []
+            for warehouse in warehouses:
+                warehouse_coordinates = (warehouse.latitude, warehouse.longitude)
+                distance = geodesic(user_coordinates, warehouse_coordinates).kilometers
+                if distance <= 10 and package.deliveryType in ['premium', 'express']:
+                    eligible_warehouses.append(warehouse)
+
+            if eligible_warehouses:
+                selected_warehouse = eligible_warehouses[0]  # You can choose any logic to select a warehouse
+                package.warehouse = selected_warehouse
+
             package.status = 'upcoming'
             # Save the additional fields to the package object
             package.recipientIdentification = form.cleaned_data['recipientIdentification']
@@ -118,6 +132,7 @@ def register_package(request):
     }
 
     return render(request, 'sender/register_package.html', context)
+
 
 
 @xframe_options_exempt

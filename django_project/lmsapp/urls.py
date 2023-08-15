@@ -98,6 +98,8 @@ urlpatterns = [
 
     # Warehouse routes
     path('warehouse_dashboard/', warehouse_views.warehouse_dashboard, name='warehouse_dashboard'),
+    path('premium_dashboard/', warehouse_views.premium_dashboard, name='premium_dashboard'),
+    path('express_dashboard/', warehouse_views.express_dashboard, name='express_dashboard'),
     path('confirm_arrival/<int:package_id>/', warehouse_views.confirm_arrival, name='confirm_arrival'),
     path('new_arrivals/', warehouse_views.new_arrivals, name='new_arrivals'),
     path('ready_packages/', warehouse_views.in_house, name='in_house'),

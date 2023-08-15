@@ -82,12 +82,22 @@ select packages and assign them to available couriers
 @login_required
 def warehouse_dashboard(request):
     greeting_message = get_time_of_day()
-    # warehouse_user = request.user
-    # warehouse = warehouse_user.warehouse
+
+    # packages = Package.objects.filter(
+    #     Q(status='dropped_off') | Q(deliveryType='premium') | Q(deliveryType='express')
+    # ).select_related('dropOffLocation').order_by('dropOffLocation__tag')
+
+    # packages = Package.objects.filter(
+    # Q(status='dropped_off', dropOffLocation__warehouse=request.user.warehouse) |
+    # Q(warehouse=request.user.warehouse)
+    # ).select_related('dropOffLocation').order_by('dropOffLocation__tag')
 
     packages = Package.objects.filter(
-        Q(status='dropped_off') | Q(deliveryType='premium') | Q(deliveryType='express')
+    status='dropped_off',
+    dropOffLocation__warehouse=request.user.warehouse
     ).select_related('dropOffLocation').order_by('dropOffLocation__tag')
+
+
 
     if request.method == 'POST':
         selected_packages = request.POST.getlist('selected_packages')
@@ -124,6 +134,101 @@ def warehouse_dashboard(request):
     }
 
     return render(request, 'warehouse/warehouse_dashboard.html', context)
+
+@login_required
+def premium_dashboard(request):
+    greeting_message = get_time_of_day()
+    # packages = Package.objects.filter(
+    # Q(deliveryType='premium') | Q(deliveryType='express'),
+    # status='upcoming',
+    # warehouse=request.user.warehouse
+    # ).select_related('dropOffLocation').order_by('dropOffLocation__tag')
+
+    packages = Package.objects.filter(
+    Q(deliveryType='premium'),
+    status='upcoming',
+    warehouse=request.user.warehouse
+    ).select_related('dropOffLocation').order_by('dropOffLocation__tag')
+
+    if request.method == 'POST':
+        selected_packages = request.POST.getlist('selected_packages')
+        courier_id = request.POST.get('selectCourier')  # Change the name attribute of the courier select field to "selectCourier"
+        if selected_packages and courier_id:
+            courier = get_object_or_404(User, id=courier_id, role='courier', status='available')
+            packages = Package.objects.filter(id__in=selected_packages)
+            
+            for package in packages:
+                if package.deliveryType == 'premium':
+                    package.status = 'en_route'
+                elif package.deliveryType == 'express':
+                    package.status = 'in_transit'
+                else:
+                    package.status = 'dispatched'
+                package.courier = courier
+                package.save()
+
+            courier_status = Package.objects.filter(courier=courier, status='dispatched').exists()
+
+            if courier_status:
+                courier.status = 'on-trip'
+                courier.save()
+
+            messages.success(request, 'Packages successfully assigned to courier.')
+            return redirect('warehouse_dashboard')
+
+    available_couriers = User.objects.filter(role='courier', status='available')
+
+    context = {
+        'packages': packages,
+        'greeting_message': greeting_message,
+        'available_couriers': available_couriers
+    }
+
+    return render(request, 'warehouse/premium_dashboard.html', context)
+@login_required
+def express_dashboard(request):
+    greeting_message = get_time_of_day()
+    packages = Package.objects.filter(
+    Q(deliveryType='express'),
+    status='upcoming',
+    warehouse=request.user.warehouse
+    ).select_related('dropOffLocation').order_by('dropOffLocation__tag')
+
+    if request.method == 'POST':
+        selected_packages = request.POST.getlist('selected_packages')
+        courier_id = request.POST.get('selectCourier')  # Change the name attribute of the courier select field to "selectCourier"
+        if selected_packages and courier_id:
+            courier = get_object_or_404(User, id=courier_id, role='courier', status='available')
+            packages = Package.objects.filter(id__in=selected_packages)
+            
+            for package in packages:
+                if package.deliveryType == 'premium':
+                    package.status = 'en_route'
+                elif package.deliveryType == 'express':
+                    package.status = 'in_transit'
+                else:
+                    package.status = 'dispatched'
+                package.courier = courier
+                package.save()
+
+            courier_status = Package.objects.filter(courier=courier, status='dispatched').exists()
+
+            if courier_status:
+                courier.status = 'on-trip'
+                courier.save()
+
+            messages.success(request, 'Packages successfully assigned to courier.')
+            return redirect('warehouse_dashboard')
+
+    available_couriers = User.objects.filter(role='courier', status='available')
+
+    context = {
+        'packages': packages,
+        'greeting_message': greeting_message,
+        'available_couriers': available_couriers
+    }
+
+    return render(request, 'warehouse/express_dashboard.html', context)
 
 
 # def warehouse_dashboard(request):
