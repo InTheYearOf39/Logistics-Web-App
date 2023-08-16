@@ -88,6 +88,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'lmsapp.context_processors.new_premium_packages_count',
+                'lmsapp.context_processors.new_express_packages_count',
             ],
         },
     },
