@@ -104,7 +104,7 @@
                     
                   <td class="text-start">
                     <div class="small text-medium-emphasis"><span>{% if package.status == 'in_transit' %}
-                        <form action="{% url 'notify_dropoff' package_id=package.id %}" method="post">
+                        <form action="{% url 'notify_dropoff_delivery' package_id=package.id %}" method="post">
                             {% csrf_token %}
                             <button type="submit" class="btn btn-sm btn-primary text-white">Notify Drop-off</button>
                         </form>                            

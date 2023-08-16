@@ -1,13 +1,13 @@
 from django.shortcuts import render, redirect, redirect
 from lmsapp.models import Package, User
 import random
-from lmsapp.utils import get_time_of_day
 from django.shortcuts import redirect, get_object_or_404
 from django.contrib import messages
 from django.core.mail import send_mail
 from django.conf import settings
 from django.core.mail import send_mail, BadHeaderError
 from django.http import HttpResponse
+from lmsapp.utils import send_sms
 
 
 
@@ -18,9 +18,7 @@ to the courier on their dashboard.
 """
 def courier_dashboard(request):
     assigned_packages = Package.objects.filter(courier=request.user, status__in=['dispatched', 'ongoing', 'arrived', 'en_route', 'warehouse_arrival', 'in_transit', 'at_pickup'])
-    greeting_message = get_time_of_day()
     context = {
-        'greeting_message': greeting_message,
         'assigned_packages': assigned_packages,
     }
     return render(request, 'courier/courier_dashboard.html', context)
@@ -75,42 +73,67 @@ def notify_arrival(request, package_id):
 """
 A function to handle the notification of package drop-off. When the view is accessed with a POST request, a package is retrieved by its id and it's status updated to 'at_pickup'. The user is then redirected to the courier dashboard.
 """
-def notify_dropoff(request, package_id):
+def notify_dropoff_delivery(request, package_id):
     package = get_object_or_404(Package, id=package_id)
 
+    if request.method == 'POST':
+        # Update the package status to 'at_pickup'
+        package.status = 'at_pickup'
+        package.save()
+
+        # Add any additional functionality or notifications here
+
+        messages.success(request, "Package drop-off notified successfully.")
+        return redirect('courier_dashboard')
+
+
+
+"""
+A function to handle notifying the recipient of a package arrival by sending an email with the OTP. A package is retrieved by its package id, then a random integer is generated and stored in a variable 'otp'. The otp is then associated to the package and the package is saved, The email is then sent and the the package status is updated from 'ongoing' to 'arrived'. The user is then redirected to the courier dashboard.
+ """
+def notify_recipient(request, package_id):
+    package = get_object_or_404(Package, id=package_id) 
+    print(package)
     if request.method == 'POST':
         # Check if the package deliveryType is premium
         if package.deliveryType in ['premium', 'express']:
          # Update the package status to 'arrived' for 'premium' and 'express' delivery types
            package.status = 'arrived'
-        else:
-        # Update the package status to 'at_pickup' for other delivery types
-           package.status = 'at_pickup'
 
         # Generate OTP
         otp = random.randint(100000, 999999)
 
         # Save the OTP in the package
         package.otp = otp
+        print(package.otp)
+        print(package.recipientTelephone)
         package.save()
 
+        print(package)
+
         subject = 'Package Arrival'
-        message = f"Dear sender, your package has arrived. Please find the One Time Password (OTP) for your package below:\n\n"\
+        message = f"Dear customer, your package has arrived. Please find the One Time Password (OTP) for your package below:\n\n"\
                   f"OTP: {package.otp}\n\n"\
-                  f"If you have any questions, please contact our customer support team.\n"\
-                  f"Package Number: {package.package_number}\n"\
-                  f"Recipient: {package.recipientName}\n"\
-                  f"Recipient Address: {package.recipientAddress}\n"
+                  f"Package Number: {package.package_number}, Recipient: {package.recipientName}, Status: {package.status}\n"\
+                  
+        # if package.dropOffLocation:
+        #     message += f"Drop-off Location: {package.dropOffLocation.name}\n"
 
-        if package.dropOffLocation:
-            message += f"Drop-off Location: {package.dropOffLocation.name}\n"
-
-        message += f"Status: {package.status}"
-        message += f"OTP: {package.otp}"
+        # message += f"Status: {package.status}"
 
         from_email = settings.DEFAULT_FROM_EMAIL
         recipient_list = [package.recipientEmail]
 
+
+        recipient_telephone = str(package.recipientTelephone).strip()
+
+        if len(recipient_telephone) == 10 and recipient_telephone.startswith('0'):
+            recipient_telephone = '+256' + recipient_telephone[1:]
+
+        print(recipient_telephone)
+
+        send_sms([recipient_telephone], message, settings.AFRICASTALKING_SENDER)
+        
         try:
             send_mail(subject, message, from_email, recipient_list, fail_silently=False)
             messages.success(request, "Package drop-off notified successfully.")
@@ -123,43 +146,6 @@ def notify_dropoff(request, package_id):
 
         # Add any additional functionality or notifications here
         return redirect('courier_dashboard')
-
-    return render(request, 'notify_dropoff.html', {'package': package})
-
-
-
-"""
-A function to handle notifying the recipient of a package arrival by sending an email with the OTP. A package is retrieved by its package id, then a random integer is generated and stored in a variable 'otp'. The otp is then associated to the package and the package is saved, The email is then sent and the the package status is updated from 'ongoing' to 'arrived'. The user is then redirected to the courier dashboard.
- """
-def notify_recipient(request, package_id):
-    # Retrieve the package object
-    package = Package.objects.get(pk=package_id)
-
-    # Generate OTP
-    otp = random.randint(100000, 999999)
-
-    # Save the OTP in the package
-    package.otp = otp
-    package.save()
-
-    # Send the email with OTP
-    subject = "Package Arrival Notification"
-    message = f"Dear {package.recipientName},\n\nYour package with delivery number {package.package_number} has arrived at its destination.\n\nOTP: Your One Time Password is: {otp}, please do not share this with anyone but your courier.\n\nThank you,\nThe Courier Service Team"
-    sender = settings.EMAIL_HOST_USER
-    receiver = package.recipientEmail
-
-    try:
-        send_mail(subject, message, sender, [receiver])
-        messages.success(request, "Email notification sent successfully.")
-
-        # Update the status to 'arrived'
-        if package.status == 'ongoing':
-            package.status = 'arrived'
-            package.save()
-    except Exception as e:
-        messages.error(request, "Failed to send email notification. Please try again later.")
-
-    return redirect('courier_dashboard')  # Replace with the appropriate URL
 
 
 """
@@ -192,9 +178,7 @@ A function to retrieve the completed packages assigned to the current courier an
 """
 def courier_history(request):
     assigned_packages = Package.objects.filter(courier=request.user, status__in=['completed'])
-    greeting_message = get_time_of_day()
     context = {
-        'greeting_message': greeting_message,
         'assigned_packages': assigned_packages,
     }
     return render(request, 'courier/courier_history.html', context)

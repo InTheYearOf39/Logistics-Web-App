@@ -1,7 +1,6 @@
 from django.shortcuts import render, redirect
 from lmsapp.models import Package, User, DropPickZone
 from lmsapp.forms import PackageForm
-from lmsapp.utils import get_time_of_day
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, get_object_or_404
 from django.core.mail import send_mail, EmailMessage
@@ -18,6 +17,7 @@ from django.http import JsonResponse
 from django.contrib.auth.decorators import user_passes_test
 import math
 from django.core.mail import send_mail, BadHeaderError
+from lmsapp.utils import send_sms
 
 
 
@@ -30,9 +30,7 @@ The view displays the dashboard for a drop pick zone. It retrieves the packages 
 def drop_pick_zone_dashboard(request):
     drop_pick_zone = DropPickZone.objects.get(users=request.user)
     packages = Package.objects.filter(dropOffLocation=drop_pick_zone, status__in=['upcoming', 'in_transit', 'at_pickup', 'ready_for_pickup'])
-    greeting_message = get_time_of_day()
     context = {
-        'greeting_message': greeting_message,
         'packages': packages,
     }
     return render(request, 'drop_pick_zone/drop_pick_zone_dashboard.html', context)
@@ -90,7 +88,6 @@ def confirm_at_pickup(request, package_id):
 
         # Save the OTP in the package
         package.otp = otp
-        package.save()
 
         # Update the package status
         package.status = 'ready_for_pickup'
@@ -108,6 +105,14 @@ def confirm_at_pickup(request, package_id):
         sender_user = User.objects.get(username=package.user.username)
         receiver = package.recipientEmail
 
+        recipient_contact = str(package.recipientTelephone).strip()
+
+        if len(recipient_contact) == 10 and recipient_contact.startswith('0'):
+            recipient_contact = '+256' + recipient_contact[1:]
+
+        print(recipient_contact)
+
+        send_sms([recipient_contact], message_receiver, settings.AFRICASTALKING_SENDER)
 
         try:
             send_mail(subject, message_receiver, settings.EMAIL_HOST_USER, [receiver])
@@ -308,11 +313,13 @@ def add_package_droppick(request):
 
 
             subject = 'Package Registered'
-            message = f"Dear User, your package has been successfully registered.\n\n"\
-                      f"If you have any questions, please contact our customer support team.\n"\
-                      f"Package Number: {package.package_number}\n"\
-                      f"Recipient: {package.recipientName}\n"\
-                      f"Recipient Address: {package.recipientAddress}\n"
+            message = (
+                f"Dear sender, your package has been successfully registered.\n\n"
+                f"Package Number: {package.package_number}\n"
+                f"Recipient: {package.recipientName}\n"
+                f"Recipient Address: {package.recipientAddress}\n"
+                f"If you have any questions, please contact our customer support team.\n"
+            )
 
             if package.dropOffLocation:
                 message += f"Drop-off Location: {package.dropOffLocation.name}\n"
@@ -321,8 +328,17 @@ def add_package_droppick(request):
             
             from_email = settings.DEFAULT_FROM_EMAIL
             recipient_list = [package.recipientEmail, package.sendersEmail]
-            
-            try:
+                           
+            sender_contact = str(package.sendersContact).strip()
+
+            if len(sender_contact) == 10 and sender_contact.startswith('0'):
+                sender_contact = '+256' + sender_contact[1:]
+    
+            print(sender_contact)
+
+            send_sms([sender_contact], message, "LASTMILE-PUDONET")
+
+            try:    
                 send_mail(subject, message, from_email, recipient_list, fail_silently=False)
             except BadHeaderError as e:
                 # Handle the BadHeaderError

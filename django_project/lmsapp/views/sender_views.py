@@ -5,8 +5,7 @@ from lmsapp.forms import PackageForm
 from lmsapp.models import Package, User,Warehouse,DropPickZone
 import random
 import string
-from lmsapp.utils import get_time_of_day
-from django.shortcuts import redirect,  get_object_or_404
+from django.shortcuts import redirect, get_object_or_404
 from django.contrib import messages
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.csrf import csrf_exempt
@@ -29,8 +28,6 @@ def sender_dashboard(request):
         # Your existing order_by logic here
     )
 
-    greeting_message = get_time_of_day()
-
     # Count the number of registered packages for the logged-in user
     num_registered_packages = Package.objects.filter(user=request.user).count()
 
@@ -38,7 +35,6 @@ def sender_dashboard(request):
     upcoming_packages = Package.objects.filter(user=request.user, status='upcoming')
 
     context = {
-        'greeting_message': greeting_message,
         'packages': packages,
         'num_registered_packages': num_registered_packages,
         'upcoming_packages': upcoming_packages,
@@ -255,6 +251,10 @@ def receive_data_view(request):
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
+
+            # for x in ["sender", "reecvev"]:
+            #     if data.get(x, "") == "":
+            #         return JsonResponse({'error': x+ " is required"}, status=400)
             
             recipient_name = data.get('recipientName')
             recipient_email = data.get('recipientEmail')
@@ -272,11 +272,10 @@ def receive_data_view(request):
 
             user = get_object_or_404(
                 User,
-                username='mordernCoast',  
+                username='muhumuza',  
                 role='sender'
             )
             
-            # Create a new package entry in the database associated with "muhumuza"
             package = Package(
                 user=user,
                 packageName=package_name,

@@ -1,4 +1,3 @@
-from lmsapp.utils import get_time_of_day
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, redirect, get_object_or_404
 from lmsapp.models import Package, User,DropPickZone, Warehouse
@@ -18,6 +17,7 @@ from django.core.mail import send_mail, BadHeaderError
 from django.db.models import Q
 import pandas as pd
 from django.http import HttpResponse
+from lmsapp.utils import send_sms
 
 
 
@@ -81,7 +81,6 @@ select packages and assign them to available couriers
 
 @login_required
 def warehouse_dashboard(request):
-    greeting_message = get_time_of_day()
 
     # packages = Package.objects.filter(
     #     Q(status='dropped_off') | Q(deliveryType='premium') | Q(deliveryType='express')
@@ -96,8 +95,6 @@ def warehouse_dashboard(request):
     status='dropped_off',
     dropOffLocation__warehouse=request.user.warehouse
     ).select_related('dropOffLocation').order_by('dropOffLocation__tag')
-
-
 
     if request.method == 'POST':
         selected_packages = request.POST.getlist('selected_packages')
@@ -129,7 +126,6 @@ def warehouse_dashboard(request):
 
     context = {
         'packages': packages,
-        'greeting_message': greeting_message,
         'available_couriers': available_couriers
     }
 
@@ -137,7 +133,6 @@ def warehouse_dashboard(request):
 
 @login_required
 def premium_dashboard(request):
-    greeting_message = get_time_of_day()
     # packages = Package.objects.filter(
     # Q(deliveryType='premium') | Q(deliveryType='express'),
     # status='upcoming',
@@ -180,14 +175,12 @@ def premium_dashboard(request):
 
     context = {
         'packages': packages,
-        'greeting_message': greeting_message,
         'available_couriers': available_couriers
     }
 
     return render(request, 'warehouse/premium_dashboard.html', context)
 @login_required
 def express_dashboard(request):
-    greeting_message = get_time_of_day()
     packages = Package.objects.filter(
     Q(deliveryType='express'),
     status='upcoming',
@@ -224,7 +217,6 @@ def express_dashboard(request):
 
     context = {
         'packages': packages,
-        'greeting_message': greeting_message,
         'available_couriers': available_couriers
     }
 
@@ -492,11 +484,14 @@ def add_package(request):
 
             # Send an email to the sender
             subject = 'Package Registered'
-            message = f"Dear User, your package has been successfully registered.\n\n"\
-                      f"If you have any questions, please contact our customer support team.\n"\
-                      f"Package Number: {package.package_number}\n"\
-                      f"Recipient: {package.recipientName}\n"\
-                      f"Recipient Address: {package.recipientAddress}\n"
+            message = (
+                f"Dear sender, your package has been successfully registered.\n\n"
+                f"Package Number: {package.package_number}\n"
+                f"Recipient: {package.recipientName}\n"
+                f"Recipient Address: {package.recipientAddress}\n"
+                f"If you have any questions, please contact our customer support team.\n"
+            )
+
 
             if package.dropOffLocation:
                 message += f"Drop-off Location: {package.dropOffLocation.name}\n"
@@ -505,7 +500,16 @@ def add_package(request):
             
             from_email = settings.DEFAULT_FROM_EMAIL
             recipient_list = [package.recipientEmail, package.sendersEmail]
-            
+                           
+            sender_contact = str(package.sendersContact).strip()
+
+            if len(sender_contact) == 10 and sender_contact.startswith('0'):
+                sender_contact = '+256' + sender_contact[1:]
+    
+            print(sender_contact)
+
+            send_sms([sender_contact], message, settings.AFRICASTALKING_SENDER)
+           
             try:
                 send_mail(subject, message, from_email, recipient_list, fail_silently=False)
             except BadHeaderError as e:
