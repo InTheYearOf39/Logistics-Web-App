@@ -278,7 +278,7 @@ def confirm_arrival(request, package_id):
         
         # Send email to sender
         subject = 'Package Dropped Off at Warehouse'
-        message = f'Dear sender, your package with delivery number {package.package_number} has been dropped off at the warehouse.'
+        message = f'Dear Customer, your package with delivery number {package.package_number} has been dropped off at the warehouse.'
 
         sender_user = User.objects.get(username=package.user.username)
         sender_email = sender_user.email
@@ -485,7 +485,7 @@ def add_package(request):
             # Send an email to the sender
             subject = 'Package Registered'
             message = (
-                f"Dear sender, your package has been successfully registered.\n\n"
+                f"Dear Customer, your package has been successfully registered.\n\n"
                 f"Package Number: {package.package_number}\n"
                 f"Recipient: {package.recipientName}\n"
                 f"Recipient Address: {package.recipientAddress}\n"
