@@ -10,12 +10,6 @@ def send_sms(recipients, message, sender):
    
     try:
         response = sms.send(message, recipients, sender)
-        print(response)
-        print(recipients)
     except Exception as e:
         print(f'Ooooops!!!, we have a problem: {e}')
-
-# sender_number = "+256754891512"
-# send_sms([sender_number], "Your package-PN9876 has arrived congs: OTP is - 98765! Thanks for choosing Pudonet", "LASTMILE-PUDONET")
-
 

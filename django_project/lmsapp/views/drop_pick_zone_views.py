@@ -110,8 +110,6 @@ def confirm_at_pickup(request, package_id):
         if len(recipient_contact) == 10 and recipient_contact.startswith('0'):
             recipient_contact = '+256' + recipient_contact[1:]
 
-        print(recipient_contact)
-
         send_sms([recipient_contact], message_receiver, settings.AFRICASTALKING_SENDER)
 
         try:
@@ -333,8 +331,6 @@ def add_package_droppick(request):
 
             if len(sender_contact) == 10 and sender_contact.startswith('0'):
                 sender_contact = '+256' + sender_contact[1:]
-    
-            print(sender_contact)
 
             send_sms([sender_contact], message, "LASTMILE-PUDONET")
 

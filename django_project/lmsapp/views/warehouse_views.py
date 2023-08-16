@@ -505,8 +505,6 @@ def add_package(request):
 
             if len(sender_contact) == 10 and sender_contact.startswith('0'):
                 sender_contact = '+256' + sender_contact[1:]
-    
-            print(sender_contact)
 
             send_sms([sender_contact], message, settings.AFRICASTALKING_SENDER)
            

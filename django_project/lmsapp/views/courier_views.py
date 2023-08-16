@@ -130,8 +130,6 @@ def notify_recipient(request, package_id):
         if len(recipient_telephone) == 10 and recipient_telephone.startswith('0'):
             recipient_telephone = '+256' + recipient_telephone[1:]
 
-        print(recipient_telephone)
-
         send_sms([recipient_telephone], message, settings.AFRICASTALKING_SENDER)
         
         try:
