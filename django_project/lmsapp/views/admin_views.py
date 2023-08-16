@@ -439,6 +439,11 @@ or the form is not valid, the form is displayed to the user for input.
 
 
 def create_courier(request):
+    warehouses = Warehouse.objects.all()
+    context = {
+        'warehouses': warehouses
+    }
+
     if request.method == 'POST':
         form = CourierForm(request.POST)
         if form.is_valid():
@@ -459,7 +464,10 @@ def create_courier(request):
             return redirect('couriers')
     else:
         form = CourierForm()
-    return render(request, 'admin/create_courier.html', {'form': form})
+
+    return render(request, 'admin/create_courier.html', {'form': form, **context})
+
+
 
 
 def create_warehouse_user(request):
@@ -722,6 +730,7 @@ def drop_pick_users(request):
 
 def edit_courier(request, courier_id):
     courier = get_object_or_404(User, id=courier_id, role='courier')
+    warehouses = Warehouse.objects.all()
 
     if request.method == 'POST':
         # Get form data
@@ -735,6 +744,13 @@ def edit_courier(request, courier_id):
         courier.username = username
         courier.phone = phone
         courier.address = address
+        
+        # Get the selected warehouse ID from the form data
+        selected_warehouse_id = request.POST.get('warehouse')
+        if selected_warehouse_id:
+            selected_warehouse = get_object_or_404(Warehouse, id=selected_warehouse_id)
+            courier.warehouse = selected_warehouse
+        
         courier.modified_by = request.user
         courier.save()
 
@@ -742,8 +758,10 @@ def edit_courier(request, courier_id):
 
     context = {
         'courier': courier,
+        'warehouses': warehouses
     }
     return render(request, 'admin/edit_courier.html', context)
+
 
 
 def delete_courier(request, courier_id):

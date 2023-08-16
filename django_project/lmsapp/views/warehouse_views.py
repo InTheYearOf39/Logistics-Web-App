@@ -81,19 +81,9 @@ select packages and assign them to available couriers
 
 @login_required
 def warehouse_dashboard(request):
-
-    # packages = Package.objects.filter(
-    #     Q(status='dropped_off') | Q(deliveryType='premium') | Q(deliveryType='express')
-    # ).select_related('dropOffLocation').order_by('dropOffLocation__tag')
-
-    # packages = Package.objects.filter(
-    # Q(status='dropped_off', dropOffLocation__warehouse=request.user.warehouse) |
-    # Q(warehouse=request.user.warehouse)
-    # ).select_related('dropOffLocation').order_by('dropOffLocation__tag')
-
     packages = Package.objects.filter(
-    status='dropped_off',
-    dropOffLocation__warehouse=request.user.warehouse
+        status='dropped_off',
+        dropOffLocation__warehouse=request.user.warehouse
     ).select_related('dropOffLocation').order_by('dropOffLocation__tag')
 
     if request.method == 'POST':
@@ -122,7 +112,10 @@ def warehouse_dashboard(request):
             messages.success(request, 'Packages successfully assigned to courier.')
             return redirect('warehouse_dashboard')
 
-    available_couriers = User.objects.filter(role='courier', status='available')
+    # Filter available couriers based on the warehouse
+    available_couriers = User.objects.filter(
+        role='courier', status='available', warehouse=request.user.warehouse
+    )
 
     context = {
         'packages': packages,
@@ -131,27 +124,22 @@ def warehouse_dashboard(request):
 
     return render(request, 'warehouse/warehouse_dashboard.html', context)
 
+
 @login_required
 def premium_dashboard(request):
-    # packages = Package.objects.filter(
-    # Q(deliveryType='premium') | Q(deliveryType='express'),
-    # status='upcoming',
-    # warehouse=request.user.warehouse
-    # ).select_related('dropOffLocation').order_by('dropOffLocation__tag')
-
     packages = Package.objects.filter(
-    Q(deliveryType='premium'),
-    status='upcoming',
-    warehouse=request.user.warehouse
+        Q(deliveryType='premium'),
+        status='upcoming',
+        warehouse=request.user.warehouse
     ).select_related('dropOffLocation').order_by('dropOffLocation__tag')
 
     if request.method == 'POST':
         selected_packages = request.POST.getlist('selected_packages')
-        courier_id = request.POST.get('selectCourier')  # Change the name attribute of the courier select field to "selectCourier"
+        courier_id = request.POST.get('selectCourier')
         if selected_packages and courier_id:
             courier = get_object_or_404(User, id=courier_id, role='courier', status='available')
             packages = Package.objects.filter(id__in=selected_packages)
-            
+
             for package in packages:
                 if package.deliveryType == 'premium':
                     package.status = 'en_route'
@@ -171,7 +159,10 @@ def premium_dashboard(request):
             messages.success(request, 'Packages successfully assigned to courier.')
             return redirect('warehouse_dashboard')
 
-    available_couriers = User.objects.filter(role='courier', status='available')
+    # Filter couriers based on the warehouse
+    available_couriers = User.objects.filter(
+        role='courier', status='available', warehouse=request.user.warehouse
+    )
 
     context = {
         'packages': packages,
@@ -179,12 +170,14 @@ def premium_dashboard(request):
     }
 
     return render(request, 'warehouse/premium_dashboard.html', context)
+
+
 @login_required
 def express_dashboard(request):
     packages = Package.objects.filter(
-    Q(deliveryType='express'),
-    status='upcoming',
-    warehouse=request.user.warehouse
+        Q(deliveryType='express'),
+        status='upcoming',
+        warehouse=request.user.warehouse
     ).select_related('dropOffLocation').order_by('dropOffLocation__tag')
 
     if request.method == 'POST':
@@ -213,7 +206,9 @@ def express_dashboard(request):
             messages.success(request, 'Packages successfully assigned to courier.')
             return redirect('warehouse_dashboard')
 
-    available_couriers = User.objects.filter(role='courier', status='available')
+    available_couriers = User.objects.filter(
+        role='courier', status='available', warehouse=request.user.warehouse
+    )
 
     context = {
         'packages': packages,
@@ -221,6 +216,7 @@ def express_dashboard(request):
     }
 
     return render(request, 'warehouse/express_dashboard.html', context)
+
 
 
 # def warehouse_dashboard(request):
