@@ -93,7 +93,7 @@ urlpatterns = [
     path('notify_recipient/<int:package_id>/', courier_views.notify_recipient, name='notify_recipient'),
     path('confirm_delivery/<int:package_id>/', courier_views.confirm_delivery, name='confirm_delivery'),
     path('courier_history/', courier_views.courier_history, name='courier_history'),
-    path('notify_dropoff/<int:package_id>/', courier_views.notify_dropoff, name='notify_dropoff'),
+    path('notify_dropoff_delivery/<int:package_id>/', courier_views.notify_dropoff_delivery, name='notify_dropoff_delivery'),
 
 
     # Warehouse routes
