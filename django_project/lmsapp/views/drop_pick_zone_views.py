@@ -50,7 +50,7 @@ def confirm_drop_off(request, package_id):
 
         # Send an email notification to the sender
         subject = 'Package Dropped Off'
-        message = f'Dear sender, your package with delivery number {package.package_number} has been dropped off at {package.dropOffLocation}.'
+        message = f'Dear Customer, your package with delivery number {package.package_number} has been dropped off at {package.dropOffLocation}.'
 
         sender_user = User.objects.get(username=package.user.username)
         sender_email = sender_user.email
@@ -101,7 +101,7 @@ def confirm_at_pickup(request, package_id):
         # Send the email with OTP
         subject = "Package Arrival Notification"
         message_receiver = f"Dear {package.recipientName},\n\nYour package with delivery number {package.package_number} has arrived at its destination.\n\nOTP: Your One Time Password is: {otp}, please do not share this with anyone but your courier.\n\nThank you,\nThe Courier Service Team"
-        message_sender = f"Dear Sender,\n\nThe package with delivery number {package.package_number} has arrived at the pick-up location.\n\nThank you,\nThe Courier Service Team."
+        message_sender = f"Dear Customer,\n\nThe package with delivery number {package.package_number} has arrived at the pick-up location.\n\nThank you,\nThe Courier Service Team."
         sender_user = User.objects.get(username=package.user.username)
         receiver = package.recipientEmail
 
@@ -192,7 +192,7 @@ def confirm_pickup(request, package_id):
 
         # Send an email notification to the sender
         subject = 'Package Update: En Route to Warehouse'
-        message = f'Dear Sender, your package {package.package_number} is now en route to the warehouse.'
+        message = f'Dear Customer, your package {package.package_number} is now en route to the warehouse.'
 
         sender_user = User.objects.get(username=package.user.username)
         sender_email = sender_user.email
@@ -260,15 +260,10 @@ def confirm_pickedup(request, package_id):
     
     return redirect('drop_pick_zone_dashboard')  # Replace with the appropriate URL for the warehouse dashboard
 
-
-
 def generate_package_number():
     prefix = 'pn'
     digits = ''.join(random.choices(string.digits, k=5))
     return f'{prefix}{digits}'
-
-   
-
 
 def is_drop_pick_user(user):
     return user.role == 'drop_pick_zone'
@@ -312,7 +307,7 @@ def add_package_droppick(request):
 
             subject = 'Package Registered'
             message = (
-                f"Dear sender, your package has been successfully registered.\n\n"
+                f"Dear Customer, your package has been successfully registered.\n\n"
                 f"Package Number: {package.package_number}\n"
                 f"Recipient: {package.recipientName}\n"
                 f"Recipient Address: {package.recipientAddress}\n"

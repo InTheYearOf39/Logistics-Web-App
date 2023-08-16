@@ -67,7 +67,7 @@ def notify_arrival(request, package_id):
     except Exception as e:
         messages.error(request, f"An error occurred: {str(e)}")
 
-    return HttpResponse("Notification attempted.") # Replace with the appropriate URL
+    return redirect("courier_dashboard") # Replace with the appropriate URL
 
 
 """
