@@ -105,11 +105,7 @@ def notify_recipient(request, package_id):
 
         # Save the OTP in the package
         package.otp = otp
-        print(package.otp)
-        print(package.recipientTelephone)
         package.save()
-
-        print(package)
 
         subject = 'Package Arrival'
         message = f"Dear customer, your package has arrived. Please find the One Time Password (OTP) for your package below:\n\n"\
