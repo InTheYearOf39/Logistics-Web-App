@@ -343,7 +343,7 @@ def ready_for_pickup(request):
             courier = get_object_or_404(User, id=courier_id, role='courier')
 
             # Update the packages with the assigned courier and change their status
-            packages = Package.objects.filter(id__in=selected_packages, deliveryType='premium')
+            packages = Package.objects.filter(id__in=selected_packages, deliveryType=['premium', 'standard'])
             packages.update(courier=courier, status='in_transit')
             
             courier.status = 'on-trip'
@@ -351,7 +351,7 @@ def ready_for_pickup(request):
 
             messages.success(request, 'Premium packages successfully assigned to courier.')
 
-            return redirect('warehouse_dashboard')
+            return redirect('in_house')
 
     ready_packages = Package.objects.filter(status='in_transit', deliveryType='premium')
     available_couriers = User.objects.filter(role='courier', status='available')
