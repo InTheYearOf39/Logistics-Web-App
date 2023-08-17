@@ -67,7 +67,7 @@ def notify_arrival(request, package_id):
     except Exception as e:
         messages.error(request, f"An error occurred: {str(e)}")
 
-    return HttpResponse("Notification attempted.") # Replace with the appropriate URL
+    return redirect("courier_dashboard") # Replace with the appropriate URL
 
 
 """
@@ -105,11 +105,7 @@ def notify_recipient(request, package_id):
 
         # Save the OTP in the package
         package.otp = otp
-        print(package.otp)
-        print(package.recipientTelephone)
         package.save()
-
-        print(package)
 
         subject = 'Package Arrival'
         message = f"Dear customer, your package has arrived. Please find the One Time Password (OTP) for your package below:\n\n"\
@@ -129,8 +125,6 @@ def notify_recipient(request, package_id):
 
         if len(recipient_telephone) == 10 and recipient_telephone.startswith('0'):
             recipient_telephone = '+256' + recipient_telephone[1:]
-
-        print(recipient_telephone)
 
         send_sms([recipient_telephone], message, settings.AFRICASTALKING_SENDER)
         

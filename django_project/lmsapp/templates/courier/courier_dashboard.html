@@ -23,6 +23,9 @@
                   {% if package.status == 'in_transit' %}
                   <th></th>
                   {% endif %}
+                  {% if package.status == 'en_route' %}
+                  <th></th>
+                  {% endif %}
                   {% endfor %}
                 </tr>
               </thead>
@@ -101,16 +104,19 @@
                     
                     {% endif %}</span></div>
                   </td>
-                    
+                   
+                  {% if package.status == 'in_transit' %}
                   <td class="text-start">
-                    <div class="small text-medium-emphasis"><span>{% if package.status == 'in_transit' %}
+                    <div class="small text-medium-emphasis"><span>
                         <form action="{% url 'notify_dropoff_delivery' package_id=package.id %}" method="post">
                             {% csrf_token %}
                             <button type="submit" class="btn btn-sm btn-primary text-white">Notify Drop-off</button>
                         </form>                            
-                    {% endif %}</span>
-                </div>
+                    </span>
+                    </div>
                   </td>
+                  {% endif %}
+                  
                  
                 </tr>
                 {% endfor %}

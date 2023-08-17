@@ -149,7 +149,7 @@ class DropPickForm(forms.ModelForm):
 class CourierForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ['name', 'username', 'phone', 'address']
+        fields = ['name', 'username', 'phone', 'address', 'warehouse']
 
 # class CourierForm(forms.ModelForm):
 #     class Meta:

@@ -81,11 +81,9 @@ select packages and assign them to available couriers
 
 @login_required
 def warehouse_dashboard(request):
-    # warehouse_user = request.user
-    # warehouse = warehouse_user.warehouse
-
     packages = Package.objects.filter(
-        Q(status='dropped_off') | Q(deliveryType='premium') | Q(deliveryType='express')
+        status='dropped_off',
+        dropOffLocation__warehouse=request.user.warehouse
     ).select_related('dropOffLocation').order_by('dropOffLocation__tag')
 
     if request.method == 'POST':
@@ -114,7 +112,10 @@ def warehouse_dashboard(request):
             messages.success(request, 'Packages successfully assigned to courier.')
             return redirect('warehouse_dashboard')
 
-    available_couriers = User.objects.filter(role='courier', status='available')
+    # Filter available couriers based on the warehouse
+    available_couriers = User.objects.filter(
+        role='courier', status='available', warehouse=request.user.warehouse
+    )
 
     context = {
         'packages': packages,
@@ -122,6 +123,100 @@ def warehouse_dashboard(request):
     }
 
     return render(request, 'warehouse/warehouse_dashboard.html', context)
+
+
+@login_required
+def premium_dashboard(request):
+    packages = Package.objects.filter(
+        Q(deliveryType='premium'),
+        status='upcoming',
+        warehouse=request.user.warehouse
+    ).select_related('dropOffLocation').order_by('dropOffLocation__tag')
+
+    if request.method == 'POST':
+        selected_packages = request.POST.getlist('selected_packages')
+        courier_id = request.POST.get('selectCourier')
+        if selected_packages and courier_id:
+            courier = get_object_or_404(User, id=courier_id, role='courier', status='available')
+            packages = Package.objects.filter(id__in=selected_packages)
+
+            for package in packages:
+                if package.deliveryType == 'premium':
+                    package.status = 'en_route'
+                elif package.deliveryType == 'express':
+                    package.status = 'in_transit'
+                else:
+                    package.status = 'dispatched'
+                package.courier = courier
+                package.save()
+
+            courier_status = Package.objects.filter(courier=courier, status='dispatched').exists()
+
+            if courier_status:
+                courier.status = 'on-trip'
+                courier.save()
+
+            messages.success(request, 'Packages successfully assigned to courier.')
+            return redirect('warehouse_dashboard')
+
+    # Filter couriers based on the warehouse
+    available_couriers = User.objects.filter(
+        role='courier', status='available', warehouse=request.user.warehouse
+    )
+
+    context = {
+        'packages': packages,
+        'available_couriers': available_couriers
+    }
+
+    return render(request, 'warehouse/premium_dashboard.html', context)
+
+
+@login_required
+def express_dashboard(request):
+    packages = Package.objects.filter(
+        Q(deliveryType='express'),
+        status='upcoming',
+        warehouse=request.user.warehouse
+    ).select_related('dropOffLocation').order_by('dropOffLocation__tag')
+
+    if request.method == 'POST':
+        selected_packages = request.POST.getlist('selected_packages')
+        courier_id = request.POST.get('selectCourier')  # Change the name attribute of the courier select field to "selectCourier"
+        if selected_packages and courier_id:
+            courier = get_object_or_404(User, id=courier_id, role='courier', status='available')
+            packages = Package.objects.filter(id__in=selected_packages)
+            
+            for package in packages:
+                if package.deliveryType == 'premium':
+                    package.status = 'en_route'
+                elif package.deliveryType == 'express':
+                    package.status = 'in_transit'
+                else:
+                    package.status = 'dispatched'
+                package.courier = courier
+                package.save()
+
+            courier_status = Package.objects.filter(courier=courier, status='dispatched').exists()
+
+            if courier_status:
+                courier.status = 'on-trip'
+                courier.save()
+
+            messages.success(request, 'Packages successfully assigned to courier.')
+            return redirect('warehouse_dashboard')
+
+    available_couriers = User.objects.filter(
+        role='courier', status='available', warehouse=request.user.warehouse
+    )
+
+    context = {
+        'packages': packages,
+        'available_couriers': available_couriers
+    }
+
+    return render(request, 'warehouse/express_dashboard.html', context)
+
 
 
 # def warehouse_dashboard(request):
@@ -179,7 +274,7 @@ def confirm_arrival(request, package_id):
         
         # Send email to sender
         subject = 'Package Dropped Off at Warehouse'
-        message = f'Dear sender, your package with delivery number {package.package_number} has been dropped off at the warehouse.'
+        message = f'Dear Customer, your package with delivery number {package.package_number} has been dropped off at the warehouse.'
 
         sender_user = User.objects.get(username=package.user.username)
         sender_email = sender_user.email
@@ -329,6 +424,9 @@ def is_warehouse_user(user):
 #     warehouse = Warehouse.objects.all()  # Adjust this based on your model
 #     context = {'form': form, 'warehouse': warehouse, 'user_warehouse': user_warehouse, 'senders': senders }
 #     return render(request, 'warehouse/add_package.html', context)
+@login_required
+@xframe_options_exempt 
+@user_passes_test(is_warehouse_user)
 
 def add_package(request):
     msg = None
@@ -340,7 +438,7 @@ def add_package(request):
 
         if form.is_valid():
             package = form.save(commit=False)
-            package.user = request.user
+            package.created_by = request.user
             package.package_number = generate_package_number()
 
             # Automatically set the warehouse to the one the user belongs to
@@ -357,12 +455,33 @@ def add_package(request):
             package.recipient_longitude = recipient_longitude
 
             package.status = 'in_house'
+
+            selected_user_id = request.POST.get('user')
+            if selected_user_id:
+                selected_user = User.objects.get(id=selected_user_id)
+
+                package.sendersEmail = selected_user.email
+                package.sendersName = selected_user.username
             package.save()
+
+            
+            # if 'userCheckbox' in request.POST:
+            #     selected_user_id = request.POST.get('user')
+            #     if selected_user_id:
+            #         selected_user = User.objects.get(id=selected_user_id)
+            #         print(selected_user)
+            #         package.sendersEmail = selected_user.email
+            #         package.sendersName = selected_user.username
+
+            # # Save the package after updating the fields
+            # # print("Form Data:", request.POST)  # Print the form data
+            # package.save()
+
 
             # Send an email to the sender
             subject = 'Package Registered'
             message = (
-                f"Dear sender, your package has been successfully registered.\n\n"
+                f"Dear Customer, your package has been successfully registered.\n\n"
                 f"Package Number: {package.package_number}\n"
                 f"Recipient: {package.recipientName}\n"
                 f"Recipient Address: {package.recipientAddress}\n"
@@ -382,8 +501,6 @@ def add_package(request):
 
             if len(sender_contact) == 10 and sender_contact.startswith('0'):
                 sender_contact = '+256' + sender_contact[1:]
-    
-            print(sender_contact)
 
             send_sms([sender_contact], message, settings.AFRICASTALKING_SENDER)
            

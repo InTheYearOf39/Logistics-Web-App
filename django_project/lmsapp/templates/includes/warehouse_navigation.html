@@ -2,9 +2,30 @@
     
   <li class="nav-item">
     <a class="nav-link" href="{% url 'warehouse_dashboard' %}">
-      <i class="nav-icon cil-layers"></i>Dashboard
+      <i class="nav-icon cil-layers"></i>Standard
     </a>
   </li>
+
+  <li class="nav-item">
+    <a class="nav-link" href="{% url 'premium_dashboard' %}">
+      <i class="nav-icon cil-layers"></i> Premium&nbsp;&nbsp;  <!-- Add a space character here -->
+  
+      {% if new_premium_packages_count > 0 %}
+        <span class="badge bg-danger text-white">{{ new_premium_packages_count }}</span>
+      {% endif %}
+    </a>
+  </li>
+
+  <li class="nav-item">
+    <a class="nav-link" href="{% url 'express_dashboard' %}">
+      <i class="nav-icon cil-layers"></i>Express&nbsp;&nbsp;
+        {% if new_express_packages_count > 0 %}
+          <span class="badge bg-danger text-white">{{ new_express_packages_count }}</span>
+        {% endif %}
+    </a>
+  </li>
+  
+
   <li class="nav-item">
     <a class="nav-link" href="{% url 'add_package' %}">
       <i class="nav-icon cil-plus"></i>Add Package
