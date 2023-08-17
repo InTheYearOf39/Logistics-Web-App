@@ -18,6 +18,7 @@ from django.contrib.auth.decorators import user_passes_test
 import math
 from django.core.mail import send_mail, BadHeaderError
 from lmsapp.utils import send_sms
+from django.db.models import Q
 
 
 
@@ -29,11 +30,18 @@ The view displays the dashboard for a drop pick zone. It retrieves the packages 
 @login_required
 def drop_pick_zone_dashboard(request):
     drop_pick_zone = DropPickZone.objects.get(users=request.user)
-    packages = Package.objects.filter(dropOffLocation=drop_pick_zone, status__in=['upcoming', 'in_transit', 'at_pickup', 'ready_for_pickup'])
+    packages = Package.objects.filter(
+        (
+            Q(dropOffLocation=drop_pick_zone, status__in=['upcoming', 'in_transit']) |
+            Q(recipientPickUpLocation=drop_pick_zone, status__in=['at_pickup', 'ready_for_pickup'])
+        )
+    )
     context = {
         'packages': packages,
     }
     return render(request, 'drop_pick_zone/drop_pick_zone_dashboard.html', context)
+
+
 
 """ 
 the view enables a drop_pick_zone user to confirm the drop-off of a package at the drop_pick_zone. 
