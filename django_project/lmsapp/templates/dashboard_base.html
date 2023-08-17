@@ -138,13 +138,16 @@
               </div><a class="dropdown-item" href="#"><i class="icon me-2 cil-bell"></i>Updates<span class="badge badge-sm bg-info ms-2">42</span></a>
                     <a class="dropdown-item" href="#"><i class="icon me-2 cil-envelope-open"></i>Messages<span class="badge badge-sm bg-success ms-2">42</span></a>
                     <a class="dropdown-item" href="#"><i class="icon me-2 cil-task"></i>Tasks<span class="badge badge-sm bg-danger ms-2">42</span></a>
-                      <a class="dropdown-item" href="#"><i class="icon me-2 cil-comment-square"></i>Comments<span class="badge badge-sm bg-warning ms-2">42</span></a>
+                      <!-- <a class="dropdown-item" href="#"><i class="icon me-2 cil-comment-square"></i>Comments<span class="badge badge-sm bg-warning ms-2">42</span></a> -->
               <div class="dropdown-header bg-light py-2">
                 <div class="fw-semibold">Settings</div>
               </div><a class="dropdown-item" href="#"><i class="icon me-2 cil-user"></i>Profile</a>
+                  {% if user.role == "sender" %}      
+                    <a class="dropdown-item" href="{% url 'generate_api_key' %}"><i class="icon me-2 cil-sitemap"></i>Developer</a>
+                  {% endif %}
                     <a class="dropdown-item" href="#"><i class="icon me-2 cil-settings"></i>Settings</a>
-                    <a class="dropdown-item" href="#"><i class="icon me-2 cil-credit-card"></i>Payments<span class="badge badge-sm bg-secondary ms-2">42</span></a>
-                    <a class="dropdown-item" href="#"><i class="icon me-2 cil-file"></i>Projects<span class="badge badge-sm bg-primary ms-2">42</span></a>
+                    <!-- <a class="dropdown-item" href="#"><i class="icon me-2 cil-credit-card"></i>Payments<span class="badge badge-sm bg-secondary ms-2">42</span></a>
+                    <a class="dropdown-item" href="#"><i class="icon me-2 cil-file"></i>Projects<span class="badge badge-sm bg-primary ms-2">42</span></a> -->
               <div class="dropdown-divider"></div>
               <!-- <a class="dropdown-item" href="#"><i class="icon me-2 cil-lock-locked"></i>Lock Account</a> -->
                   <a class="dropdown-item" href="{% url 'logout_user' %}"><i class="icon me-2 cil-account-logout"></i>Logout</a>

@@ -249,8 +249,131 @@ def calculate_delivery_fee(request):
     return JsonResponse({'error': 'Invalid request method.'}, status=400)
 
 
+# @csrf_exempt
+# def receive_data_view(request):
+#     if request.method == 'POST':
+#         try:
+#             data = json.loads(request.body)
+#             for field in data:
+#                 if isinstance(data[field], str):
+#                     data[field] = data[field].strip()
+
+#             expected_data_types = {
+#                 "recipientName": str,
+#                 "recipientEmail": str,
+#                 "recipientAddress": str,
+#                 "recipientContact": str,
+#                 "recipientIdentification": str,
+#                 "packageName": str,
+#                 "packageDescription": str,
+#                 "packageNumber": str,
+#                 "sendersName": str,
+#                 "sendersEmail": str,
+#                 "sendersAddress": str,
+#                 "sendersContact": str,
+#             }
+
+#             for field, expected_type in expected_data_types.items():
+#                 value = data.get(field)
+#                 if not isinstance(value, expected_type):
+#                     return JsonResponse({'error': f'{field} must be a {expected_type.__name__}'}, status=400)
+                
+#             for x in [
+#                 "recipientName", "recipientAddress", "recipientContact","packageName","sendersContact",
+#                 "packageDescription", "packageNumber", "sendersName","sendersAddress" 
+#             ]:
+#                 if data.get(x, "") == "":
+#                     return JsonResponse({'error': f'{x} is required'}, status=400)
+                                  
+#             recipient_name = data.get('recipientName')
+#             recipient_email = data.get('recipientEmail')
+#             recipient_address = data.get('recipientAddress')
+#             recipient_contact = data.get('recipientContact')
+#             recipient_ID = data.get('recipientIdentification')
+#             package_name = data.get('packageName')
+#             package_description = data.get('packageDescription')
+#             package_number = data.get('packageNumber')
+
+#             sender_name = data.get('sendersName')
+#             sender_email = data.get('sendersEmail')
+#             sender_address = data.get('sendersAddress')
+#             sender_contact = data.get('sendersContact')
+               
+#             try:
+#                 validate_email(recipient_email)
+#                 validate_email(sender_email)
+#             except ValidationError:
+#                 return JsonResponse({'error': 'Invalid email format'}, status=400)
+                     
+#             user = get_object_or_404(
+#                 User,
+#                 username='muhumuza',
+#                 role='sender'
+#             )
+                    
+#             package = Package(
+#                 user=user,
+#                 packageName=package_name,
+#                 deliveryType='premium', 
+#                 packageDescription=package_description,
+#                 recipientName=recipient_name,
+#                 recipientEmail=recipient_email,
+#                 recipientTelephone=recipient_contact,
+#                 recipientAddress=recipient_address,
+#                 recipientIdentification=recipient_ID,
+#                 sendersName=sender_name,
+#                 sendersEmail=sender_email,
+#                 sendersAddress=sender_address,
+#                 sendersContact=sender_contact,
+#                 package_number=package_number,
+#                 status='warehouse_arrival'
+#             )
+
+#             package.save()
+#             response_data = {
+#                 'response': {
+#                     'success': True,
+#                     'data': {
+#                     "recipientName" : recipient_name,
+#                     "recipientEmail" :recipient_email,
+#                     "recipientAddress" : recipient_address, 
+#                     "recipientContact" : recipient_contact,
+#                     "recipientIdentification" : recipient_ID,
+#                     "packageName" : package_name,
+#                     "packageDescription" : package_description,
+#                     "packageNumber" : package_number,
+#                     "sendersName" : sender_name,
+#                     "sendersEmail" : sender_email,
+#                     "sendersAddress" : sender_address,
+#                     "sendersContact" : sender_contact
+#                     }
+#                 }
+#             }
+
+#             return JsonResponse(response_data, status=200)
+        
+#         except ValueError as ve:
+#             return JsonResponse({'error': str(ve)}, status=400)
+#         except IntegrityError as ie:
+#                 if 'UNIQUE constraint failed: lmsapp_package.package_number' in str(ie):
+#                     return JsonResponse({'error': 'Package number already exists'}, status=400)
+#         except Exception as e:
+#             return JsonResponse({'error': str(e)}, status=400)
+#     else:
+#         return JsonResponse({'error': 'Only POST requests are allowed.'}, status=405)
+
+
 @csrf_exempt
 def receive_data_view(request):
+    api_key = request.META.get('HTTP_X_API_KEY')
+    content_type = request.META.get('CONTENT_TYPE')
+
+    if api_key != 'your_generated_api_key':
+        return JsonResponse({'error': 'Invalid API key'}, status=401)
+           
+    if content_type != 'application/json':
+        return JsonResponse({'error': 'Invalid content type'}, status=400)
+    
     if request.method == 'POST':
         try:
             data = json.loads(request.body)

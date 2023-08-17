@@ -1,0 +1,33 @@
+{% extends 'dashboard_base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+
+<h4 class="mb-4">Generate API Key</h4>
+
+    <form method="post">
+        {% csrf_token %}
+            <div class="col-md-6"> 
+                <label for="generateApiKey" class="form-label form-label-sm">Generate API key</label>
+                {{ form.password }}
+            </div> 
+            <div class="col-md-6 my-4"> 
+                <button type="submit" class="btn btn-md btn-primary text-white">Send</button>
+            </div>
+
+    </form>
+
+
+    {% if error_message %}
+        <p>{{ error_message }}</p>
+    {% endif %}
+
+    {% if api_key %}
+        <h4>API Key Generated</h4>
+        <p>Your API key has been generated:</p>
+        <p><strong>{{ api_key }}</strong></p>
+    {% endif %}
+
+{% endblock %}

@@ -8,6 +8,8 @@ from django.contrib.auth import update_session_auth_hash
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import send_mail
 from django.conf import settings
+from lmsapp.utils import generate_and_store_api_key
+from lmsapp.forms import ApiForm
 
 
 """
@@ -139,3 +141,31 @@ def change_password(request):
     else:
         form = ChangePasswordForm(request.user)
     return render(request, 'change_password.html', {'form': form})
+
+def generate_api_key(request):
+    if request.method == 'POST':
+        form = ApiForm(request.POST)
+        user = request.user
+        username = user.username
+
+        if form.is_valid():            
+            password = form.cleaned_data['password']
+            
+            try:
+                # user = User.objects.get(username=username)
+                user = authenticate(username=username, password=password)
+                if user:
+                    api_key = generate_and_store_api_key(user)
+                    return render(request, 'api_key_generated.html', {'api_key': api_key})
+                else:
+                    error_message = "Wrong Credentials!!!!."
+            except User.DoesNotExist:
+                error_message = "User does not exist."
+        else:
+            error_message = "Invalid form data."
+
+        return render(request, 'auth/generate_api_key.html', {'form': form, 'error_message': error_message})
+    else:
+        form = ApiForm()
+
+    return render(request, 'auth/generate_api_key.html', {'form': form})

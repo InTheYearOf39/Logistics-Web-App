@@ -201,3 +201,20 @@ class ChangePasswordForm(SetPasswordForm):
 
     def validate_password(self, password):
         password_validation.validate_password(password, self.user)
+
+
+class ApiForm(forms.Form):
+    password = forms.CharField(
+        max_length=150,
+        label="Enter Password",
+        strip=False,
+        widget=forms.PasswordInput(
+            attrs={
+                "class": "form-control form-control-sm",
+                "placeholder": "Enter password",
+                "type": "password",
+                "name": "generateApiKey",
+                "id": "generateApiKey"
+            }
+        )
+    )

@@ -27,6 +27,7 @@ urlpatterns = [
 	path('email-verification-sent/', authentication_views.email_verification_sent, name='email_verification_sent'),
     path('email-verification-failed/', authentication_views.email_verification_failed, name='email_verification_failed'),
     path('verify-email/', authentication_views.verify_email, name='verify_email'),
+    path('settings/generate_api_key/', authentication_views.generate_api_key, name='generate_api_key'),
 
     # reset password routes
     path( 'reset_password/', 

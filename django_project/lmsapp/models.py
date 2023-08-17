@@ -7,7 +7,6 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.utils.crypto import get_random_string
 
-
 class CustomUserManager(UserManager):
     def create_admin(self, username, password):
         admin = self.create_user(username=username, password=password)
@@ -229,3 +228,12 @@ class Notification(models.Model):
     message = models.TextField()
     is_read = models.BooleanField(default=False)
     timestamp = models.DateTimeField(auto_now_add=True)
+
+
+class APIKey(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    api_key = models.CharField(max_length=64, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"API Key for {self.user.username}"
