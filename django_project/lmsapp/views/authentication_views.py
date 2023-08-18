@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, redirect
 from django.contrib.auth import authenticate, login, logout
 from lmsapp.forms import SignUpForm, LoginForm
 from lmsapp.models import User
+from allauth.account.models import EmailAddress
 from django.contrib import messages
 from lmsapp.forms import ChangePasswordForm
 from django.contrib.auth import update_session_auth_hash
@@ -10,7 +11,7 @@ from django.core.mail import send_mail
 from django.conf import settings
 from lmsapp.utils import generate_and_store_api_key
 from lmsapp.forms import ApiForm
-
+from django.contrib.auth.decorators import login_required
 
 """
 A function to handle user registration. The form data is validated, and if valid, a user is created, saved to the database, 
@@ -28,6 +29,12 @@ def register(request):
 
             user.generate_verification_token()
             user.save()
+            # create email recoird
+            EmailAddress(user = user,
+                             email = user.email,
+                             verified = False,
+                             primary = True
+            ).save()
             # Send verification email
             current_site = get_current_site(request)
             subject = 'Activate your account'
@@ -89,7 +96,7 @@ def login_view(request):
             msg = 'error validating form'
     return render(request, 'auth/login.html', {'form': form, 'msg': msg})
 
-""""A function to notify a user when an account verification token has been sent"""
+"""A function to notify a user when an account verification token has been sent"""
 def email_verification_sent(request):
     return render(request, 'auth/email_verification_sent.html')
 

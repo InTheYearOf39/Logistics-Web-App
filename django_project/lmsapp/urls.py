@@ -83,7 +83,7 @@ urlpatterns = [
     path('register_package/', sender_views.register_package, name='register_package'),
     path('api/', sender_views.api, name='api'),
     path('sender_history/', sender_views.sender_history, name='sender_history'),
-    path('delivery_orders/mordercoast/', sender_views.receive_data_view, name='receive_data_view'),
+    path('api/integrate/delivery_orders/', sender_views.receive_data_view, name='receive_data_view'),
     path('api/calculate_delivery_fee/', sender_views.calculate_delivery_fee, name='calculate_delivery_fee'),
     
 

@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, redirect
 from django.db.models import Q, Case, When, IntegerField
 from django.contrib.auth.decorators import login_required
 from lmsapp.forms import PackageForm
-from lmsapp.models import Package, User,Warehouse,DropPickZone
+from lmsapp.models import Package, User,Warehouse,DropPickZone,APIKey
 import random
 import string
 from django.shortcuts import redirect, get_object_or_404
@@ -251,7 +251,11 @@ def calculate_delivery_fee(request):
 
 # @csrf_exempt
 # def receive_data_view(request):
+#     # print(f"request: {request}")
 #     if request.method == 'POST':
+#         print(f"request: {request.headers}")
+#         print(f"request: {request.body}")
+
 #         try:
 #             data = json.loads(request.body)
 #             for field in data:
@@ -365,11 +369,27 @@ def calculate_delivery_fee(request):
 
 @csrf_exempt
 def receive_data_view(request):
-    api_key = request.META.get('HTTP_X_API_KEY')
+    
+    print(f"request: {request.headers}")
+    api_req = request.headers.get('X-Api-Key', "")
+    print(api_req)
     content_type = request.META.get('CONTENT_TYPE')
 
-    if api_key != 'your_generated_api_key':
+    if api_req == "":
+        return JsonResponse({'error': 'Provide API key'}, status=401)
+    
+    api_obj =  APIKey.objects.filter(api_key=api_req)
+    api_key = None
+    print(f"fetched key is: {api_obj}")
+    
+        
+    if api_obj.__len__() == 0:
         return JsonResponse({'error': 'Invalid API key'}, status=401)
+    else:
+        api_key = api_obj[0]
+
+    print(f"fetched key is: {api_key.api_key}")
+
            
     if content_type != 'application/json':
         return JsonResponse({'error': 'Invalid content type'}, status=400)
@@ -428,14 +448,9 @@ def receive_data_view(request):
             except ValidationError:
                 return JsonResponse({'error': 'Invalid email format'}, status=400)
                      
-            user = get_object_or_404(
-                User,
-                username='muhumuza',
-                role='sender'
-            )
-                    
+             
             package = Package(
-                user=user,
+                user=api_key.user,
                 packageName=package_name,
                 deliveryType='premium', 
                 packageDescription=package_description,
