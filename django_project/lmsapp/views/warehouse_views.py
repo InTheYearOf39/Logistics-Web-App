@@ -587,7 +587,7 @@ def package_reports_export(request):
     end_datetime = request.GET.get('end_datetime')
 
     packages_delivered = Package.objects.filter(status='completed')
-    packages_ready = Package.objects.filter(status='ready_for_pickup')
+    # packages_ready = Package.objects.filter(status='ready_for_pickup')
     
     if start_datetime and end_datetime:
         start_datetime = datetime.strptime(start_datetime, '%Y-%m-%dT%H:%M')
@@ -604,7 +604,7 @@ def package_reports_export(request):
         
     context = {
         'packages_delivered': packages_delivered,
-        'packages_ready': packages_ready,
+        # 'packages_ready': packages_ready,
     }
 
     # Get the current date and time
