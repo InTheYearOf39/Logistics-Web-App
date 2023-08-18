@@ -92,6 +92,7 @@ class User(AbstractUser):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='available')
     objects = CustomUserManager()
     verification_token = models.CharField(max_length=200, null=True, blank=True)
+    email = models.EmailField(max_length=254, null=True, blank=True )
 
     # Add warehouse-specific fields
     tag = models.CharField(max_length=20, null=True, blank=True)

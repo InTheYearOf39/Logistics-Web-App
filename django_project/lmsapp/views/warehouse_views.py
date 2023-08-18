@@ -292,33 +292,58 @@ The view displays a list of packages with the 'in_house'status and allows the us
 to available couriers and drop_pick_zones, and updates the package status to 'in_transit'.
 """ 
 def in_house(request):
-    ready_packages = Package.objects.filter(status__in=['warehouse_arrival', 'ready_for_pickup', 'in_house'])
+    ready_packages = Package.objects.filter(status='in_house')
+
     if request.method == 'POST':
         selected_packages = request.POST.getlist('selected_packages')
         courier_id = request.POST.get('courier')
-        drop_pick_zone_id = request.POST.get('drop_pick_zone')
 
-        if selected_packages and courier_id and drop_pick_zone_id:
+        if selected_packages and courier_id:
             courier = get_object_or_404(User, id=courier_id, role='courier')
-            drop_pick_zone = get_object_or_404(User, id=drop_pick_zone_id, role='drop_pick_zone')
 
             # Update the packages with the assigned courier and change their status
             packages = Package.objects.filter(id__in=selected_packages)
-            packages.update(courier=courier, dropOffLocation=drop_pick_zone, status='in_transit')
-            
+            package_types = set(package.deliveryType for package in packages)
+            status_updated = False
+
+            for package in packages:
+                if package.deliveryType == 'premium':
+                    package.status = 'en_route'
+                    status_updated = True
+                elif package.deliveryType == 'express':
+                    package.status = 'in_transit'
+                    status_updated = True
+                else:
+                    package.status = 'in_transit'  # Change status to 'in_transit' for standard packages
+                    status_updated = True
+                package.courier = courier
+                package.save()
+
             courier.status = 'on-trip'
             courier.save()
 
-            messages.success(request, 'Packages successfully assigned to courier.')
+            if status_updated:
+                if 'premium' in package_types and 'express' in package_types:
+                    messages.success(request, 'Premium and Express packages successfully assigned to courier.')
+                elif 'premium' in package_types:
+                    messages.success(request, 'Premium packages successfully assigned to courier.')
+                elif 'express' in package_types:
+                    messages.success(request, 'Express packages successfully assigned to courier.')
+                else:
+                    messages.success(request, 'Standard packages successfully assigned to courier.')
+            else:
+                messages.error(request, 'No packages were assigned.')
 
-            return redirect('ready_for_pickup')
-        
+            return redirect('in_house')
+        else:
+            messages.error(request, 'Please select packages and a courier.')
+
     context = {
         'ready_packages': ready_packages,
         'available_couriers': User.objects.filter(role='courier', status='available'),
-        'available_drop_pick_zones': User.objects.filter(role='drop_pick_zone').select_related('drop_pick_zone')
     }
     return render(request, 'warehouse/ready_packages.html', context)
+
 
 
 def to_pickup(request, package_id):
@@ -343,7 +368,7 @@ def ready_for_pickup(request):
             courier = get_object_or_404(User, id=courier_id, role='courier')
 
             # Update the packages with the assigned courier and change their status
-            packages = Package.objects.filter(id__in=selected_packages, deliveryType='premium')
+            packages = Package.objects.filter(id__in=selected_packages, deliveryType=['premium', 'standard'])
             packages.update(courier=courier, status='in_transit')
             
             courier.status = 'on-trip'
@@ -351,7 +376,7 @@ def ready_for_pickup(request):
 
             messages.success(request, 'Premium packages successfully assigned to courier.')
 
-            return redirect('warehouse_dashboard')
+            return redirect('in_house')
 
     ready_packages = Package.objects.filter(status='in_transit', deliveryType='premium')
     available_couriers = User.objects.filter(role='courier', status='available')
@@ -562,7 +587,7 @@ def package_reports_export(request):
     end_datetime = request.GET.get('end_datetime')
 
     packages_delivered = Package.objects.filter(status='completed')
-    packages_ready = Package.objects.filter(status='ready_for_pickup')
+    # packages_ready = Package.objects.filter(status='ready_for_pickup')
     
     if start_datetime and end_datetime:
         start_datetime = datetime.strptime(start_datetime, '%Y-%m-%dT%H:%M')
@@ -579,7 +604,7 @@ def package_reports_export(request):
         
     context = {
         'packages_delivered': packages_delivered,
-        'packages_ready': packages_ready,
+        # 'packages_ready': packages_ready,
     }
 
     # Get the current date and time
