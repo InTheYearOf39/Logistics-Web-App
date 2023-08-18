@@ -72,7 +72,12 @@ Status: 400 Bad Request
 }
 ```
 
-
+#### headers     
+    
+    `The integration api key is required and should be passed in the request headers`
+```
+X-Api-Key: <API KEY>
+```
 
 
 
