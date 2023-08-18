@@ -131,16 +131,17 @@ class PackageForm(forms.ModelForm):
 class WarehouseForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ['name', 'username', 'phone', 'address', 'tag']
+        fields = ['name', 'username', 'phone', 'address', 'tag', 'email']
 
 class DropPickForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ['name', 'username', 'phone', 'address', 'tag', 'warehouse']
+        fields = ['name', 'username', 'phone', 'email', 'address', 'tag', 'warehouse']
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control'}),
             'username': forms.TextInput(attrs={'class': 'form-control'}),
             'phone': forms.TextInput(attrs={'class': 'form-control'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control'}),
             'address': forms.TextInput(attrs={'class': 'form-control'}),
             'tag': forms.TextInput(attrs={'class': 'form-control'}),
             'warehouse': forms.Select(attrs={'class': 'form-control selectpicker'}),
@@ -149,7 +150,7 @@ class DropPickForm(forms.ModelForm):
 class CourierForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ['name', 'username', 'phone', 'address', 'warehouse']
+        fields = ['name', 'username', 'phone', 'address', 'warehouse', 'email']
 
 # class CourierForm(forms.ModelForm):
 #     class Meta:
