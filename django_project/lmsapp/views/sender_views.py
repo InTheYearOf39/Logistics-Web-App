@@ -370,9 +370,9 @@ def calculate_delivery_fee(request):
 @csrf_exempt
 def receive_data_view(request):
     
-    print(f"request: {request.headers}")
+    # print(f"request: {request.headers}")
     api_req = request.headers.get('X-Api-Key', "")
-    print(api_req)
+    # print(api_req)
     content_type = request.META.get('CONTENT_TYPE')
 
     if api_req == "":
@@ -380,7 +380,7 @@ def receive_data_view(request):
     
     api_obj =  APIKey.objects.filter(api_key=api_req)
     api_key = None
-    print(f"fetched key is: {api_obj}")
+    # print(f"fetched key is: {api_obj}")
     
         
     if api_obj.__len__() == 0:

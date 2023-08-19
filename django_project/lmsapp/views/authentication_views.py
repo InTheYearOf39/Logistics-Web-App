@@ -159,11 +159,10 @@ def generate_api_key(request):
             password = form.cleaned_data['password']
             
             try:
-                # user = User.objects.get(username=username)
                 user = authenticate(username=username, password=password)
                 if user:
                     api_key = generate_and_store_api_key(user)
-                    return render(request, 'api_key_generated.html', {'api_key': api_key})
+                    return render(request, 'auth/generate_api_key.html', {'api_key': api_key})
                 else:
                     error_message = "Wrong Credentials!!!!."
             except User.DoesNotExist:
