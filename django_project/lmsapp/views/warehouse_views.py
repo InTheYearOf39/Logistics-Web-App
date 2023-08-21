@@ -18,6 +18,7 @@ from django.db.models import Q
 import pandas as pd
 from django.http import HttpResponse
 from lmsapp.utils import send_sms
+import openpyxl
 
 
 
@@ -556,7 +557,7 @@ def warehouse_reports(request):
     end_date = request.GET.get('end_date')
 
     packages_delivered = Package.objects.filter(status='completed')
-    packages_ready = Package.objects.filter(status='ready_for_pickup')
+    packages_ready = Package.objects.filter(status__in=['in_house', 'ready_for_pickup'])
     
     if start_date and end_date:
         start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
@@ -587,7 +588,7 @@ def package_reports_export(request):
     end_datetime = request.GET.get('end_datetime')
 
     packages_delivered = Package.objects.filter(status='completed')
-    # packages_ready = Package.objects.filter(status='ready_for_pickup')
+    packages_ready = Package.objects.filter(status='ready_for_pickup')
     
     if start_datetime and end_datetime:
         start_datetime = datetime.strptime(start_datetime, '%Y-%m-%dT%H:%M')
@@ -602,22 +603,45 @@ def package_reports_export(request):
         start_datetime = datetime.strptime(start_datetime, '%Y-%m-%dT%H:%M')
         packages_delivered = packages_delivered.filter(completed_at__gte=start_datetime)
         
-    context = {
-        'packages_delivered': packages_delivered,
-        # 'packages_ready': packages_ready,
-    }
-
-    # Get the current date and time
-    current_datetime = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-
-    # Create a Pandas DataFrame from the data
-    df = pd.DataFrame(context)
-
     # Create a response with the Excel file
     response = HttpResponse(content_type='application/ms-excel')
-    response['Content-Disposition'] = f'attachment; filename="Package_summary_data_{current_datetime}.xlsx"'
+    response['Content-Disposition'] = f'attachment; filename="Package_summary_data.xlsx"'
 
-    # Save the DataFrame to the Excel response
-    df.to_excel(response, index=False, engine='openpyxl')
-    
+    # Create a new workbook
+    workbook = openpyxl.Workbook()
+
+    # Create a sheet for packages_delivered
+    sheet_delivered = workbook.active
+    sheet_delivered.title = 'Packages Delivered'
+    write_data_to_sheet(sheet_delivered, packages_delivered)
+
+    # Create a sheet for packages_ready
+    sheet_ready = workbook.create_sheet(title='Packages Ready')
+    write_data_to_sheet(sheet_ready, packages_ready)
+
+    # Save the workbook to the response
+    workbook.save(response)
+
     return response
+
+def write_data_to_sheet(sheet, queryset):
+    # Write header row
+    header = ['Package Name','Package Number', 'Sender Address', 'Sender Name', 'Recipient Name', 'Recipient Address', 'Package Description', 'Delivery Type', 'Status', 'Time Completed', 'Time Received']
+    sheet.append(header)
+
+    # Write data rows
+    for package in queryset:
+        row_data = [
+            package.packageName,
+            package.package_number,
+            package.sendersAddress,
+            package.sendersName,
+            package.recipientName,
+            package.recipientAddress,
+            package.packageDescription,
+            package.deliveryType,
+            package.status,
+            package.completed_at,
+            package.in_house_at
+        ]
+        sheet.append(row_data)
