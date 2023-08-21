@@ -18,6 +18,7 @@ import json
 from django.core.serializers.json import DjangoJSONEncoder
 from django.http import JsonResponse
 from geopy.distance import geodesic
+from typing import Union
 
 """
 Renders out a sender dashboard template and shows packages with the statuses 
@@ -388,7 +389,7 @@ def receive_data_view(request):
     else:
         api_key = api_obj[0]
 
-    print(f"fetched key is: {api_key.api_key}")
+    # print(f"fetched key is: {api_key.api_key}")
 
            
     if content_type != 'application/json':
@@ -406,7 +407,11 @@ def receive_data_view(request):
                 "recipientEmail": str,
                 "recipientAddress": str,
                 "recipientContact": str,
-                "recipientIdentification": str,
+                "recipientIdentification": str, 
+                # #this is the required field and we shall have to revert to it,
+                # have used the one below just to allow mordern coast system to test since they dont capture ids at the moment
+
+                # "recipientIdentification": Union[str, None],
                 "packageName": str,
                 "packageDescription": str,
                 "packageNumber": str,

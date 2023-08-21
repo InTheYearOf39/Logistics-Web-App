@@ -171,7 +171,7 @@ class Package(models.Model):
     recipientEmail = models.CharField(max_length=100)
     recipientTelephone = models.CharField(max_length=100)
     recipientAddress = models.CharField(max_length=200)
-    recipientIdentification = models.CharField(max_length=200)
+    recipientIdentification = models.CharField(max_length=200, null=True, blank=True)
     sendersName = models.CharField(max_length=200, null=True, blank=True)
     sendersEmail = models.CharField(max_length=200, null=True, blank=True)
     sendersAddress = models.CharField(max_length=200, null=True, blank=True)
