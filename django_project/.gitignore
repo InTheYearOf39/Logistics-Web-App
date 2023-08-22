@@ -12,3 +12,4 @@ site_static
 .env
 .idea
 django_project\.idea
+cred.json
