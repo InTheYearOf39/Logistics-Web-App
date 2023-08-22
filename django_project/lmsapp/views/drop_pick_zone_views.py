@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from lmsapp.models import Package, User, DropPickZone
 from lmsapp.forms import PackageForm
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import redirect, get_object_or_404
 from django.core.mail import send_mail, EmailMessage
 from django.contrib.auth import get_user_model
@@ -14,12 +14,14 @@ from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.csrf import csrf_exempt
 import math
 from django.http import JsonResponse
-from django.contrib.auth.decorators import user_passes_test
 import math
 from django.core.mail import send_mail, BadHeaderError
 from lmsapp.utils import send_sms
 from django.db.models import Q
 
+
+def is_drop_pick_user(user):
+    return user.role == 'drop_pick_zone'
 
 
 User = get_user_model()
@@ -28,6 +30,7 @@ User = get_user_model()
 The view displays the dashboard for a drop pick zone. It retrieves the packages assigned to the drop pick zone with specific statuses and renders them in the 'drop_pick_zone/drop_pick_zone_dashboard.html' template.
 """
 @login_required
+@user_passes_test(is_drop_pick_user)
 def drop_pick_zone_dashboard(request):
     drop_pick_zone = DropPickZone.objects.get(users=request.user)
     packages = Package.objects.filter(
@@ -48,6 +51,8 @@ the view enables a drop_pick_zone user to confirm the drop-off of a package at t
 When the user submits the confirmation form, the package status is updated to 'dropped_off', 
 and an email notification is sent to the sender.
 """
+@login_required
+@user_passes_test(is_drop_pick_user)
 def confirm_drop_off(request, package_id):
     package = get_object_or_404(Package, id=package_id)
 
@@ -87,6 +92,8 @@ The view enables a user to confirm that a package is ready for pickup by a recip
 When the user submits the confirmation form, an OTP is generated and saved in the package, 
 the package status is updated, and an email notification with the OTP is sent to the recipient.
 """ 
+@login_required
+@user_passes_test(is_drop_pick_user)
 def confirm_at_pickup(request, package_id):
     if request.method == 'POST':
         package = Package.objects.get(pk=package_id)
@@ -144,6 +151,8 @@ The view confirms the recipient's pickup of a package from the drop_pick_zone by
 with the one stored in the package. I the OTP matches and the package status is 'ready_for_pickup', 
 the package status is updated to 'completed'
 """
+@login_required
+@user_passes_test(is_drop_pick_user)
 def confirm_recipient_pickup(request, package_id):
     if request.method == 'POST':
         package = Package.objects.get(pk=package_id)
@@ -163,6 +172,8 @@ def confirm_recipient_pickup(request, package_id):
 The view retrieves the packages dropped off at the current drop pick zone and displays them in the dispatch template. 
 The retrieved packages are passed to the template through the context.
 """
+@login_required
+@user_passes_test(is_drop_pick_user)
 def received_packages(request):
     # drop_pick_zone = request.user
     drop_pick_zone = DropPickZone.objects.get(users=request.user)
@@ -178,6 +189,8 @@ def received_packages(request):
 The view retrieves packages that are marked as 'dispatched' and belong to the current drop pick zone user. 
 It then renders the dispatched_packages.html template, passing the retrieved packages to be displayed.
 """
+@login_required
+@user_passes_test(is_drop_pick_user)
 def dispatched_packages(request):
     # drop_pick_zone = request.user
     drop_pick_zone = DropPickZone.objects.get(users=request.user)
@@ -188,6 +201,8 @@ def dispatched_packages(request):
 The view allows the drop pick zone to confirm the pickup of a package. Upon confirmation, 
 the package status is updated and an email notification is sent to the sender. 
 """
+@login_required
+@user_passes_test(is_drop_pick_user)
 def confirm_pickup(request, package_id):
     package = get_object_or_404(Package, id=package_id)
 
@@ -211,55 +226,57 @@ def confirm_pickup(request, package_id):
 
     return render(request, 'drop_pick_zone/drop_pick_dashboard.html', {'package': package})
 
-""" 
-The view allows the drop pick zone to assign a courier to a package for delivery.
-It updates the package's courier and status fields, as well as the courier's status
- """
-def delivery_courier(request, package_id):
-    package = get_object_or_404(Package, id=package_id)
+# """ 
+# The view allows the drop pick zone to assign a courier to a package for delivery.
+# It updates the package's courier and status fields, as well as the courier's status
+#  """
+# def delivery_courier(request, package_id):
+#     package = get_object_or_404(Package, id=package_id)
 
-    if request.method == 'POST':
-        courier_id = request.POST.get('courier')
-        courier = get_object_or_404(User, id=courier_id, role='courier')
+#     if request.method == 'POST':
+#         courier_id = request.POST.get('courier')
+#         courier = get_object_or_404(User, id=courier_id, role='courier')
 
-        previous_courier_status = courier.status  # Save the previous status
+#         previous_courier_status = courier.status  # Save the previous status
 
-        package.courier = courier
+#         package.courier = courier
 
-        # Update the package status based on the delivery type
-        if (package.status == 'pending_delivery'):
-            package.status = 'out_for_delivery'
-        # elif package.deliveryType == 'premium' and package.status == 'upcoming':
-        #     package.status = 'ongoing'
+#         # Update the package status based on the delivery type
+#         if (package.status == 'pending_delivery'):
+#             package.status = 'out_for_delivery'
+#         # elif package.deliveryType == 'premium' and package.status == 'upcoming':
+#         #     package.status = 'ongoing'
 
-        package.save()
+#         package.save()
         
-        # Check if the courier has any packages assigned
-        has_packages = Package.objects.filter(courier=courier).exists()
+#         # Check if the courier has any packages assigned
+#         has_packages = Package.objects.filter(courier=courier).exists()
 
-        # Update the courier status
-        if has_packages:
-            courier.status = 'on-trip'
-        else:
-            courier.status = 'available'
+#         # Update the courier status
+#         if has_packages:
+#             courier.status = 'on-trip'
+#         else:
+#             courier.status = 'available'
         
-        courier.save()
+#         courier.save()
 
 
-        return redirect('drop_pick_zone_dashboard')
+#         return redirect('drop_pick_zone_dashboard')
 
-    couriers = User.objects.filter(role='courier', status='available')  # Filter couriers by status='available'
-    context = {
-        'package_id': package_id,
-        'couriers': couriers
-        }
+#     couriers = User.objects.filter(role='courier', status='available')  # Filter couriers by status='available'
+#     context = {
+#         'package_id': package_id,
+#         'couriers': couriers
+#         }
     
-    return render(request, 'drop_pick_zone/delivery_courier.html', context)
+#     return render(request, 'drop_pick_zone/delivery_courier.html', context)
 
 """ 
 The view allows the drop pick zone to assign a courier to a package for delivery. 
 It updates the package's courier and status fields, as well as the courier's status
 """
+@login_required
+@user_passes_test(is_drop_pick_user)
 def confirm_pickedup(request, package_id):
     if request.method == 'POST':
         package = Package.objects.get(pk=package_id)
@@ -272,9 +289,6 @@ def generate_package_number():
     prefix = 'pn'
     digits = ''.join(random.choices(string.digits, k=5))
     return f'{prefix}{digits}'
-
-def is_drop_pick_user(user):
-    return user.role == 'drop_pick_zone'
 
 @login_required
 @xframe_options_exempt 

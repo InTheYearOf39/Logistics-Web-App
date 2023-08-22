@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from django.db.models import Q, Case, When, IntegerField, Count
 from django.db.models.functions import ExtractDay, ExtractHour, ExtractMonth
 from django.shortcuts import redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import render
 from django.utils import timezone
 from django.views.decorators.clickjacking import xframe_options_exempt
@@ -18,6 +19,10 @@ from datetime import datetime, timedelta
 import pandas as pd
 from django.http import HttpResponse
 
+
+def is_admin_user(user):
+    return user.role == 'admin'
+
 User = get_user_model()
 
 """ 
@@ -26,7 +31,8 @@ displaying packages and functionality depending on the different delivery types,
 and rendering the corresponding template with the appropriate context
 """
 
-
+@login_required
+@user_passes_test(is_admin_user)
 def admin(request):
     packages = Package.objects.filter(
         Q(status='ongoing') | Q(status='dropped_off') | Q(status='ready_for_pickup') | Q(status='upcoming')
@@ -58,6 +64,8 @@ def admin(request):
     }
     return render(request, 'admin/admin_dashboard.html', context)
 
+@login_required
+@user_passes_test(is_admin_user)
 def master_dashboard(request):  
     total_packages = Package.objects.all().count()      
     # Get the datetime for the start of the current week
@@ -147,6 +155,8 @@ def master_dashboard(request):
     }
     return render(request, 'admin/master_dashboard.html', context)
 
+@login_required
+@user_passes_test(is_admin_user)
 def data_export(request):
     total_packages = Package.objects.all().count()      
     # Get the datetime for the start of the current week
@@ -197,9 +207,10 @@ def data_export(request):
 
     return response
 
-
+@login_required
+@user_passes_test(is_admin_user)
 def users(request):
-    users = User.objects.all()  # Retrieve all users from the database
+    users = User.objects.filter(role='sender')  # Retrieve all senders from the database
 
     context = {
         'users': users

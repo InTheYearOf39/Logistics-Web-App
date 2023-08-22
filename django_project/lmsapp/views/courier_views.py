@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, redirect
 from lmsapp.models import Package, User
+from django.contrib.auth.decorators import login_required, user_passes_test
 import random
 from django.shortcuts import redirect, get_object_or_404
 from django.contrib import messages
@@ -9,6 +10,8 @@ from django.core.mail import send_mail, BadHeaderError
 from django.http import HttpResponse
 from lmsapp.utils import send_sms
 
+def is_courier_user(user):
+    return user.role == 'courier'
 
 
 """
@@ -16,6 +19,8 @@ A function to render the courier dashboard. It retrieves the assigned packages f
 and passes them to the template along with a greeting message. Relevant information is then displayed
 to the courier on their dashboard.
 """
+@login_required
+@user_passes_test(is_courier_user)
 def courier_dashboard(request):
     assigned_packages = Package.objects.filter(courier=request.user, status__in=['dispatched', 'ongoing', 'arrived', 'en_route', 'warehouse_arrival', 'in_transit', 'at_pickup'])
     context = {
@@ -27,6 +32,8 @@ def courier_dashboard(request):
 A function to handle the notification of package arrival at the warehouse. When the view is accessed with a POST request, 
 the package is retrieved by it's package id and then the package status is updated to 'warehouse_arrival', An email notification is sent to the sender and the warehouse. If the request method is not POST, it displays an error message. Finally, the user is redirected to the courier dashboard.
  """
+@login_required
+@user_passes_test(is_courier_user)
 def notify_arrival(request, package_id):
     try:
         if request.method == 'POST':
@@ -73,6 +80,8 @@ def notify_arrival(request, package_id):
 """
 A function to handle the notification of package drop-off. When the view is accessed with a POST request, a package is retrieved by its id and it's status updated to 'at_pickup'. The user is then redirected to the courier dashboard.
 """
+@login_required
+@user_passes_test(is_courier_user)
 def notify_dropoff_delivery(request, package_id):
     package = get_object_or_404(Package, id=package_id)
 
@@ -91,6 +100,8 @@ def notify_dropoff_delivery(request, package_id):
 """
 A function to handle notifying the recipient of a package arrival by sending an email with the OTP. A package is retrieved by its package id, then a random integer is generated and stored in a variable 'otp'. The otp is then associated to the package and the package is saved, The email is then sent and the the package status is updated from 'ongoing' to 'arrived'. The user is then redirected to the courier dashboard.
  """
+@login_required
+@user_passes_test(is_courier_user)
 def notify_recipient(request, package_id):
     package = get_object_or_404(Package, id=package_id) 
     print(package)
@@ -146,6 +157,8 @@ def notify_recipient(request, package_id):
 A function to handle confirming the delivery of a package by checking the entered OTP. 
 If the entered OTP matches the stored OTP and the package status is 'arrived', the package status is updated to 'completed', a success message is displayed, and the associated courier's status is updated from 'on-trip' to 'available. If the entered OTP is invalid, an error message is displayed. The user is then redirected to the courier dashboard.
 """
+@login_required
+@user_passes_test(is_courier_user)
 def confirm_delivery(request, package_id):
     if request.method == 'POST':
         package = Package.objects.get(pk=package_id)
@@ -170,6 +183,8 @@ def confirm_delivery(request, package_id):
 """
 A function to retrieve the completed packages assigned to the current courier and display them in the courier history template. i.e Packages with the status 'completed' The greeting message and the assigned packages are passed to the template through the context.
 """
+@login_required
+@user_passes_test(is_courier_user)
 def courier_history(request):
     assigned_packages = Package.objects.filter(courier=request.user, status__in=['completed'])
     context = {

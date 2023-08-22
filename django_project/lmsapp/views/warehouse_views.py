@@ -1,15 +1,13 @@
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import render, redirect, redirect, get_object_or_404
 from lmsapp.models import Package, User,DropPickZone, Warehouse
 from django.contrib import messages
 from django.shortcuts import render, redirect
 from lmsapp.forms import ChangePasswordForm, PackageForm, ExcelUploadForm
 from django.contrib.auth import update_session_auth_hash
-from django.contrib import messages
 from django.core.mail import send_mail
 from django.conf import settings
 from django.views.decorators.clickjacking import xframe_options_exempt
-from django.contrib.auth.decorators import user_passes_test
 import random
 import string
 from datetime import datetime, timedelta
@@ -22,6 +20,7 @@ from lmsapp.utils import send_sms
 from openpyxl import load_workbook
 from django.utils import timezone
 from django.utils.dateparse import parse_date
+from django.db import IntegrityError
 
 
 """  
@@ -82,7 +81,11 @@ select packages and assign them to available couriers
 
 #     return render(request, 'warehouse/warehouse_dashboard.html', context)
 
+def is_warehouse_user(user):
+    return user.role == 'warehouse'
+
 @login_required
+@user_passes_test(is_warehouse_user)
 def warehouse_dashboard(request):
     packages = Package.objects.filter(
         status='dropped_off',
@@ -129,6 +132,7 @@ def warehouse_dashboard(request):
 
 
 @login_required
+@user_passes_test(is_warehouse_user)
 def premium_dashboard(request):
     packages = Package.objects.filter(
         Q(deliveryType='premium'),
@@ -176,6 +180,7 @@ def premium_dashboard(request):
 
 
 @login_required
+@user_passes_test(is_warehouse_user)
 def express_dashboard(request):
     packages = Package.objects.filter(
         Q(deliveryType='express'),
@@ -257,6 +262,8 @@ def change_password(request):
 Handles the confirmation of package arrival at the warehouse. It updates the package status, 
 updates the courier's status if applicable, sends an email notification to the sender
 """
+@login_required
+@user_passes_test(is_warehouse_user)
 def confirm_arrival(request, package_id):
     if request.method == 'POST':
         warehouse_user = request.user
@@ -294,6 +301,8 @@ def confirm_arrival(request, package_id):
 The view displays a list of packages with the 'in_house'status and allows the user to assign selected packages 
 to available couriers and drop_pick_zones, and updates the package status to 'in_transit'.
 """ 
+@login_required
+@user_passes_test(is_warehouse_user)
 def in_house(request):
     ready_packages = Package.objects.filter(status='in_house')
 
@@ -362,6 +371,8 @@ The view displays a list of packages ready for pickup and allows the user to ass
 to couriers and drop_pick_zones. It handles form submissions, updates the package assignments and statuses, 
 and provides available couriers and drop_pick_zones in the context.
 """ 
+@login_required
+@user_passes_test(is_warehouse_user)
 def ready_for_pickup(request):
     if request.method == 'POST':
         selected_packages = request.POST.getlist('selected_packages')
@@ -391,7 +402,8 @@ def ready_for_pickup(request):
     return render(request, 'warehouse/ready_for_pickup.html', context)
 
 
-
+@login_required
+@user_passes_test(is_warehouse_user)
 def new_arrivals(request):
     arrived_packages = Package.objects.filter(status='warehouse_arrival')
 
@@ -409,8 +421,8 @@ def generate_package_number():
     digits = ''.join(random.choices(string.digits, k=5))
     return f'{prefix}{digits}'
 
-def is_warehouse_user(user):
-    return user.role == 'warehouse'
+# def is_warehouse_user(user):
+#     return user.role == 'warehouse'
 
 @login_required
 @xframe_options_exempt 
@@ -554,6 +566,8 @@ def add_package(request):
     context = {'form': form, 'warehouse': warehouse, 'user_warehouse': user_warehouse, 'senders': senders}
     return render(request, 'warehouse/add_package.html', context)
 
+@login_required
+@user_passes_test(is_warehouse_user)
 def warehouse_reports(request):
     start_date = request.GET.get('start_date')
     end_date = request.GET.get('end_date')
@@ -585,6 +599,8 @@ def warehouse_reports(request):
     
     return render(request, 'warehouse/warehouse_reports.html', context )
 
+@login_required
+@user_passes_test(is_warehouse_user)
 def package_reports_export(request):
     start_datetime = request.GET.get('start_datetime')
     end_datetime = request.GET.get('end_datetime')
@@ -625,8 +641,106 @@ def package_reports_export(request):
     
     return response
 
+# @login_required
+# @user_passes_test(is_warehouse_user)
+# def upload_excel(request):
+#     username_list = ['Ivan', 'muhumuza', 'Shem', 'Izzy']
 
+#     senders = User.objects.filter(username__in=username_list, role='sender')
+
+#     if request.method == "POST":
+#         form = ExcelUploadForm(request.POST, request.FILES)
+#         if form.is_valid():
+#             excel_file = form.cleaned_data['excel_file']
+#             wb = load_workbook(excel_file)
+#             sheet = wb.active
+
+#             header_mapping = {
+#                 "order_id":1, 
+#                 "order_date":2, 
+#                 "recipient_name":3, 
+#                 "delivery_address":4, 
+#                 "city":5, 
+#                 "phone":6, 
+#                 "item" :7
+#             }
+
+#             for row in sheet.iter_rows(min_row=2, values_only=True):
+                
+#                 # Format the order_date value to a string in ISO format
+#                 order_date_str = row[header_mapping["order_date"]].strftime("%Y-%m-%d")
+
+#                  # Check if the phone field is blank
+#                 recipient_telephone = row[header_mapping["phone"]]
+#                 if not recipient_telephone:
+#                     recipient_telephone = "00000"  
+
+#                 package = Package(
+#                     user=request.POST.get('user'),
+#                     packageName=row[header_mapping["item"]],
+#                     deliveryType='premium',  
+#                     package_number=row[header_mapping["order_id"]],
+#                     recipientName=row[header_mapping["recipient_name"]],
+#                     recipientEmail='',  
+#                     recipientTelephone=recipient_telephone,
+#                     recipientAddress=row[header_mapping["delivery_address"]] + ', ' + row[header_mapping["city"]],
+#                     packageDescription='',
+#                     sendersName='Sam Kulubya',  
+#                     sendersEmail='selmo@gmail.com',  
+#                     sendersAddress='',  
+#                     sendersContact='',  
+#                     created_on=parse_date(order_date_str),
+#                     created_by=request.user,
+#                     modified_by=request.user,
+#                     assigned_at=timezone.now(),
+#                     status='warehouse_arrival',
+#                     warehouse=request.user.warehouse
+#                 )
+
+#                 try:
+#                     package.save()
+#                 except IntegrityError as ie:
+#                     if "UNIQUE constraint" in str(ie):
+#                         # Handle integrity error when package_number is already taken
+#                         messages.error(request, "Error: The package number already exists.")
+#                     else:
+#                         messages.error(request, "An error occurred while saving the package.")
+
+#             return redirect("new_arrivals")
+#     else:
+#         form = ExcelUploadForm()
+
+#     return render(request, "warehouse/upload_excel.html", {"form": form, "senders": senders})
+
+def preprocess_phone_number(phone_number):
+    # Convert phone_number to string if it's an integer
+    phone_number_str = str(phone_number)
+    
+    # Remove non-digit characters and return the cleaned phone number
+    cleaned_phone_number = ''.join(filter(str.isdigit, phone_number_str))
+
+    # Add the leading zero if missing
+    if not cleaned_phone_number.startswith('0'):
+        cleaned_phone_number = '0' + cleaned_phone_number
+
+    return cleaned_phone_number
+
+from django.db import IntegrityError
+from openpyxl import load_workbook
+# from django.utils.timezone import parse_date
+from django.utils.dateparse import parse_date
+from django.contrib import messages
+from django.shortcuts import render, redirect
+from django.utils import timezone
+from lmsapp.models import Package
+
+@login_required
+@user_passes_test(is_warehouse_user)
 def upload_excel(request):
+    username_list = ['Ivan', 'muhumuza', 'Shem', 'Izzy']
+
+    senders = User.objects.filter(username__in=username_list, role='sender')
+
     if request.method == "POST":
         form = ExcelUploadForm(request.POST, request.FILES)
         if form.is_valid():
@@ -634,33 +748,122 @@ def upload_excel(request):
             wb = load_workbook(excel_file)
             sheet = wb.active
 
+            header_mapping = {
+                "order_id": 1, 
+                "order_date": 2, 
+                "recipient_name": 3, 
+                "delivery_address": 4, 
+                "city": 5, 
+                "phone": 6, 
+                "item": 7
+            }
+
             for row in sheet.iter_rows(min_row=2, values_only=True):
-                order_id, order_date_str, recipient_name, delivery_address, city, phone, item = row
-                order_date = parse_date(order_date_str.strip())
-                # Create a new Package instance
+
+                order_date_value = row[header_mapping["order_date"]]   
+                if order_date_value is None:
+                    # Handle the case where order_date_value is None (blank cell)
+                    continue
+                
+                order_date_str = order_date_value.strftime("%Y-%m-%d")
+
+                # Check if the phone field is blank
+                recipient_telephone = preprocess_phone_number(row[header_mapping["phone"]])
+                if not recipient_telephone:
+                    recipient_telephone = "Not Provided"  
+
+                recipient_address = row[header_mapping["delivery_address"]]
+                city = row[header_mapping["city"]]
+
+                if not recipient_address and not city:
+                    recipient_address_city = ""
+                elif not recipient_address:
+                    recipient_address_city = city
+                elif not city:
+                    recipient_address_city = recipient_address
+                else:
+                    recipient_address_city = recipient_address + ', -' + city
+
+                package_number = row[header_mapping["order_id"]]
+                order_date = parse_date(order_date_str)
+
+                # Check if a package with the same package_number already exists
+                existing_package = Package.objects.filter(package_number=package_number).first()
+
+                if existing_package:
+                    # Package with the same package_number already exists, skip
+                    continue
+                
+                
+                user_id = request.POST.get('client')
+                try:
+                    user = User.objects.get(id=user_id)
+                except User.DoesNotExist:
+                    user = None
+
+                # Check if user has the 'name' attribute, if not, use 'username'
+                if user and hasattr(user, 'name') and user.name:
+                    senders_name = user.name
+                else:
+                    senders_name = user.username
+
                 package = Package(
-                    packageName=item,
+                    user=user,
+                    packageName=row[header_mapping["item"]],
                     deliveryType='premium',  
-                    package_number=order_id,
-                    recipientName=recipient_name,
-                    recipientEmail='',  # You can set this based on your requirement
-                    recipientTelephone=phone,
-                    recipientAddress=delivery_address + ', ' + city,
+                    package_number=package_number,
+                    recipientName=row[header_mapping["recipient_name"]],
+                    recipientEmail='',  
+                    recipientTelephone=recipient_telephone,
+                    recipientAddress=recipient_address_city,
                     packageDescription='',
-                    sendersName='',  # You can set this based on your requirement
-                    sendersEmail='',  # You can set this based on your requirement
-                    sendersAddress='',  # You can set this based on your requirement
-                    sendersContact='',  # You can set this based on your requirement
+                    sendersName=senders_name,  
+                    sendersEmail=user.email,  
+                    sendersAddress=user.address,  
+                    sendersContact='',  
                     created_on=order_date,
-                    created_by=request.user,
+                    created_by=user,
                     modified_by=request.user,
                     assigned_at=timezone.now(),
-                    status='upcoming',  # You can set this based on your requirement
+                    status='warehouse_arrival',
+                    warehouse=request.user.warehouse
                 )
-                package.save()
+
+                try:
+                    package.save()
+                except IntegrityError as ie:
+                    if "UNIQUE constraint" in str(ie):
+                        # Handle integrity error when package_number is already taken
+                        messages.error(request, "Error: The package number already exists.")
+                    else:
+                        messages.error(request, "An error occurred while saving the package.")
 
             return redirect("new_arrivals")
     else:
         form = ExcelUploadForm()
 
-    return render(request, "warehouse/upload_excel.html", {"form": form})
+    return render(request, "warehouse/upload_excel.html", {"form": form, "senders": senders})
+
+
+
+
+
+# import gspread
+# from oauth2client.service_account import ServiceAccountCredentials
+
+# scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive',
+#          'https://www.googleapis.com/auth/drive.file', 'https://www.googleapis.com/auth/spreadsheets']
+
+
+# credentials = ServiceAccountCredentials.from_json_keyfile_name('cred.json', scope)
+
+# # creds = ServiceAccountCredentials.from_json_keyfile_name('mod.json', scope)
+# client = gspread.authorize(credentials)
+
+# sheet = client.open_by_url("https://docs.google.com/spreadsheets/d/1xsk1k8F1rJJ4nj350LGSJpRXUIBv_F-t6KPIyGdCJ_I/edit#gid=0").sheet1
+
+# data = sheet.get_all_records()
+
+# # sheet.update_cell(1, 1, "You made it") #Write this message in first row and first column
+
+# print(data)

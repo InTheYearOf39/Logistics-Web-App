@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, redirect
 from django.db.models import Q, Case, When, IntegerField
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test 
 from lmsapp.forms import PackageForm
 from lmsapp.models import Package, User,Warehouse,DropPickZone,APIKey
 import random
@@ -20,11 +20,16 @@ from django.http import JsonResponse
 from geopy.distance import geodesic
 from typing import Union
 
+
+def is_sender_user(user):
+    return user.role == 'sender'
+
 """
 Renders out a sender dashboard template and shows packages with the statuses 
 'ongoing' & 'upcoming' that are for a specific sender.
 """
 @login_required
+@user_passes_test(is_sender_user)
 def sender_dashboard(request):
     packages = Package.objects.filter(
         user=request.user
@@ -54,6 +59,8 @@ def generate_package_number():
 # def sender_history(request):
 #     return render(request, 'sender/sender_history.html', {})
 
+@login_required
+@user_passes_test(is_sender_user)
 def sender_history(request):
     # Retrieve the completed packages from the database
     completed_packages = Package.objects.filter(status='completed')
@@ -66,6 +73,7 @@ and saving the package to the database with the appropriate details.
 """ 
 #allow loading resources from other locations
 @login_required
+@user_passes_test(is_sender_user)
 @xframe_options_exempt
 def register_package(request):
     api_key = settings.API_KEY

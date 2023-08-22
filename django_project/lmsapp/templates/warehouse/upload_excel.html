@@ -2,14 +2,52 @@
 
 {% load static %}
 
+{% block static_links %}
+
+<link href="{% static 'select2/css/select2.min.css' %}" rel="stylesheet" />
+<script src="{% static 'select2/js/select2.min.js' %}"></script>
+
+{% endblock %}
+
 {% block content %}
 
 
 
 <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
+
+    <div class="form-group col-md-12">
+        <div id="userSelectContainer">
+          <label for="client" class="form-label form-label-sm">Select Client</label>
+          <select class="form-select form-select-sm col-md-5" id="client" name="client">
+            <option value=""> -- Select Client -- </option>
+            {% for sender in senders %}
+            <option value="{{sender.id}}">{{sender.username}} - {{sender.email}}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+
     {{ form.as_p }}
     <button type="submit">Upload</button>
 </form>
+
+{% if messages %}
+<div class="alert alert-danger" role="alert">
+    <ul>
+        {% for message in messages %}
+        <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
+<script>
+   $(document).ready(function() {
+    $('#client').select2({width: '40%'});
+});
+
+</script>
 
 {% endblock %}

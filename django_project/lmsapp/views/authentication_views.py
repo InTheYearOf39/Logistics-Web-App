@@ -118,6 +118,7 @@ the user's password is updated and the session authentication hash is updated. T
 then redirected to their respective dashboard based on their role. If the form is not valid 
 or the request method is not POST, the password change form is displayed.
 """
+@login_required
 def change_password(request):
     # Mapping of user roles to dashboard URLs
     dashboard_urls = {
@@ -149,6 +150,7 @@ def change_password(request):
         form = ChangePasswordForm(request.user)
     return render(request, 'change_password.html', {'form': form})
 
+@login_required
 def generate_api_key(request):
     if request.method == 'POST':
         form = ApiForm(request.POST)
