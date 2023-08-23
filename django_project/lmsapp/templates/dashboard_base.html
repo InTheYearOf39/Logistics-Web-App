@@ -100,9 +100,13 @@
             <li class="nav-item"><a class="nav-link" href="#">Settings</a></li>
           </ul>
           <ul class="header-nav ms-auto">
-            {% if request.path == '/warehouse_reports/' %}
+            {% if request.path == '/packages_delivered/' %}
             <li class="nav-item"><button class="btn btn-primary text-white" type="button">         
-              <a class="text-white" href="{% url 'package_reports_export' %}"><i class="icon cil-cloud-download"></i></a>
+              <a class="text-white" href="{% url 'packages_delivered_export' %}"><i class="icon cil-cloud-download"></i></a>
+            </button></li>
+            {% elif request.path == '/packages_received/' %}
+            <li class="nav-item"><button class="btn btn-primary text-white" type="button">         
+              <a class="text-white" href="{% url 'packages_received_export' %}"><i class="icon cil-cloud-download"></i></a>
             </button></li>         
             {% endif %}
 
