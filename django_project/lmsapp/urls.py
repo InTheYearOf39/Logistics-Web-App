@@ -105,7 +105,6 @@ urlpatterns = [
     path('new_arrivals/', warehouse_views.new_arrivals, name='new_arrivals'),
     path('ready_packages/', warehouse_views.in_house, name='in_house'),
     # path('ready_for_pickup/', warehouse_views.ready_for_pickup, name='ready_for_pickup'),
-    path('to_pickup/<int:package_id>/', warehouse_views.to_pickup, name='to_pickup'),
     path('packages_delivered/', warehouse_views.packages_delivered, name='packages_delivered'),
     path('packages_received/', warehouse_views.packages_received, name='packages_received'),
     path('packages_delivered_export/', warehouse_views.packages_delivered_export, name='packages_delivered_export'),
