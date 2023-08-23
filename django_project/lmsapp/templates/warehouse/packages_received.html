@@ -23,7 +23,11 @@
             <input type="date" id="end_date" name="end_date" class="form-control me-2" value="{{ request.GET.end_date }}">
             
             <button type="submit" class="btn btn-primary">Filter</button>
-          </form>      
+          </form>    
+
+          <button class="btn btn-primary text-white" type="button">         
+            <a class="text-white" href="{% url 'packages_received_export' %}"><i class="icon cil-cloud-download"></i></a>
+          </button>
         </div>
       <!-- </div> -->
       <!-- /.row--><br />

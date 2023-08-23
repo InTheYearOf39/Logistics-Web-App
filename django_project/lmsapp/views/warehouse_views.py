@@ -977,11 +977,10 @@ def extract_google_sheet_data(request):
             for date_format in date_formats:
                 try:
                     order_date = datetime.strptime(order_date_value, date_format)
-                    
-                    break # Break out of the loop if successful parsing
+
+                    break 
                 except ValueError:
-                    print(f"Error: Failed to parse date: {order_date_value} with format {date_format}")
-                    messages.error(request, f"Error: Failed to parse date: {order_date_value} with format {date_format}")
+                    pass
 
             if order_date is None:
                 continue 
