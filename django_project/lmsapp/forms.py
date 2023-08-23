@@ -221,4 +221,7 @@ class ApiForm(forms.Form):
     )
 
 class ExcelUploadForm(forms.Form):
-    excel_file = forms.FileField(label="Upload Excel File")
+    excel_file = forms.FileField(
+        label="Upload Excel File",
+        widget=forms.ClearableFileInput(attrs={'class': 'form-control-file btn btn-secondary'})
+    )

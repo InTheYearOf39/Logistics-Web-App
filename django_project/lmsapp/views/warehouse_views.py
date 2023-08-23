@@ -416,7 +416,7 @@ def new_arrivals(request):
     context = {
         'arrived_packages': arrived_packages,
     }
-    extract_google_sheet_data(request)
+    # extract_google_sheet_data(request)
     return render(request, 'warehouse/new_arrivals.html', context)
 
 def generate_package_number():
@@ -612,14 +612,25 @@ def upload_excel(request):
             wb = load_workbook(excel_file)
             sheet = wb.active
 
+            # header_mapping = {
+            #     "order_id": 1, 
+            #     "order_date": 2, 
+            #     "recipient_name": 3, 
+            #     "delivery_address": 4, 
+            #     "city": 5, 
+            #     "phone": 6, 
+            #     "item": 7
+            # }
+
             header_mapping = {
-                "order_id": 1, 
-                "order_date": 2, 
-                "recipient_name": 3, 
-                "delivery_address": 4, 
-                "city": 5, 
-                "phone": 6, 
-                "item": 7
+                "order_id": "Order ID", 
+                "order_date": "Order Date",  
+                "recipient_name": "Name of\nReceiver", 
+                "delivery_address": "Deliery address", 
+                "city": "City", 
+                "phone": "Phone", 
+                "item": "Item1",
+                "quantity": "QTY(pieces)"
             }
 
             for row in sheet.iter_rows(min_row=2, values_only=True):
@@ -841,123 +852,124 @@ def upload_excel(request):
 @login_required
 @user_passes_test(is_warehouse_user)
 def extract_google_sheet_data(request):
-    # username_list = ['Ivan', 'muhumuza', 'Shem', 'Izzy']
+    username_list = ['Ivan', 'muhumuza', 'Shem', 'Izzy']
 
-    # senders = User.objects.filter(username__in=username_list, role='sender')
+    senders = User.objects.filter(username__in=username_list, role='sender')
 
-
-    user_id = request.POST.get('client')
-    # user_id = 26
-    try:
-        user = User.objects.get(id=user_id)
-    except User.DoesNotExist:
-        user = None
-
-    try:
-        user_google_sheet = UserGoogleSheet.objects.get(user=user)
-    except UserGoogleSheet.DoesNotExist:
-        return HttpResponse("No Google Sheet URL found for this user.")
-
-    scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive',
-            'https://www.googleapis.com/auth/drive.file', 'https://www.googleapis.com/auth/spreadsheets']
-
-    credentials = ServiceAccountCredentials.from_json_keyfile_name('cred.json', scope)
-    client = gspread.authorize(credentials)
-
-    sheet = client.open_by_url(user_google_sheet.google_sheet_url).sheet1
-
-    google_sheets_data = sheet.get_all_records()
-
-    header_mapping = user_google_sheet.header_mapping
-
-
-    for row in google_sheets_data:
-
-        order_date_value = row[header_mapping["order_date"]]
-        print("Order Date Value:", order_date_value) 
-
-        if order_date_value:
-            order_date = datetime.strptime(order_date_value, "%d/%b/%Y")
-            order_date_str = order_date.strftime("%Y-%m-%d")
-        else:
-            # Handle the case where order_date_value is empty
-            # You can choose to skip processing this row or handle it according to your logic
-            continue
+    if request.method == "POST":
+        user_id = request.POST.get('user')
         
-
-        # Assuming order_date_value is a string in the format "YYYY-MM-DD"
-        order_date_str = order_date_value
-        order_date = datetime.strptime(order_date_str, "%d/%b/%Y")
-
-        # Check if the phone field is blank
-        recipient_telephone = preprocess_phone_number(row[header_mapping["phone"]])
-        if not recipient_telephone:
-            recipient_telephone = "Not Provided"  
-
-        recipient_address = row[header_mapping["delivery_address"]]
-        city = row[header_mapping["city"]]
-
-        if not recipient_address and not city:
-            recipient_address_city = ""
-        elif not recipient_address:
-            recipient_address_city = city
-        elif not city:
-            recipient_address_city = recipient_address
-        else:
-            recipient_address_city = recipient_address + ' --' + city
-
-        package_number = row[header_mapping["order_id"]]
-
-        # Check if a package with the same package_number already exists
-        existing_package = Package.objects.filter(package_number=package_number).first()
-
-        if existing_package:
-            # Package with the same package_number already exists, skip
-            continue
-        
-        # Get the item name and quantity from the row
-        item_name = row[header_mapping["item"]]
-        quantity = row[header_mapping["quantity"]]
-
-        # Append the quantity to the item name if quantity is greater than 1
-        if quantity > 1:
-            item_name += f' *({quantity} units)'
-
-        # Check if user has the 'name' attribute, if not, use 'username'
-        if user and hasattr(user, 'name') and user.name:
-            senders_name = user.name
-        else:
-            senders_name = user.username
-
-        package = Package(
-            user=user,
-            packageName=item_name,
-            deliveryType='premium',  
-            package_number=package_number,
-            recipientName=row[header_mapping["recipient_name"]],
-            recipientEmail='',  
-            recipientTelephone=recipient_telephone,
-            recipientAddress=recipient_address_city,
-            packageDescription='',
-            sendersName=senders_name,  
-            sendersEmail=user.email,  
-            sendersAddress=user.address,  
-            sendersContact='',  
-            created_on=order_date,
-            created_by=user,
-            modified_by=request.user,
-            assigned_at=timezone.now(),
-            status='warehouse_arrival',
-            warehouse=request.user.warehouse
-        )
+        try:
+            user = User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            user = None
 
         try:
-            package.save()
-        except IntegrityError as ie:
-            if "UNIQUE constraint" in str(ie):
-                # Handle integrity error when package_number is already taken
-                messages.error(request, "Error: The package number already exists.")
-            else:
-                messages.error(request, "An error occurred while saving the package.")
+            user_google_sheet = UserGoogleSheet.objects.get(user=user)
+        except UserGoogleSheet.DoesNotExist:
+            return HttpResponse("No Google Sheet URL found for this user.")
 
-    return redirect("new_arrivals")
+        scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive',
+                'https://www.googleapis.com/auth/drive.file', 'https://www.googleapis.com/auth/spreadsheets']
+
+        credentials = ServiceAccountCredentials.from_json_keyfile_name('cred.json', scope)
+        client = gspread.authorize(credentials)
+
+        sheet = client.open_by_url(user_google_sheet.google_sheet_url).sheet1
+
+        google_sheets_data = sheet.get_all_records()
+
+        header_mapping = user_google_sheet.header_mapping
+
+
+        for row in google_sheets_data:
+            order_date_value = row[header_mapping["order_date"]]
+
+            date_formats = ["%d/%b/%Y", "%Y/%m/%d", "%m/%d/%Y", "%Y-%m-%d", "%d-%m-%Y"]
+            order_date = None
+
+            for date_format in date_formats:
+                try:
+                    order_date = datetime.strptime(order_date_value, date_format)
+                    
+                    break # Break out of the loop if successful parsing
+                except ValueError:
+                    print(f"Error: Failed to parse date: {order_date_value} with format {date_format}")
+                    messages.error(request, f"Error: Failed to parse date: {order_date_value} with format {date_format}")
+
+            if order_date is None:
+                continue 
+
+
+            # Check if the phone field is blank
+            recipient_telephone = preprocess_phone_number(row[header_mapping["phone"]])
+            if not recipient_telephone:
+                recipient_telephone = "Not Provided"  
+
+            recipient_address = row[header_mapping["delivery_address"]]
+            city = row[header_mapping["city"]]
+
+            if not recipient_address and not city:
+                recipient_address_city = ""
+            elif not recipient_address:
+                recipient_address_city = city
+            elif not city:
+                recipient_address_city = recipient_address
+            else:
+                recipient_address_city = recipient_address + ' --' + city
+
+            package_number = row[header_mapping["order_id"]]
+
+            existing_package = Package.objects.filter(package_number=package_number).first()
+
+            if existing_package:
+                continue
+            
+            # Get the item name and quantity from the row
+            item_name = row[header_mapping["item"]]
+            quantity = row[header_mapping["quantity"]]
+
+            # Append the quantity to the item name if quantity is greater than 1
+            if quantity > 1:
+                item_name += f' *({quantity} units)'
+
+            # Check if user has the 'name' attribute, if not, use 'username'
+            if user and hasattr(user, 'name') and user.name:
+                senders_name = user.name
+            else:
+                senders_name = user.username
+
+            package = Package(
+                user=user,
+                packageName=item_name,
+                deliveryType='premium',  
+                package_number=package_number,
+                recipientName=row[header_mapping["recipient_name"]],
+                recipientEmail='',  
+                recipientTelephone=recipient_telephone,
+                recipientAddress=recipient_address_city,
+                packageDescription='',
+                sendersName=senders_name,  
+                sendersEmail=user.email,  
+                sendersAddress=user.address,  
+                sendersContact='',  
+                created_on=order_date,
+                created_by=user,
+                modified_by=request.user,
+                assigned_at=timezone.now(),
+                status='warehouse_arrival',
+                warehouse=request.user.warehouse
+            )
+
+            try:
+                package.save()
+            except IntegrityError as ie:
+                if "UNIQUE constraint" in str(ie):
+                    # Handle integrity error when package_number is already taken
+                    messages.error(request, "Error: The package number already exists.")
+                else:
+                    messages.error(request, "An error occurred while saving the package.")
+
+        return redirect("new_arrivals")
+
+    return render(request, "warehouse/extract_google_sheet_data.html", {"senders": senders})
