@@ -363,7 +363,7 @@ def create_warehouse(request):
         longitude = request.POST.get('longitude')
         latitude = request.POST.get('latitude')
 
-        warehouse = Warehouse(name=name, address=address, phone=phone, tag=tag, latitude=latitude, longitude=longitude)
+        warehouse = Warehouse(name=name, address=address, phone=phone,email=email, tag=tag, latitude=latitude, longitude=longitude)
         # warehouse.created_by = user
         warehouse.save(user=user)
 
@@ -485,13 +485,14 @@ def create_warehouse_user(request):
     if request.method == 'POST':
         name = request.POST.get('name')
         username = request.POST.get('username')
+        email = request.POST.get('email')
         warehouse_id = request.POST.get('warehouse')
 
         if warehouse_id:
             warehouse = get_object_or_404(Warehouse, id=warehouse_id)
 
             # Create the user with the role "warehouse"
-            user = User.objects.create_user(username=username, password='warehouse@warehouse', role='warehouse',
+            user = User.objects.create_user(username=username,email=email, password='warehouse@warehouse', role='warehouse',
                                             name=name, warehouse=warehouse)
             user.created_by = request.user
             user.save()
@@ -512,12 +513,14 @@ def create_drop_pick_user(request):
         name = request.POST.get('name')
         username = request.POST.get('username')
         drop_pick_zone_id = request.POST.get('drop_pick_zone')
+        email = request.POST.get('email')
+
 
         if drop_pick_zone_id:
             drop_pick_zone = get_object_or_404(DropPickZone, id=drop_pick_zone_id)
 
             # Create the user with the role "drop_pick_zone"
-            user = User.objects.create_user(username=username, password='droppick@droppick', role='drop_pick_zone',
+            user = User.objects.create_user(username=username, email=email, password='droppick@droppick', role='drop_pick_zone',
                                             name=name, drop_pick_zone=drop_pick_zone)
             
             user.created_by = request.user

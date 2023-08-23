@@ -17,6 +17,7 @@ from django.http import HttpResponse
 from lmsapp.utils import send_sms
 
 from openpyxl import load_workbook
+from openpyxl.workbook import Workbook
 from django.utils import timezone
 from django.utils.dateparse import parse_date
 from django.db import IntegrityError
@@ -359,15 +360,6 @@ def in_house(request):
     return render(request, 'warehouse/ready_packages.html', context)
 
 
-
-def to_pickup(request, package_id):
-    if request.method == 'POST':
-        package = Package.objects.get(pk=package_id)
-        package.status = 'in_transit'
-        package.save()
-
-    return redirect('ready_packages')  # Replace with the appropriate URL for the warehouse dashboard
-
 """ 
 The view displays a list of packages ready for pickup and allows the user to assign selected packages 
 to couriers and drop_pick_zones. It handles form submissions, updates the package assignments and statuses, 
@@ -514,12 +506,11 @@ def add_package(request):
 
 @login_required
 @user_passes_test(is_warehouse_user)
-def warehouse_reports(request):
+def packages_delivered(request):
     start_date = request.GET.get('start_date')
     end_date = request.GET.get('end_date')
 
     packages_delivered = Package.objects.filter(status='completed')
-    packages_ready = Package.objects.filter(status='ready_for_pickup')
     
     if start_date and end_date:
         start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
@@ -540,19 +531,48 @@ def warehouse_reports(request):
     
     context = {
         'packages_delivered': packages_delivered,
-        'packages_ready': packages_ready,
     }
     
-    return render(request, 'warehouse/warehouse_reports.html', context )
+    return render(request, 'warehouse/packages_delivered.html', context )
 
 @login_required
 @user_passes_test(is_warehouse_user)
-def package_reports_export(request):
+def packages_received(request):
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+
+    packages_received = Package.objects.filter(status__in=['in_house', 'ready_for_pickup'])
+    
+    if start_date and end_date:
+        start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
+        end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
+        
+        # Ensure that start_date is always before end_date
+        if start_date > end_date:
+            start_date, end_date = end_date, start_date
+        
+        # Adjust end_date to be inclusive of the entire day
+        end_date += timedelta(days=1)
+        
+        packages_received = packages_received.filter(received_at__range=(start_date, end_date))
+    elif start_date:
+        start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
+        packages_received = packages_received.filter(received_at__date=start_date)
+        
+    
+    context = {
+        'packages_received': packages_received,
+    }
+    
+    return render(request, 'warehouse/packages_received.html', context )
+
+@login_required
+@user_passes_test(is_warehouse_user)
+def packages_delivered_export(request):
     start_datetime = request.GET.get('start_datetime')
     end_datetime = request.GET.get('end_datetime')
 
     packages_delivered = Package.objects.filter(status='completed')
-    # packages_ready = Package.objects.filter(status='ready_for_pickup')
     
     if start_datetime and end_datetime:
         start_datetime = datetime.strptime(start_datetime, '%Y-%m-%dT%H:%M')
@@ -567,25 +587,91 @@ def package_reports_export(request):
         start_datetime = datetime.strptime(start_datetime, '%Y-%m-%dT%H:%M')
         packages_delivered = packages_delivered.filter(completed_at__gte=start_datetime)
         
-    context = {
-        'packages_delivered': packages_delivered,
-        # 'packages_ready': packages_ready,
-    }
-
-    # Get the current date and time
-    current_datetime = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-
-    # Create a Pandas DataFrame from the data
-    df = pd.DataFrame(context)
-
     # Create a response with the Excel file
     response = HttpResponse(content_type='application/ms-excel')
-    response['Content-Disposition'] = f'attachment; filename="Package_summary_data_{current_datetime}.xlsx"'
+    response['Content-Disposition'] = f'attachment; filename="Packages_delivered_summary_data.xlsx"'
 
-    # Save the DataFrame to the Excel response
-    df.to_excel(response, index=False, engine='openpyxl')
-    
+    # Create a new workbook
+    workbook = Workbook()
+
+    # Create a sheet for packages_delivered
+    sheet_delivered = workbook.active
+    sheet_delivered.title = 'Packages Delivered'
+
+    columns_to_include_delivered = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]  # Include columns
+    write_data_to_sheet(sheet_delivered, packages_delivered, columns_to_include_delivered)
+
+    # Save the workbook to the response
+    workbook.save(response)
+
     return response
+
+@login_required
+@user_passes_test(is_warehouse_user)
+def packages_received_export(request):
+    start_datetime = request.GET.get('start_datetime')
+    end_datetime = request.GET.get('end_datetime')
+
+    packages_received = Package.objects.filter(status__in=['in_house', 'ready_for_pickup'])
+    
+    if start_datetime and end_datetime:
+        start_datetime = datetime.strptime(start_datetime, '%Y-%m-%dT%H:%M')
+        end_datetime = datetime.strptime(end_datetime, '%Y-%m-%dT%H:%M')
+        
+        # Ensure that start_datetime is always before end_datetime
+        if start_datetime > end_datetime:
+            start_datetime, end_datetime = end_datetime, start_datetime
+        
+        packages_received = packages_received.filter(received_at__range=(start_datetime, end_datetime))
+    elif start_datetime:
+        start_datetime = datetime.strptime(start_datetime, '%Y-%m-%dT%H:%M')
+        packages_received = packages_received.filter(received_at__gte=start_datetime)
+        
+    # Create a response with the Excel file
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = f'attachment; filename="Packages_received_summary_data.xlsx"'
+
+    # Create a new workbook
+    workbook = Workbook()
+
+    # Create a sheet for packages_received
+    sheet_received = workbook.active
+    sheet_received.title = 'Packages Received'
+
+    # Specify columns to include for packages_delivered_export view
+    columns_to_include_received = [0, 1, 2, 3, 4, 5, 6, 7, 8, 10]  # Include columns
+    write_data_to_sheet(sheet_received, packages_received, columns_to_include_received)
+
+    # Save the workbook to the response
+    workbook.save(response)
+
+    return response
+
+@login_required
+@user_passes_test(is_warehouse_user)
+def write_data_to_sheet(sheet, queryset, columns_to_include):
+    # Write header row
+    header = ['Package Name', 'Package Number', 'Sender Address', 'Sender Name', 'Recipient Name', 'Recipient Address', 'Package Description', 'Delivery Type', 'Status', 'Time Completed', 'Time Received']
+    included_header = [header[i] for i in columns_to_include]
+    sheet.append(included_header)
+
+    # Write data rows
+    for package in queryset:
+        row_data = [
+            package.packageName,
+            package.package_number,
+            package.sendersAddress,
+            package.sendersName,
+            package.recipientName,
+            package.recipientAddress,
+            package.packageDescription,
+            package.deliveryType,
+            package.status,
+            package.completed_at,
+            package.in_house_at
+        ]
+        included_row_data = [row_data[i] for i in columns_to_include]
+        sheet.append(included_row_data)
 
 
 def preprocess_phone_number(phone_number):
