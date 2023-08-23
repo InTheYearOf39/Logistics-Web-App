@@ -238,3 +238,12 @@ class APIKey(models.Model):
 
     def __str__(self):
         return f"API Key for {self.user.username}"
+
+
+class UserGoogleSheet(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    google_sheet_url = models.URLField(blank=True, null=True, unique=True)
+    header_mapping = models.JSONField(default=dict)
+
+    def __str__(self):
+        return f"Google sheet: {self.user.username}"
