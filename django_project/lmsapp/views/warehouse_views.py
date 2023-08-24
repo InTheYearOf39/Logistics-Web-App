@@ -935,23 +935,31 @@ def upload_excel(request):
 
 #     return redirect("new_arrivals")
 
+
+def is_empty_value(val):
+    if val is None:
+        return True
+    elif str(val).strip().__len__() == 0:
+        return True
+    else:
+        return False
+
 @login_required
 @user_passes_test(is_warehouse_user)
 def extract_google_sheet_data(request):
-    username_list = ['Ivan', 'muhumuza', 'Shem', 'Izzy']
 
-    senders = User.objects.filter(username__in=username_list, role='sender')
+    sheets = UserGoogleSheet.objects.all()
 
     if request.method == "POST":
-        user_id = request.POST.get('user')
-        
-        try:
-            user = User.objects.get(id=user_id)
-        except User.DoesNotExist:
-            user = None
+        sheet_id = request.POST.get('sheet_id')
+        empty_rows = 0
+        data_rows = 0
+        user_google_sheet = None
+        user = None
 
         try:
-            user_google_sheet = UserGoogleSheet.objects.get(user=user)
+            user_google_sheet = UserGoogleSheet.objects.get(id=sheet_id)
+            user = user_google_sheet.user
         except UserGoogleSheet.DoesNotExist:
             return HttpResponse("No Google Sheet URL found for this user.")
 
@@ -965,96 +973,240 @@ def extract_google_sheet_data(request):
 
         google_sheets_data = sheet.get_all_records()
 
-        header_mapping = user_google_sheet.header_mapping
+        # indicate all possible fields
+
+        sample_mapping = {
+            "fields": {
+            "package_number": "Order ID", 
+            "created_on": "Order Date",  
+            "recipientName": "Name of\nReceiver", 
+            "recipientAddress": "Deliery address", 
+            "city": "City", 
+            "recipientTelephone": "Phone", 
+            "packageName": "Item1",
+            "quantity": "QTY(pieces)"
+        },
+        "custom_fields": ["city","quantity"],
+        "settings": {
+            "created_on_formats": ["%d/%b/%Y", "%Y-%m-%d"],
+            "non_empty_indicator_field": ["recipientName", "packageName", "recipientTelephone"],
+            "all_fields_mandatory": ["created_on", "package_number", "packageName", "recipientTelephone"]
+        },
+        "defaults": {
+            "deliveryType": "premium",
+            "packageDescription": "", 
+            "recipientEmail": "",
+            "sendersContact": "",
+                }
+        }
+
+        all_fields = ["created_on", "package_number", "packageName", "sendersName"
+                      , "packageDescription", "sendersName", "sendersEmail", "sendersAddress", "sendersContact"
+                      , "sender_latitude", "sender_longitude"
+                      , "recipientName", "recipientEmail", "recipientTelephone"
+                      , "recipientAddress", "recipientIdentification", "recipient_latitude"
+                      , "recipient_longitude", "genderType"
+                      , "deliveryFee", "deliveryType"]
+        
+        
+        mapping_options = user_google_sheet.header_mapping
+        header_mapping = mapping_options["fields"]
+        mapping_settings = mapping_options["settings"]
+        mapping_defaults = mapping_options.get("defaults", {})
+        custom_fields = mapping_options.get("custom_fields", [])
+
+        # a row is considered not empty if it has a value in any of these
+        non_empty_indicator_field = mapping_settings["non_empty_indicator_field"]
+        # thse will be validated for each non empty row
+        all_fields_mandatory = mapping_settings["all_fields_mandatory"]
+        
+        
+
+        try:
+            # save batch insert data
+            batch_list = list()
+            # get a list of all package number
+            # advised to save original pacakge number
+            existing_package_numbers = [ a_pkg.package_number for a_pkg in Package.objects.all() ]
+            created_on_formats = mapping_settings["created_on_formats"]
+            row_ind = 2 # offset heading row
+            for row in google_sheets_data:
+                # get all values be nullbale for those missing
+                package_row = {}
+                # assume its empty
+                is_empty = True
+                # loop through all possible pacakge fields
+                # read all other fields
+                for a_fld in non_empty_indicator_field:
+                    # check if it is provided for in mappings
+                    if header_mapping.get(a_fld, None) is not None:
+                        # try to read it
+                        package_row[a_fld] = row.get(header_mapping[a_fld], None)
+                    else:
+                        # if it was not in mapping, set to respective empty values
+                        # definbe case for those to be empty bstrings
+                        package_row[a_fld] = None
+                    # is any of these fields has a value mark as not empty
+                    if is_empty_value(package_row[a_fld]) is False:
+                        is_empty = False
+
+                print("empty:"+ str(is_empty), batch_list.__len__())
+                # if row not empty continue
+                if is_empty is False:
+
+                    # loop through all possible pacakge fields
+                    # read all other fields
+                    for a_fld in all_fields:
+                        # check if it is provided for in mappings
+                        if header_mapping.get(a_fld, None) is not None:
+                            # try to read it
+                            package_row[a_fld] = row.get(header_mapping[a_fld], None)
+                        else:
+                            # if it was not in mapping, set to respective empty values
+                            # definbe case for those to be empty bstrings
+                            # apply default value if available
+                            package_row[a_fld] = mapping_defaults.get(a_fld, None)
+
+                    # loop through all possible any custom fields
+                    # read if any more cutsom fields
+                    if custom_fields.__len__() > 0:
+                        for a_fld in custom_fields:
+                            # check if it is provided for in mappings
+                            if header_mapping.get(a_fld, None) is not None:
+                                # try to read it
+                                package_row[a_fld] = row.get(header_mapping[a_fld], None)
+                            else:
+                                # if it was not in mapping, set to respective empty values
+                                # definbe case for those to be empty bstrings
+                                # apply default value if available
+                                package_row[a_fld] = mapping_defaults.get(a_fld, None)
+                        
+                    
+                    
+                    # validate mandatory
+                    for a_fld in all_fields_mandatory:
+                        if is_empty_value(package_row[a_fld]) is True:
+                            status_msg = "Value for {} on row {} should not be empty".format(header_mapping[a_fld], row_ind)
+                            print("mandatory missing")
+                            return render(request, "warehouse/extract_google_sheet_data.html", {"sheets": sheets
+                                                                                , "status_msg": status_msg  })
+
+                    #### handle other data conversions
+                    
+
+                    #### handle date conversions if not date format yet
+                    if is_empty_value(package_row["created_on"]) is False:
+                        # only do this if not a valid datetime object yet
+                        if not isinstance(package_row["created_on"], datetime):
+                            for date_format in created_on_formats:
+                                try:
+                                    package_row["created_on"] = datetime.strptime(package_row["created_on"], date_format)
+                                    # stop trying if it succeds for first format
+                                    break
+                                except Exception as ie:
+                                    status_msg = "exception:{}".format(row_ind,str(ie) )
+                            # check if up to now no valid conversion happed
+                            if not isinstance(package_row["created_on"], datetime):
+                                status_msg = "Could not convert date value {} on row {}: {}".format(package_row["created_on"], row_ind,str(ie) )
+                                print("date conversion failed")
+                                return render(request, "warehouse/extract_google_sheet_data.html", {"sheets": sheets})
+                            
+                    ####default package date to now unless provided
+                    if is_empty_value(package_row["created_on"]) is True:
+                        package_row["created_on"] = datetime.now()
+
+                    ##### clean phone number
+                    if not package_row["recipientTelephone"]:
+                        package_row["recipientTelephone"] = ""
+                    package_row["recipientTelephone"] = preprocess_phone_number(package_row["recipientTelephone"])
+                      
+
+                    # add special case for city UNTILL WE ADD IT INTO THE DATBASE
+                    ##### Add city to address info ########
+                    # as long as city data exists for this row
+                    if package_row.get("city", None) is not None:
+                            package_row["recipientAddress"] = str(package_row["recipientAddress"]) + ' --' + str(package_row["city"])
+
+                    ##### Add city to address info ########
+
+                    
+                    #### check unique package number
+                    ### NEeed to later csale it to preserver original pcakag enumber and add filed for extrernal_source_ids
+                    if package_row["package_number"] in existing_package_numbers:
+                        status_msg = "Package Numbers must be unique, value {} on row {} already exists".format(package_row["package_number"], row_ind )
+                        return render(request, "warehouse/extract_google_sheet_data.html", {"sheets": sheets
+                                                                            , "status_msg": status_msg  })
+
+                    
+
+                    # add special case for quantity UNTILL WE ADD IT INTO THE DATBASE
+                    ##### Add quantity to package name ########
+                    # as long as quantity data exists for this row
+                    if package_row.get("quantity", None) is not None:
+                            package_row["packageName"] = str(package_row["packageName"]) + ' (' + str(package_row["quantity"]) + ")"
+
+                    ##### Add quantity to package name ########
 
 
-        for row in google_sheets_data:
-            order_date_value = row[header_mapping["order_date"]]
+                    ###Set Sender name if not porvided
+                    if is_empty_value(package_row["sendersName"]) is True:
+                        # Check if user has the 'name' attribute, if not, use 'username'
+                        if user and hasattr(user, 'name') and user.name:
+                            package_row["sendersName"] = user.name
+                        else:
+                            package_row["sendersName"] = user.username
+                    if is_empty_value(package_row["sendersEmail"]) is True:
+                        package_row["sendersEmail"] = user.email
+                    if is_empty_value(package_row["sendersAddress"]) is True:
+                        package_row["sendersAddress"] = user.address
 
-            date_formats = ["%d/%b/%Y", "%Y/%m/%d", "%m/%d/%Y", "%Y-%m-%d", "%d-%m-%Y"]
-            order_date = None
+                    print(package_row["package_number"])
+                    # add to batch to insert later
+                    batch_list.append(
+                        Package(
+                        user=user,
+                        packageName=package_row["packageName"],
+                        deliveryType=package_row["deliveryType"],  
+                        package_number=package_row["package_number"],
+                        recipientName=package_row["recipientName"],
+                        recipientEmail=package_row["recipientEmail"],  
+                        recipientTelephone=package_row["recipientTelephone"],
+                        recipientAddress=package_row["recipientAddress"],
+                        packageDescription=package_row["packageDescription"],
+                        sendersName=package_row["sendersName"],  
+                        sendersEmail=package_row["sendersEmail"],  
+                        sendersAddress=package_row["sendersAddress"],  
+                        sendersContact=package_row["sendersContact"],  
+                        created_on=package_row["created_on"],
+                        created_by=user,
+                        modified_by=request.user,
+                        assigned_at=timezone.now(),
+                        status='warehouse_arrival',
+                        warehouse=request.user.warehouse
+                    )
+                    )
 
-            for date_format in date_formats:
-                try:
-                    order_date = datetime.strptime(order_date_value, date_format)
-
-                    break 
-                except ValueError:
-                    pass
-
-            if order_date is None:
-                continue 
-
-
-            # Check if the phone field is blank
-            recipient_telephone = preprocess_phone_number(row[header_mapping["phone"]])
-            if not recipient_telephone:
-                recipient_telephone = "Not Provided"  
-
-            recipient_address = row[header_mapping["delivery_address"]]
-            city = row[header_mapping["city"]]
-
-            if not recipient_address and not city:
-                recipient_address_city = ""
-            elif not recipient_address:
-                recipient_address_city = city
-            elif not city:
-                recipient_address_city = recipient_address
-            else:
-                recipient_address_city = recipient_address + ' --' + city
-
-            package_number = row[header_mapping["order_id"]]
-
-            existing_package = Package.objects.filter(package_number=package_number).first()
-
-            if existing_package:
-                continue
-            
-            # Get the item name and quantity from the row
-            item_name = row[header_mapping["item"]]
-            quantity = row[header_mapping["quantity"]]
-
-            # Append the quantity to the item name if quantity is greater than 1
-            if quantity > 1:
-                item_name += f' *({quantity} units)'
-
-            # Check if user has the 'name' attribute, if not, use 'username'
-            if user and hasattr(user, 'name') and user.name:
-                senders_name = user.name
-            else:
-                senders_name = user.username
-
-            package = Package(
-                user=user,
-                packageName=item_name,
-                deliveryType='premium',  
-                package_number=package_number,
-                recipientName=row[header_mapping["recipient_name"]],
-                recipientEmail='',  
-                recipientTelephone=recipient_telephone,
-                recipientAddress=recipient_address_city,
-                packageDescription='',
-                sendersName=senders_name,  
-                sendersEmail=user.email,  
-                sendersAddress=user.address,  
-                sendersContact='',  
-                created_on=order_date,
-                created_by=user,
-                modified_by=request.user,
-                assigned_at=timezone.now(),
-                status='warehouse_arrival',
-                warehouse=request.user.warehouse
-            )
-
-            try:
-                package.save()
-            except IntegrityError as ie:
-                if "UNIQUE constraint" in str(ie):
-                    # Handle integrity error when package_number is already taken
-                    messages.error(request, "Error: The package number already exists.")
+                    # go next
+                    row_ind += 1
                 else:
-                    messages.error(request, "An error occurred while saving the package.")
-
+                    # if empty row
+                    # go next
+                    row_ind += 1
+            
+            # do the insert
+            if batch_list.__len__() > 0:
+                for a_pkg in batch_list:
+                    a_pkg.save()
+        except Exception as ie:
+            
+            status_msg = "Failed to complete operation:" + str(ie) 
+            return render(request, "warehouse/extract_google_sheet_data.html", {"sheets": sheets
+                                                                              , "status_msg": status_msg  })
+        
+        print(empty_rows, data_rows)
         return redirect("new_arrivals")
-
-    return render(request, "warehouse/extract_google_sheet_data.html", {"senders": senders})
+    else:
+        status_msg = "Normal form"
+        print(status_msg)
+        return render(request, "warehouse/extract_google_sheet_data.html", {"sheets": sheets
+                                                                              , "status_msg": status_msg})

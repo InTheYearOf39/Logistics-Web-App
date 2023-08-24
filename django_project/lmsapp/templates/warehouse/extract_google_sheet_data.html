@@ -11,19 +11,23 @@
 
 {% block content %}
 
+{% if status_msg %}
+<div class="alert alert-danger" role="alert">
+{{ status_msg }}
+</div>
+{% endif %}
 
 <h3 class="mb-5">Select Client to Extract data from:</h3>
 <form method="post" enctype="multipart/form-data" style="min-height: 60vh;" action="{% url 'extract_google_sheet_data' %}">
     {% csrf_token %}
-
     <div class="d-flex align-items-center">
         <div class="form-group col-md-5">
             <div id="userSelectContainer">
                 <label for="client" class="form-label form-label-sm">Select Client</label>
-                <select class="form-select form-select-sm" id="user" name="user">
+                <select class="form-select form-select-sm" id="sheet_id" name="sheet_id">
                     <option value=""> -- Select Client -- </option>
-                    {% for sender in senders %}
-                    <option value="{{sender.id}}">{{sender.username}} - {{sender.email}}</option>
+                    {% for a_sheet in sheets %}
+                    <option value="{{a_sheet.id}}">{{a_sheet.user.username}} - {{a_sheet.user.email}}</option>
                     {% endfor %}
                 </select>
             </div>
@@ -34,19 +38,11 @@
 </form>
 
 
-{% if messages %}
-<div class="alert alert-danger" role="alert">
-    <ul>
-        {% for message in messages %}
-        <li>{{ message }}</li>
-        {% endfor %}
-    </ul>
-</div>
-{% endif %}
+
 
 <script>
    $(document).ready(function() {
-    $('#user').select2({width: '70%'});
+    $('#sheet_id').select2({width: '70%'});
 });
 
 </script>

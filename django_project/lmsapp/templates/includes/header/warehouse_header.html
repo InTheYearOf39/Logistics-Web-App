@@ -14,8 +14,12 @@
         <li class="nav-item"><a class="nav-link" href="#">Settings</a></li>
       </ul>
       <ul class="header-nav ms-auto">
-        <li class="nav-item">
-          
+
+        <li class="nav-item"><a class="nav-link" href="{% url 'extract_google_sheet_data' %}">
+          <i class="fa-solid fa-file-excel fa-lg" style="color: #24a824;"></i></a></li>
+          <!-- <i class="fa-solid fa-file-import fa-lg"></i></a></li> -->
+          <li class="nav-item"><a class="nav-link" href="#"><i class="icon icon-lg cil-envelope-open"></i></a></li>
+        <li class="nav-item">          
           <div class="dropdown">
             <button class="btn btn btn-transparent m-0 dropdown-toggle" type="button" data-coreui-toggle="dropdown" aria-expanded="false">
               <i class="icon icon-lg cil-bell"></i>
@@ -27,12 +31,11 @@
           
       </li>
 
-        <li class="nav-item"><a class="nav-link" href="#">
-            <i class="icon icon-lg cil-list-rich"></i></a></li>
+        <!-- <li class="nav-item"><a class="nav-link" href="#">
+            <i class="icon icon-lg cil-list-rich"></i></a></li> -->
         
-        <li class="nav-item"><a class="nav-link" href="#"><i class="icon icon-lg cil-envelope-open"></i></a></li>
-        <li class="nav-item"><a class="nav-link" href="{% url 'extract_google_sheet_data' %}">
-          <i class="fa-solid me-2 fa-file-import fa-lg"></i></a></li>
+       
+        
       </ul>
       <ul class="header-nav ms-3">
         <li class="nav-item dropdown"><a class="nav-link py-0" data-coreui-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
@@ -43,7 +46,7 @@
           </div><a class="dropdown-item" href="#"><i class="icon me-2 cil-bell"></i>Updates<span class="badge badge-sm bg-info ms-2">42</span></a>
                 <a class="dropdown-item" href="#"><i class="icon me-2 cil-envelope-open"></i>Messages<span class="badge badge-sm bg-success ms-2">42</span></a>
                 <a class="dropdown-item" href="#"><i class="icon me-2 cil-task"></i>Tasks<span class="badge badge-sm bg-danger ms-2">42</span></a>
-                <a class="dropdown-item" href="#"><i class="fa-solid me-2 fa-file-import"></i>Tasks<span class="badge badge-sm bg-danger ms-2">42</span></a>
+                <a class="dropdown-item" href="#"><i class="fa-solid me-2 fa-file-import" style="color: #2489a8;"></i>Tasks<span class="badge badge-sm bg-danger ms-2">42</span></a>
                 <a class="dropdown-item" href="#"><i class="fa-solid me-2 fa-file-excel"></i>Tasks<span class="badge badge-sm bg-danger ms-2">42</span></a>
                   <!-- <a class="dropdown-item" href="#"><i class="icon me-2 cil-comment-square"></i>Comments<span class="badge badge-sm bg-warning ms-2">42</span></a> -->
           <div class="dropdown-header bg-light py-2">
