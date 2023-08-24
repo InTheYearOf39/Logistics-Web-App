@@ -1,0 +1,78 @@
+{% load static %}
+<header class="header header-sticky mb-4">
+    <div class="container-fluid">
+      <button class="header-toggler px-md-0 me-md-3" type="button" onclick="coreui.Sidebar.getInstance(document.querySelector('#sidebar')).toggle()">
+        <i class="icon icon-lg cil-menu"></i>
+      </button><a class="header-brand d-md-none" href="#">
+        <!-- <svg width="118" height="46" alt="CoreUI Logo">
+          <use xlink:href="/static/dist/assets/brand/coreui.svg#full"></use>
+        </svg> -->LMS
+      </a>
+      <ul class="header-nav d-none d-md-flex">
+        <li class="nav-item"><a class="nav-link" href="#">Dashboard</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Users</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Settings</a></li>
+      </ul>
+      <ul class="header-nav ms-auto">
+        <li class="nav-item">
+          
+          <div class="dropdown">
+            <button class="btn btn btn-transparent m-0 dropdown-toggle" type="button" data-coreui-toggle="dropdown" aria-expanded="false">
+              <i class="icon icon-lg cil-bell"></i>
+            </button>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="#"></a></li>
+            </ul>
+          </div>
+          
+      </li>
+
+        <li class="nav-item"><a class="nav-link" href="#">
+            <i class="icon icon-lg cil-list-rich"></i></a></li>
+        
+        <li class="nav-item"><a class="nav-link" href="#"><i class="icon icon-lg cil-envelope-open"></i></a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'extract_google_sheet_data' %}">
+          <i class="fa-solid me-2 fa-file-import fa-lg"></i></a></li>
+      </ul>
+      <ul class="header-nav ms-3">
+        <li class="nav-item dropdown"><a class="nav-link py-0" data-coreui-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+          <div class="avatar avatar-md"><img class="avatar-img" src="{% static 'dist/assets/img/avatars/8.jpg' %}" alt="user@email.com"></div></a>
+        <div class="dropdown-menu dropdown-menu-end pt-0">
+          <div class="dropdown-header bg-light py-2">
+            <div class="fw-semibold">Account</div>
+          </div><a class="dropdown-item" href="#"><i class="icon me-2 cil-bell"></i>Updates<span class="badge badge-sm bg-info ms-2">42</span></a>
+                <a class="dropdown-item" href="#"><i class="icon me-2 cil-envelope-open"></i>Messages<span class="badge badge-sm bg-success ms-2">42</span></a>
+                <a class="dropdown-item" href="#"><i class="icon me-2 cil-task"></i>Tasks<span class="badge badge-sm bg-danger ms-2">42</span></a>
+                <a class="dropdown-item" href="#"><i class="fa-solid me-2 fa-file-import"></i>Tasks<span class="badge badge-sm bg-danger ms-2">42</span></a>
+                <a class="dropdown-item" href="#"><i class="fa-solid me-2 fa-file-excel"></i>Tasks<span class="badge badge-sm bg-danger ms-2">42</span></a>
+                  <!-- <a class="dropdown-item" href="#"><i class="icon me-2 cil-comment-square"></i>Comments<span class="badge badge-sm bg-warning ms-2">42</span></a> -->
+          <div class="dropdown-header bg-light py-2">
+            <div class="fw-semibold">Settings</div>
+          </div><a class="dropdown-item" href="#"><i class="icon me-2 cil-user"></i>Profile</a>
+              {% if user.role == "sender" %}      
+                <a class="dropdown-item" href="{% url 'generate_api_key' %}"><i class="icon me-2 cil-sitemap"></i>Developer</a>
+              {% endif %}
+                <a class="dropdown-item" href="#"><i class="icon me-2 cil-settings"></i>Settings</a>
+                <!-- <a class="dropdown-item" href="#"><i class="icon me-2 cil-credit-card"></i>Payments<span class="badge badge-sm bg-secondary ms-2">42</span></a>
+                <a class="dropdown-item" href="#"><i class="icon me-2 cil-file"></i>Projects<span class="badge badge-sm bg-primary ms-2">42</span></a> -->
+          <div class="dropdown-divider"></div>
+          <!-- <a class="dropdown-item" href="#"><i class="icon me-2 cil-lock-locked"></i>Lock Account</a> -->
+              <a class="dropdown-item" href="{% url 'logout_user' %}"><i class="icon me-2 cil-account-logout"></i>Logout</a>
+        </div>
+      </li>
+      </ul>
+    </div>
+    <div class="header-divider"></div>
+    <div class="container-fluid">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb my-0 ms-2">
+          <li class="breadcrumb-item">
+            <!-- if breadcrumb is single-->
+            <span><a href="/" class="nav-link" style="text-decoration: none;">
+              Home</a></span>
+          </li>
+          <li class="breadcrumb-item active"><span>Dashboard</span></li>
+        </ol>
+      </nav>
+    </div>
+  </header>
