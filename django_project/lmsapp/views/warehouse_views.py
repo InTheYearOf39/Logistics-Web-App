@@ -1062,7 +1062,7 @@ def extract_google_sheet_data(request):
                     for a_fld in all_fields_mandatory:
                         if is_empty_value(package_row[a_fld]) is True:
                             status_msg = "Value for {} on row {} should not be empty".format(header_mapping[a_fld], row_ind)
-                            print("mandatory missing")
+                            # print("mandatory missing")
                             return render(request, "warehouse/extract_google_sheet_data.html", {"sheets": sheets
                                                                                 , "status_msg": status_msg  })
 
@@ -1083,7 +1083,7 @@ def extract_google_sheet_data(request):
                             # check if up to now no valid conversion happed
                             if not isinstance(package_row["created_on"], datetime):
                                 status_msg = "Could not convert date value {} on row {}: {}".format(package_row["created_on"], row_ind,str(ie) )
-                                print("date conversion failed")
+                                # print("date conversion failed")
                                 return render(request, "warehouse/extract_google_sheet_data.html", {"sheets": sheets})
                             
                     ####default package date to now unless provided
@@ -1127,7 +1127,7 @@ def extract_google_sheet_data(request):
                     if is_empty_value(package_row["sendersAddress"]) is True:
                         package_row["sendersAddress"] = user.address
 
-                    print(package_row["package_number"])
+                    # print(package_row["package_number"])
                     #### check unique package number
                     ### NEeed to later csale it to preserver original pcakag enumber and add filed for extrernal_source_ids
                     if package_row["package_number"] in existing_package_numbers:
@@ -1179,7 +1179,7 @@ def extract_google_sheet_data(request):
             return render(request, "warehouse/extract_google_sheet_data.html", {"sheets": sheets
                                                                               , "status_msg": status_msg  })
         success_message = f"inserted:{inserted_rows}, skipped:{skipped_rows}" 
-        print(empty_rows, data_rows, skipped_rows, inserted_rows)
+        # print(empty_rows, data_rows, skipped_rows, inserted_rows)
         return redirect(reverse('new_arrivals') + f'?success_message={success_message}')
     else:
         
