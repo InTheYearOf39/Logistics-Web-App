@@ -17,7 +17,7 @@
         <div class="mb-3 d-flex justify-content-between align-items-center">
           <h4>Packages Delivered</h4>
           <button class="btn btn-primary text-white d-md-none d-inline me-2" type="button">
-            <a class="text-white" href="{% url 'packages_delivered_export' %}"><i
+            <a class="text-white" href="{% url 'packages_delivered' %}?req_a=excel"><i
                 class="icon cil-cloud-download"></i></a>
             
                 <!-- <button class="btn btn-primary text-white d-md-none d-inline me-2" type="button">
@@ -46,7 +46,7 @@
   
               <div class="ps-1 d-none d-md-inline">
                 <button class="btn btn-primary text-white" type="button">
-                  <a class="text-white" href="{% url 'packages_delivered_export' %}"><i
+                  <a class="text-white" href="{% url 'packages_delivered' %}?req_a=excel"><i
                       class="icon cil-cloud-download"></i></a>
                 </button>
               </div>

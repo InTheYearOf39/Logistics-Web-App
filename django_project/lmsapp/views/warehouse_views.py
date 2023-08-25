@@ -509,6 +509,7 @@ def add_package(request):
 def packages_delivered(request):
     start_date = request.GET.get('start_date')
     end_date = request.GET.get('end_date')
+    req_action = request.GET.get('req_a',"")
 
     packages_delivered = Package.objects.filter(status='completed')
     
@@ -527,19 +528,43 @@ def packages_delivered(request):
     elif start_date:
         start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
         packages_delivered = packages_delivered.filter(completed_at__date=start_date)
+      
+    # determine wether to export or render html
+    if req_action == "excel":
+         # Create a response with the Excel file
+        response = HttpResponse(content_type='application/ms-excel')
+        response['Content-Disposition'] = f'attachment; filename="Packages_delivered_summary_data.xlsx"'
+
+        # Create a new workbook
+        workbook = Workbook()
+        # print(f"initital workbook: {workbook}")
+        # Create a sheet for packages_delivered
+        sheet_delivered = workbook.active
+        sheet_delivered.title = 'Packages Delivered'
+        columns_to_include_delivered = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]  # Include columns
+        write_data_to_sheet(sheet_delivered, packages_delivered, columns_to_include_delivered)
+
+
+        # Save the workbook to the response
+        workbook.save(response)
+        print(f"The work book: {workbook}")
+
+        print(f"The response: {response}")
+        return response
+    else:
+        context = {
+            'packages_delivered': packages_delivered,
+        }
         
-    
-    context = {
-        'packages_delivered': packages_delivered,
-    }
-    
-    return render(request, 'warehouse/packages_delivered.html', context )
+        return render(request, 'warehouse/packages_delivered.html', context )
 
 @login_required
 @user_passes_test(is_warehouse_user)
 def packages_received(request):
     start_date = request.GET.get('start_date')
     end_date = request.GET.get('end_date')
+    req_action = request.GET.get('req_a',"")
+
 
     packages_received = Package.objects.filter(status__in=['in_house', 'ready_for_pickup'])
     
@@ -558,97 +583,38 @@ def packages_received(request):
     elif start_date:
         start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
         packages_received = packages_received.filter(received_at__date=start_date)
-        
+       
+    # determine wether to export or render html
+    if req_action == "excel":
+        # Create a response with the Excel file
+        response = HttpResponse(content_type='application/ms-excel')
+        response['Content-Disposition'] = f'attachment; filename="Packages_received_summary_data.xlsx"'
+
+        # Create a new workbook
+        workbook = Workbook()
+
+        # Create a sheet for packages_received
+        sheet_received = workbook.active
+        sheet_received.title = 'Packages Received'
+
+        # Specify columns to include for packages_delivered_export view
+        columns_to_include_received = [0, 1, 2, 3, 4, 5, 6, 7, 8, 10]  # Include columns
+        write_data_to_sheet(sheet_received, packages_received, columns_to_include_received)
+
+        # Save the workbook to the response
+        workbook.save(response)
+
+        return response
     
-    context = {
-        'packages_received': packages_received,
-    }
+    else:        
     
-    return render(request, 'warehouse/packages_received.html', context )
-
-@login_required
-@user_passes_test(is_warehouse_user)
-def packages_delivered_export(request):
-    start_datetime = request.GET.get('start_datetime')
-    end_datetime = request.GET.get('end_datetime')
-
-    packages_delivered = Package.objects.filter(status='completed')
-    
-    if start_datetime and end_datetime:
-        start_datetime = datetime.strptime(start_datetime, '%Y-%m-%dT%H:%M')
-        end_datetime = datetime.strptime(end_datetime, '%Y-%m-%dT%H:%M')
+        context = {
+            'packages_received': packages_received,
+        }
         
-        # Ensure that start_datetime is always before end_datetime
-        if start_datetime > end_datetime:
-            start_datetime, end_datetime = end_datetime, start_datetime
+        return render(request, 'warehouse/packages_received.html', context )
         
-        packages_delivered = packages_delivered.filter(completed_at__range=(start_datetime, end_datetime))
-    elif start_datetime:
-        start_datetime = datetime.strptime(start_datetime, '%Y-%m-%dT%H:%M')
-        packages_delivered = packages_delivered.filter(completed_at__gte=start_datetime)
-        
-    # Create a response with the Excel file
-    response = HttpResponse(content_type='application/ms-excel')
-    response['Content-Disposition'] = f'attachment; filename="Packages_delivered_summary_data.xlsx"'
 
-    # Create a new workbook
-    workbook = Workbook()
-
-    # Create a sheet for packages_delivered
-    sheet_delivered = workbook.active
-    sheet_delivered.title = 'Packages Delivered'
-
-    columns_to_include_delivered = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]  # Include columns
-    write_data_to_sheet(sheet_delivered, packages_delivered, columns_to_include_delivered)
-
-    # Save the workbook to the response
-    workbook.save(response)
-
-    return response
-
-@login_required
-@user_passes_test(is_warehouse_user)
-def packages_received_export(request):
-    start_datetime = request.GET.get('start_datetime')
-    end_datetime = request.GET.get('end_datetime')
-
-    packages_received = Package.objects.filter(status__in=['in_house', 'ready_for_pickup'])
-    
-    if start_datetime and end_datetime:
-        start_datetime = datetime.strptime(start_datetime, '%Y-%m-%dT%H:%M')
-        end_datetime = datetime.strptime(end_datetime, '%Y-%m-%dT%H:%M')
-        
-        # Ensure that start_datetime is always before end_datetime
-        if start_datetime > end_datetime:
-            start_datetime, end_datetime = end_datetime, start_datetime
-        
-        packages_received = packages_received.filter(received_at__range=(start_datetime, end_datetime))
-    elif start_datetime:
-        start_datetime = datetime.strptime(start_datetime, '%Y-%m-%dT%H:%M')
-        packages_received = packages_received.filter(received_at__gte=start_datetime)
-        
-    # Create a response with the Excel file
-    response = HttpResponse(content_type='application/ms-excel')
-    response['Content-Disposition'] = f'attachment; filename="Packages_received_summary_data.xlsx"'
-
-    # Create a new workbook
-    workbook = Workbook()
-
-    # Create a sheet for packages_received
-    sheet_received = workbook.active
-    sheet_received.title = 'Packages Received'
-
-    # Specify columns to include for packages_delivered_export view
-    columns_to_include_received = [0, 1, 2, 3, 4, 5, 6, 7, 8, 10]  # Include columns
-    write_data_to_sheet(sheet_received, packages_received, columns_to_include_received)
-
-    # Save the workbook to the response
-    workbook.save(response)
-
-    return response
-
-@login_required
-@user_passes_test(is_warehouse_user)
 def write_data_to_sheet(sheet, queryset, columns_to_include):
     # Write header row
     header = ['Package Name', 'Package Number', 'Sender Address', 'Sender Name', 'Recipient Name', 'Recipient Address', 'Package Description', 'Delivery Type', 'Status', 'Time Completed', 'Time Received']
@@ -945,7 +911,7 @@ def is_empty_value(val):
         return False
 
 @login_required
-@user_passes_test(is_warehouse_user)
+# @user_passes_test(is_warehouse_user)
 def extract_google_sheet_data(request):
 
     sheets = UserGoogleSheet.objects.all()
