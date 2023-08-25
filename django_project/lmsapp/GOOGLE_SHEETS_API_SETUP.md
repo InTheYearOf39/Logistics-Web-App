@@ -99,3 +99,8 @@ The json mapped object should look like this 'this assumes these are the possibl
 
 `NOTE:` The custom fields, can be adjusted depending on a client, the settings object should not be touched, and neither should the defaults.    
 
+The client will then have to provide the link to their google sheet. This will be added together with the mapping object at the point of creating a UserGoogleSheet instance to associate with the user on our system. 
+    -- The link should look something like this:  `https://docs.google.com/spreadsheets/d/1Ub5Iadb950LGSJpRXUIBvSswiWMq_K-tTy0Q1DaYr5_S/edit?usp=sharing`    
+    
+    
+
