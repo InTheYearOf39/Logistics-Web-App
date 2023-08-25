@@ -4,6 +4,12 @@
 
 {% block content %}
 
+{% if success_message %}
+<div class="alert alert-success" role="alert">
+{{ success_message }}
+</div>
+{% endif %}
+
 <div class="row">
     <div class="col-md-12">
           

@@ -1,5 +1,6 @@
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse
 from lmsapp.models import Package, User,DropPickZone, Warehouse, UserGoogleSheet
 from django.contrib import messages
 from lmsapp.forms import ChangePasswordForm, PackageForm, ExcelUploadForm
@@ -400,14 +401,18 @@ def ready_for_pickup(request):
 @user_passes_test(is_warehouse_user)
 def new_arrivals(request):
     arrived_packages = Package.objects.filter(status='warehouse_arrival')
-
+    success_message = ""
     if request.method == 'POST':
 
         return redirect('ready_packages')
+    elif request.method == 'GET':
+        success_message = request.GET.get('success_message', "")
             
     context = {
         'arrived_packages': arrived_packages,
+        "success_message": success_message,
     }
+    
     # extract_google_sheet_data(request)
     return render(request, 'warehouse/new_arrivals.html', context)
 
@@ -917,9 +922,12 @@ def extract_google_sheet_data(request):
     sheets = UserGoogleSheet.objects.all()
 
     if request.method == "POST":
+        
         sheet_id = request.POST.get('sheet_id')
         empty_rows = 0
         data_rows = 0
+        skipped_rows = 0
+        inserted_rows = 0
         user_google_sheet = None
         user = None
 
@@ -941,30 +949,30 @@ def extract_google_sheet_data(request):
 
         # indicate all possible fields
 
-        sample_mapping = {
-            "fields": {
-            "package_number": "Order ID", 
-            "created_on": "Order Date",  
-            "recipientName": "Name of\nReceiver", 
-            "recipientAddress": "Deliery address", 
-            "city": "City", 
-            "recipientTelephone": "Phone", 
-            "packageName": "Item1",
-            "quantity": "QTY(pieces)"
-        },
-        "custom_fields": ["city","quantity"],
-        "settings": {
-            "created_on_formats": ["%d/%b/%Y", "%Y-%m-%d"],
-            "non_empty_indicator_field": ["recipientName", "packageName", "recipientTelephone"],
-            "all_fields_mandatory": ["created_on", "package_number", "packageName", "recipientTelephone"]
-        },
-        "defaults": {
-            "deliveryType": "premium",
-            "packageDescription": "", 
-            "recipientEmail": "",
-            "sendersContact": "",
-                }
-        }
+        # sample_mapping = {
+        #     "fields": {
+        #     "package_number": "Order ID", 
+        #     "created_on": "Order Date",  
+        #     "recipientName": "Name of\nReceiver", 
+        #     "recipientAddress": "Deliery address", 
+        #     "city": "City", 
+        #     "recipientTelephone": "Phone", 
+        #     "packageName": "Item1",
+        #     "quantity": "QTY(pieces)"
+        # },
+        # "custom_fields": ["city","quantity"],
+        # "settings": {
+        #     "created_on_formats": ["%d/%b/%Y", "%Y-%m-%d"],
+        #     "non_empty_indicator_field": ["recipientName", "packageName", "recipientTelephone"],
+        #     "all_fields_mandatory": ["created_on", "package_number", "packageName", "recipientTelephone"]
+        # },
+        # "defaults": {
+        #     "deliveryType": "premium",
+        #     "packageDescription": "", 
+        #     "recipientEmail": "",
+        #     "sendersContact": "",
+        #         }
+        # }
 
         all_fields = ["created_on", "package_number", "packageName", "sendersName"
                       , "packageDescription", "sendersName", "sendersEmail", "sendersAddress", "sendersContact"
@@ -1016,9 +1024,10 @@ def extract_google_sheet_data(request):
                     if is_empty_value(package_row[a_fld]) is False:
                         is_empty = False
 
-                print("empty:"+ str(is_empty), batch_list.__len__())
+                # print("empty:"+ str(is_empty), batch_list.__len__())
                 # if row not empty continue
                 if is_empty is False:
+                    data_rows += 1
 
                     # loop through all possible pacakge fields
                     # read all other fields
@@ -1096,14 +1105,6 @@ def extract_google_sheet_data(request):
                     ##### Add city to address info ########
 
                     
-                    #### check unique package number
-                    ### NEeed to later csale it to preserver original pcakag enumber and add filed for extrernal_source_ids
-                    if package_row["package_number"] in existing_package_numbers:
-                        status_msg = "Package Numbers must be unique, value {} on row {} already exists".format(package_row["package_number"], row_ind )
-                        return render(request, "warehouse/extract_google_sheet_data.html", {"sheets": sheets
-                                                                            , "status_msg": status_msg  })
-
-                    
 
                     # add special case for quantity UNTILL WE ADD IT INTO THE DATBASE
                     ##### Add quantity to package name ########
@@ -1127,30 +1128,36 @@ def extract_google_sheet_data(request):
                         package_row["sendersAddress"] = user.address
 
                     print(package_row["package_number"])
-                    # add to batch to insert later
-                    batch_list.append(
-                        Package(
-                        user=user,
-                        packageName=package_row["packageName"],
-                        deliveryType=package_row["deliveryType"],  
-                        package_number=package_row["package_number"],
-                        recipientName=package_row["recipientName"],
-                        recipientEmail=package_row["recipientEmail"],  
-                        recipientTelephone=package_row["recipientTelephone"],
-                        recipientAddress=package_row["recipientAddress"],
-                        packageDescription=package_row["packageDescription"],
-                        sendersName=package_row["sendersName"],  
-                        sendersEmail=package_row["sendersEmail"],  
-                        sendersAddress=package_row["sendersAddress"],  
-                        sendersContact=package_row["sendersContact"],  
-                        created_on=package_row["created_on"],
-                        created_by=user,
-                        modified_by=request.user,
-                        assigned_at=timezone.now(),
-                        status='warehouse_arrival',
-                        warehouse=request.user.warehouse
-                    )
-                    )
+                    #### check unique package number
+                    ### NEeed to later csale it to preserver original pcakag enumber and add filed for extrernal_source_ids
+                    if package_row["package_number"] in existing_package_numbers:
+                        skipped_rows += 1
+                    else:
+                        inserted_rows += 1
+                        # add to batch to insert later
+                        batch_list.append(
+                            Package(
+                            user=user,
+                            packageName=package_row["packageName"],
+                            deliveryType=package_row["deliveryType"],  
+                            package_number=package_row["package_number"],
+                            recipientName=package_row["recipientName"],
+                            recipientEmail=package_row["recipientEmail"],  
+                            recipientTelephone=package_row["recipientTelephone"],
+                            recipientAddress=package_row["recipientAddress"],
+                            packageDescription=package_row["packageDescription"],
+                            sendersName=package_row["sendersName"],  
+                            sendersEmail=package_row["sendersEmail"],  
+                            sendersAddress=package_row["sendersAddress"],  
+                            sendersContact=package_row["sendersContact"],  
+                            created_on=package_row["created_on"],
+                            created_by=user,
+                            modified_by=request.user,
+                            assigned_at=timezone.now(),
+                            status='warehouse_arrival',
+                            warehouse=request.user.warehouse
+                        )
+                        )
 
                     # go next
                     row_ind += 1
@@ -1158,21 +1165,22 @@ def extract_google_sheet_data(request):
                     # if empty row
                     # go next
                     row_ind += 1
+                    empty_rows += 1
             
             # do the insert
             if batch_list.__len__() > 0:
-                for a_pkg in batch_list:
-                    a_pkg.save()
+                # import all at once but in btatches of 1000 each time
+                Package.objects.bulk_create(batch_list, 1000)
+                #for a_pkg in batch_list:
+                #    a_pkg.save()
         except Exception as ie:
             
             status_msg = "Failed to complete operation:" + str(ie) 
             return render(request, "warehouse/extract_google_sheet_data.html", {"sheets": sheets
                                                                               , "status_msg": status_msg  })
-        
-        print(empty_rows, data_rows)
-        return redirect("new_arrivals")
+        success_message = f"inserted:{inserted_rows}, skipped:{skipped_rows}" 
+        print(empty_rows, data_rows, skipped_rows, inserted_rows)
+        return redirect(reverse('new_arrivals') + f'?success_message={success_message}')
     else:
-        status_msg = "Normal form"
-        print(status_msg)
-        return render(request, "warehouse/extract_google_sheet_data.html", {"sheets": sheets
-                                                                              , "status_msg": status_msg})
+        
+        return render(request, "warehouse/extract_google_sheet_data.html", {"sheets": sheets})
