@@ -363,7 +363,7 @@ def create_warehouse(request):
         longitude = request.POST.get('longitude')
         latitude = request.POST.get('latitude')
 
-        warehouse = Warehouse(name=name, address=address, phone=phone,email=email, tag=tag, latitude=latitude, longitude=longitude)
+        warehouse = Warehouse(name=name, address=address, phone=phone, tag=tag, latitude=latitude, longitude=longitude)
         # warehouse.created_by = user
         warehouse.save(user=user)
 
