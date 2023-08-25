@@ -947,33 +947,6 @@ def extract_google_sheet_data(request):
 
         google_sheets_data = sheet.get_all_records()
 
-        # indicate all possible fields
-
-        # sample_mapping = {
-        #     "fields": {
-        #     "package_number": "Order ID", 
-        #     "created_on": "Order Date",  
-        #     "recipientName": "Name of\nReceiver", 
-        #     "recipientAddress": "Deliery address", 
-        #     "city": "City", 
-        #     "recipientTelephone": "Phone", 
-        #     "packageName": "Item1",
-        #     "quantity": "QTY(pieces)"
-        # },
-        # "custom_fields": ["city","quantity"],
-        # "settings": {
-        #     "created_on_formats": ["%d/%b/%Y", "%Y-%m-%d"],
-        #     "non_empty_indicator_field": ["recipientName", "packageName", "recipientTelephone"],
-        #     "all_fields_mandatory": ["created_on", "package_number", "packageName", "recipientTelephone"]
-        # },
-        # "defaults": {
-        #     "deliveryType": "premium",
-        #     "packageDescription": "", 
-        #     "recipientEmail": "",
-        #     "sendersContact": "",
-        #         }
-        # }
-
         all_fields = ["created_on", "package_number", "packageName", "sendersName"
                       , "packageDescription", "sendersName", "sendersEmail", "sendersAddress", "sendersContact"
                       , "sender_latitude", "sender_longitude"
@@ -1173,9 +1146,8 @@ def extract_google_sheet_data(request):
                 Package.objects.bulk_create(batch_list, 1000)
                 #for a_pkg in batch_list:
                 #    a_pkg.save()
-        except Exception as ie:
-            
-            status_msg = "Failed to complete operation:" + str(ie) 
+        except Exception as e:
+            status_msg = "Failed to complete operation: {}".format(str(e))
             return render(request, "warehouse/extract_google_sheet_data.html", {"sheets": sheets
                                                                               , "status_msg": status_msg  })
         success_message = f"inserted:{inserted_rows}, skipped:{skipped_rows}" 

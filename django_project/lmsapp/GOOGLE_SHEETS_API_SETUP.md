@@ -61,7 +61,7 @@ The json mapped object should look like this 'this assumes these are the possibl
     
 - When the mapped object has been identified it should be fitted to match the key in the object below: And the entire object pasted in the django Admin to match the client. Or They could be mapped using a form.   
 ```
-    sample_mapping = {
+    {
         "fields": {
         "package_number": "Order ID", 
         "created_on": "Order Date",  
@@ -85,22 +85,26 @@ The json mapped object should look like this 'this assumes these are the possibl
         "sendersContact": "",
             }
     }
+```    
 
+`Nothing else should be touched in the object above, If a new field is added to the models, it should be added inside the all_fields array.`    
+
+```
     all_fields = ["created_on", "package_number", "packageName", "sendersName"
                     , "packageDescription", "sendersName", "sendersEmail", "sendersAddress", "sendersContact"
                     , "sender_latitude", "sender_longitude"
                     , "recipientName", "recipientEmail", "recipientTelephone"
                     , "recipientAddress", "recipientIdentification", "recipient_latitude"
                     , "recipient_longitude", "genderType"
-                    , "deliveryFee", "deliveryType"]
-```    
+                    , "deliveryFee", "deliveryType"]    
+```
+    
 
-`Nothing else should be touched in the object above, If a new field is added to the models, it should be added inside the all_fields array.`    
 
 `NOTE:` The custom fields, can be adjusted depending on a client, the settings object should not be touched, and neither should the defaults.    
 
 The client will then have to provide the link to their google sheet. This will be added together with the mapping object at the point of creating a UserGoogleSheet instance to associate with the user on our system. 
     -- The link should look something like this:  `https://docs.google.com/spreadsheets/d/1Ub5Iadb950LGSJpRXUIBvSswiWMq_K-tTy0Q1DaYr5_S/edit?usp=sharing`    
-    
+
     
 
