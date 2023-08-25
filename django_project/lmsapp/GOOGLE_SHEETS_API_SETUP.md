@@ -74,7 +74,7 @@ The json mapped object should look like this 'this assumes these are the possibl
     },
     "custom_fields": ["city","quantity"],
     "settings": {
-        "created_on_formats": ["%d/%b/%Y", "%Y-%m-%d"],
+        "created_on_formats": ["%d/%b/%Y", "%Y-%m-%d", "%Y/%m/%d", "%m/%d/%Y", "%d-%m-%Y"],
         "non_empty_indicator_field": ["recipientName", "packageName", "recipientTelephone"],
         "all_fields_mandatory": ["created_on", "package_number", "packageName", "recipientTelephone"]
     },
