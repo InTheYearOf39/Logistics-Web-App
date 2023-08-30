@@ -1,10 +1,11 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from .models import User
-from .models import Package
+from lmsapp.models import User, Package, DropPickZone
 from django.contrib.auth import password_validation
 from django.contrib.auth.forms import SetPasswordForm
 from django.utils.translation import gettext_lazy as _
+from django.core.exceptions import ValidationError
+from django.core.validators import EmailValidator, RegexValidator, MinLengthValidator, MaxLengthValidator
 
 class LoginForm(forms.Form):
     username = forms.CharField(
@@ -26,24 +27,6 @@ class LoginForm(forms.Form):
 
 
 class SignUpForm(UserCreationForm):
-    # admin = "admin"
-    # courier = "courier"
-    # sender = "sender"
-    # drop_pick_zone = "drop_pick_zone"
-    
-
-    # ROLE_CHOICES = [
-    #     (admin, "admin"),
-    #     (courier, "courier"),
-    #     (sender, "sender"),
-    #     (drop_pick_zone, "drop pick zone")
-    # ]
-
-    # role = forms.ChoiceField(
-    #     required=True,
-    #     choices=ROLE_CHOICES,
-    #     widget=forms.RadioSelect(attrs={'id': 'id_role'}),
-    # )
 
     name = forms.CharField(
         widget=forms.TextInput(
@@ -97,14 +80,13 @@ class SignUpForm(UserCreationForm):
         )
     )
 
-
-
     class Meta:
         model = User
         fields = ('name', 'username', 'email', 'password1', 'password2', 'tag')
 
+
 class PackageForm(forms.ModelForm):
-    
+
     class Meta:
         model = Package
         fields = ['packageName', 'deliveryType', 'dropOffLocation', 'packageDescription', 'recipientName', 'recipientAddress', 'sendersAddress', 'recipientEmail', 'recipientTelephone', 'recipientPickUpLocation', 'recipientIdentification', 'genderType', 'sendersContact', 'deliveryFee', 'sendersName', 'sendersEmail', 'warehouse', 'user']
@@ -128,6 +110,105 @@ class PackageForm(forms.ModelForm):
             'warehouse': forms.TextInput(attrs={'class': 'form-control form-control-sm'}),
         }
 
+    packageName = forms.CharField(
+        required = True,
+        validators=[
+            MinLengthValidator(3, message='Package name should have at least 3 characters.'),
+            MaxLengthValidator(100, message='Package name should have at most 100 characters.')
+        ]
+    )
+
+    packageDescription = forms.CharField(
+        required = True,
+        validators=[
+            MinLengthValidator(3, message='Package description should have at least 3 characters.'),
+            MaxLengthValidator(500, message='Package description should have at most 100 characters.')
+        ]
+    )
+
+    deliveryType = forms.ChoiceField(
+        required = True,
+        choices=Package.DELIVERY_CHOICES,
+        widget=forms.Select(attrs={'class': 'form-control'}),
+    )
+
+    recipientPickUpLocation = forms.ModelChoiceField(
+        queryset=DropPickZone.objects.all(),
+        widget=forms.TextInput(attrs={'class': 'form-control'}),
+    )
+
+    recipientName = forms.CharField(
+        required = True,
+        validators=[
+            MinLengthValidator(3, message='recipient name should have at least 3 characters.'),
+            MaxLengthValidator(100, message='recipient name should have at most 100 characters.')
+        ]
+    )
+
+    recipientEmail = forms.CharField(
+        validators=[EmailValidator(message='Please enter a valid email address.')]
+    )
+
+    recipientTelephone = forms.CharField(
+        required = True,
+        validators=[
+            RegexValidator(
+                regex=r'^\+?\d{9,15}$',
+                message='Please enter a valid phone number.'
+            )
+        ]
+    )
+
+    recipientAddress = forms.CharField(
+        validators=[
+            MinLengthValidator(10, message='Recipient address should have at least 10 characters.'),
+            MaxLengthValidator(200, message='Recipient address should have at most 200 characters.')
+        ]
+    )
+
+    recipientIdentification = forms.CharField(
+        validators=[
+            MinLengthValidator(5, message='Recipient identification should have at least 5 characters.'),
+            MaxLengthValidator(50, message='Recipient identification should have at most 50 characters.')
+        ]
+    )
+
+    genderType = forms.ChoiceField(
+        required = True,
+        choices=Package.DELIVERY_CHOICES,
+        widget=forms.Select(attrs={'class': 'form-control'}),
+    )
+
+    sendersName = forms.CharField(
+        required = True,
+        validators=[
+            MinLengthValidator(3, message='recipient name should have at least 3 characters.'),
+            MaxLengthValidator(100, message='recipient name should have at most 100 characters.')
+        ]
+    )
+
+    sendersEmail = forms.CharField(
+        validators=[EmailValidator(message='Please enter a valid email address.')]
+    )
+
+    sendersContact = forms.CharField(
+        required = True,
+        validators=[
+            RegexValidator(
+                regex=r'^\+?\d{9,15}$',
+                message='Please enter a valid phone number.'
+            )
+        ]
+    )
+
+    sendersAddress = forms.CharField(
+        validators=[
+            MinLengthValidator(10, message='sender address should have at least 10 characters.'),
+            MaxLengthValidator(200, message='sender address should have at most 200 characters.')
+        ]
+    )
+
+    
 class WarehouseForm(forms.ModelForm):
     class Meta:
         model = User

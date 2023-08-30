@@ -3,7 +3,11 @@
 {% load static %}
 
 {% block content %}
-
+{% if status_msg %}
+<div class="alert alert-danger" role="alert">
+{{ status_msg }}
+</div>
+{% endif %}
 <div class="container my-2" data-aos="fade-up">
     <div class="row g-5">
         
@@ -17,7 +21,7 @@
 
               <div class="col-md-4">
                 <label for="sendersAddress" class="form-label form-label-sm"> Sender's Address</label>
-                <input id="senderAddress" name="sendersAddress" placeholder="Sender's Address" class="form-control form-control-sm" type="text" onkeyup="calculateDeliveryFee()">
+                <input id="senderAddress" name="sendersAddress" placeholder="Sender's Address" class="form-control form-control-sm" type="text" onkeyup="calculateDeliveryFee()" required>
                 <div class="invalid-feedback">
                   Please enter your shipping address.
                 </div>
@@ -25,7 +29,7 @@
 
               <div class="col-md-4">
                 <label for="sendersContact" class="form-label form-label-sm"> Sender's Contact</label>
-                <input id="senderContact" name="sendersContact" placeholder="Sender Contact" class="form-control form-control-sm" type="tel">
+                <input id="senderContact" name="sendersContact" placeholder="Sender Contact" class="form-control form-control-sm" type="tel" required>
                 <div class="invalid-feedback">
                   Please enter your Contact.
                 </div>
@@ -82,8 +86,8 @@
 
             <div class="row g-3">
 
-            <input type="hidden" id="sender_latitude" name="sender_latitude" value="">
-            <input type="hidden" id="sender_longitude" name="sender_longitude" value="">        
+            <input type="hidden" id="sender_latitude" name="sender_latitude" value="" required>
+            <input type="hidden" id="sender_longitude" name="sender_longitude" value="" required>        
             
           
             <div class="col-md-4">
@@ -99,7 +103,7 @@
             <div class="col-md-4">
               <label for="recipientEmail" class="form-label form-label-sm">Recipient Email</label>
               <div class="input-group has-validation">
-                <input type="email" class="form-control form-control-sm" id="recipientEmail" name="recipientEmail" placeholder="Recipient Email" required>
+                <input type="email" class="form-control form-control-sm" id="recipientEmail" name="recipientEmail" placeholder="Recipient Email">
               <div class="invalid-feedback">
                   Recipient Email is required.
                 </div>
@@ -118,7 +122,7 @@
 
             <div class="col-md-6">
               <label for="recipientAddress" class="form-label form-label-sm">Recipient Address</label>
-              <input id="recipientAddress" name="recipientAddress" placeholder="Recipient Address" class="form-control form-control-sm" type="text" onkeyup="calculateDeliveryFee()">
+              <input id="recipientAddress" name="recipientAddress" placeholder="Recipient Address" class="form-control form-control-sm" type="text" onkeyup="calculateDeliveryFee()" required>
               <div class="invalid-feedback">
                 Please enter a valid email address for shipping updates.
               </div>
@@ -135,7 +139,7 @@
             <div class="form-group col-md-2">
               <label for="genderType" class="form-label form-label-sm">Gender</label>
               <select class="form-select form-select-sm" id="genderType" name="genderType">
-                <option value="" selected disabled> -- Select Gender-- </option>
+                <option value="" selected disabled> -- Select Gender -- </option>
                 <option value="female">Female</option>
                 <option value="male">Male</option>
               </select>
@@ -188,7 +192,7 @@
                   {% endfor %}
               </ul>
           </div>
-          {% endif %}
+          {% endif %}
         </div>
       </div>
   </div>
