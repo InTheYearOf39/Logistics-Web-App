@@ -31,42 +31,42 @@ displaying packages and functionality depending on the different delivery types,
 and rendering the corresponding template with the appropriate context
 """
 
+# @login_required
+# @user_passes_test(is_admin_user)
+# def admin(request):
+#     packages = Package.objects.filter(
+#         Q(status='ongoing') | Q(status='dropped_off') | Q(status='ready_for_pickup') | Q(status='upcoming')
+#     ).order_by(
+#         Case(
+#             When(status='upcoming', then=0),
+#             When(status='dropped_off', then=1),
+#             When(status='ongoing', then=2),
+#             default=3,
+#             output_field=IntegerField()
+#         ),
+#         '-assigned_at'  # Sort by assignment day in descending order
+#     )
+
+#     if request.method == 'POST':
+#         package_id = request.POST.get('package_id')
+#         delivery_type = request.POST.get('delivery_type')
+
+#         # Check the delivery type of the package
+#         if delivery_type == 'standard':
+#             package = get_object_or_404(Package, id=package_id, status='dropped_off')
+#             return redirect('assign_courier', package_id=package.id)
+#         elif delivery_type == 'premium' or delivery_type == 'express':
+#             package = get_object_or_404(Package, id=package_id, status='upcoming')
+#             return redirect('assign_courier', package_id=package.id)
+
+#     context = {
+#         'packages': packages
+#     }
+#     return render(request, 'admin/admin_dashboard.html', context)
+
 @login_required
 @user_passes_test(is_admin_user)
-def admin(request):
-    packages = Package.objects.filter(
-        Q(status='ongoing') | Q(status='dropped_off') | Q(status='ready_for_pickup') | Q(status='upcoming')
-    ).order_by(
-        Case(
-            When(status='upcoming', then=0),
-            When(status='dropped_off', then=1),
-            When(status='ongoing', then=2),
-            default=3,
-            output_field=IntegerField()
-        ),
-        '-assigned_at'  # Sort by assignment day in descending order
-    )
-
-    if request.method == 'POST':
-        package_id = request.POST.get('package_id')
-        delivery_type = request.POST.get('delivery_type')
-
-        # Check the delivery type of the package
-        if delivery_type == 'standard':
-            package = get_object_or_404(Package, id=package_id, status='dropped_off')
-            return redirect('assign_courier', package_id=package.id)
-        elif delivery_type == 'premium' or delivery_type == 'express':
-            package = get_object_or_404(Package, id=package_id, status='upcoming')
-            return redirect('assign_courier', package_id=package.id)
-
-    context = {
-        'packages': packages
-    }
-    return render(request, 'admin/admin_dashboard.html', context)
-
-@login_required
-@user_passes_test(is_admin_user)
-def master_dashboard(request):  
+def admin_dashboard(request):  
     total_packages = Package.objects.all().count()      
     # Get the datetime for the start of the current week
     current_week_start = timezone.now().replace(hour=0, minute=0, second=0, microsecond=0) - timedelta(days=timezone.now().weekday())

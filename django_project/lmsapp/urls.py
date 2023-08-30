@@ -45,12 +45,12 @@ urlpatterns = [
 
 
     # admin routes
-    path('admin_dashboard/', admin_views.admin, name='admin_dashboard'),
+    path('admin_dashboard/', admin_views.admin_dashboard, name='admin_dashboard'),
     path('users/', admin_views.users, name='users'),
     path('couriers/', admin_views.couriers, name='couriers'),
     path('warehouse_users/', admin_views.warehouse_users, name='warehouse_users'),
     path('drop_pick_users/', admin_views.drop_pick_users, name='drop_pick_users'),
-    path('master_dashboard/', admin_views.master_dashboard, name='master_dashboard'),
+    # path('master_dashboard/', admin_views.master_dashboard, name='master_dashboard'),
     path('admin_history/', admin_views.admin_history, name='admin_history'),
     path('admin_dashboard/assign_courier/<int:package_id>/', admin_views.assign_courier, name='admin_assign_courier'),
     path('dropoffs/', admin_views.dropoffs, name='dropoffs'),
