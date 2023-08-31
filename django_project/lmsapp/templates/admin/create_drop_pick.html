@@ -5,14 +5,11 @@
 
 {% block content %}
 
-
 <div class="row">
   <div class="container mb-3">
       <div class="col-md-12">
     <form class="well form-horizontal" action=" " method="post"  id="contact_form">
       {% csrf_token %}
-
-      {{ form.errors }}
 
 
 <!-- Form Name -->
@@ -25,8 +22,22 @@
   <div class="col-md-6 inputGroupContainer">
   <div class="input-group">
   <span class="input-group-text">👤</span>
-  <input  name="name" placeholder="Name" class="form-control form-control-sm"  type="text">
+  <!-- <input  name="name" placeholder="Name" class="form-control form-control-sm"  type="text"> -->
+  {{ form.name }}
     </div>
+    {% if form.name.errors %}
+    <div class="alert alert-danger  alert-dismissible fade show mt-2" role="alert">{{ form.name.errors }}
+      <button type="button" class="btn-close" data-coreui-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endif %}
+
+    {% if duplicate_error %}
+    <div class="alert alert-danger alert-dismissible fade show mt-2" role="alert">
+      {{ duplicate_error }}
+      <button type="button" class="btn-close" data-coreui-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endif %}
+
   </div>
 </div>
 
@@ -37,8 +48,20 @@
     <div class="col-md-6 inputGroupContainer">
     <div class="input-group">
         <span class="input-group-text">📌</span>
-  <input id="address" name="address" placeholder="Address" class="form-control form-control-sm" type="text">
+  <!-- <input id="address" name="address" placeholder="Address" class="form-control form-control-sm" type="text"> -->
+  {{ form.address }}
     </div>
+    {% if form.address.errors %}
+    <div class="alert alert-danger  alert-dismissible fade show mt-2" role="alert">{{ form.address.errors }}
+      <button type="button" class="btn-close" data-coreui-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endif %}
+
+    {% if address_error %}
+    <div class="alert alert-danger  alert-dismissible fade show mt-2" role="alert">{{ address_error }}
+      <button type="button" class="btn-close" data-coreui-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endif %}
   </div>
 </div>
 
@@ -53,8 +76,14 @@
     <div class="col-md-6 inputGroupContainer">
     <div class="input-group">
         <span class="input-group-text">📞</span>
-  <input name="phone" placeholder="Phone number" class="form-control form-control-sm" type="text">
+  <!-- <input name="phone" placeholder="Phone number" class="form-control form-control-sm" type="text"> -->
+  {{ form.phone }}
     </div>
+    {% if form.phone.errors %}
+    <div class="alert alert-danger  alert-dismissible fade show mt-2" role="alert">{{ form.phone.errors }}
+      <button type="button" class="btn-close" data-coreui-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endif %}
   </div>
 </div>
 
@@ -65,13 +94,23 @@
     <div class="col-md-6 selectContainer">
     <div class="input-group">
         <span class="input-group-text">🏬</span>
+        {{ form.warehouse }}
+
+
+        {% comment %}
         <select name="warehouse" class="form-control form-control-sm selectpicker">
           <option value="">Please select warehouse</option>  
           {% for warehouse in warehouses %}
             <option value="{{ warehouse.id }}">{{ warehouse.name }}</option>
           {% endfor %}
         </select>
+        {% endcomment %}
   </div>
+  {% if form.warehouse.errors %}
+  <div class="alert alert-danger  alert-dismissible fade show mt-2" role="alert">{{ form.warehouse.errors }}
+    <button type="button" class="btn-close" data-coreui-dismiss="alert" aria-label="Close"></button>
+  </div>
+  {% endif %}
 </div>
 </div>
 
@@ -81,8 +120,22 @@
       <div class="col-md-6 inputGroupContainer">
       <div class="input-group">
           <span class="input-group-text">🏷️</span>
-    <input name="tag" placeholder="Tag alias" class="form-control form-control-sm" type="text">
+    <!-- <input name="tag" placeholder="Tag alias" class="form-control form-control-sm" type="text"> -->
+    {{ form.tag }}
       </div>
+      {% if form.tag.errors %}
+      <div class="alert alert-danger  alert-dismissible fade show mt-2" role="alert">{{ form.tag.errors }}
+        <button type="button" class="btn-close" data-coreui-dismiss="alert" aria-label="Close"></button>
+      </div>
+      {% endif %}
+
+      {% if duplicate_error %}
+    <div class="alert alert-danger alert-dismissible fade show mt-2" role="alert">
+      {{ duplicate_error }}
+      <button type="button" class="btn-close" data-coreui-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endif %}
+    
     </div>
   </div>
 

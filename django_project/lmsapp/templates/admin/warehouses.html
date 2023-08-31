@@ -7,6 +7,13 @@
 <div class="row">
   
     <h5>Warehouses</h5>  
+
+    {% if success_message %}
+    <div class="alert alert-success alert-dismissible fade show mt-2" role="alert">{{ success_message }}
+      <button type="button" class="btn-close" data-coreui-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endif %}
+
     <div class="col-md-12">
           
           <!-- /.row--><br>

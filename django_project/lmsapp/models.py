@@ -18,11 +18,10 @@ class CustomUserManager(UserManager):
 
 
 class Warehouse(models.Model):
-    name = models.CharField(max_length=40)
-    address = models.CharField(max_length=40)
-    phone = models.CharField(max_length=20, null=True, blank=True)
-    email = models.EmailField(max_length=254, null=True, blank=True )
-    tag = models.CharField(max_length=20, null=True, blank=True)
+    name = models.CharField(max_length=100, null=True, blank=True)
+    address = models.CharField(max_length=200, null=True, blank=True)
+    phone = models.CharField(max_length=15, null=True, blank=True)
+    tag = models.CharField(max_length=10, null=True, blank=True)
     latitude = models.FloatField( null=True, blank=True)
     longitude = models.FloatField( null=True, blank=True)
     
@@ -44,15 +43,14 @@ class Warehouse(models.Model):
             super(Warehouse, self).save(*args, **kwargs)
     
     def __str__(self):
-        return self.name
+        return str(self.name)
 
 class DropPickZone(models.Model):
-    name = models.CharField(max_length=40)
-    address = models.CharField(max_length=40)
-    phone = models.CharField(max_length=20, null=True, blank=True)
-    email = models.EmailField(max_length=254, null=True, blank=True )
+    name = models.CharField(max_length=100, null=True, blank=True)
+    address = models.CharField(max_length=200, null=True, blank=True)
+    phone = models.CharField(max_length=15, null=True, blank=True)
     warehouse = models.ForeignKey(Warehouse, on_delete=models.PROTECT, related_name='drop_pick_zones')
-    tag = models.CharField(max_length=20, null=True, blank=True)
+    tag = models.CharField(max_length=10, null=True, blank=True)
     latitude = models.FloatField( null=True, blank=True)
     longitude = models.FloatField( null=True, blank=True)
     
@@ -74,7 +72,7 @@ class DropPickZone(models.Model):
  
 
     def __str__(self):
-        return self.name
+        return str(self.name)
 
 
 class User(AbstractUser):
@@ -128,7 +126,7 @@ class User(AbstractUser):
         return super().save(*args, **kwargs)
 
     def __str__(self):
-        return self.username
+        return str(self.username)
     
 
 
@@ -224,7 +222,7 @@ class Package(models.Model):
             raise ValidationError("A package cannot have both drop-off location and warehouse assigned.")
 
     def __str__(self):
-        return self.packageName
+        return str(self.packageName)
 
 class Notification(models.Model):
     user = models.ForeignKey(User, on_delete=models.PROTECT)
@@ -239,7 +237,7 @@ class APIKey(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"API Key for {self.user.username}"
+        return f"API Key for {str(self.user.username)}"
 
 
 class UserGoogleSheet(models.Model):
@@ -248,4 +246,4 @@ class UserGoogleSheet(models.Model):
     header_mapping = models.JSONField(default=dict)
 
     def __str__(self):
-        return f"Google sheet: {self.user.username}"
+        return f"Google sheet: {str(self.user.username)}"

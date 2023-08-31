@@ -8,10 +8,11 @@ from django.db.models.functions import ExtractDay, ExtractHour, ExtractMonth
 from django.shortcuts import redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import render
+from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.clickjacking import xframe_options_exempt
-
-from lmsapp.forms import CourierForm
+from django.contrib import messages
+from lmsapp.forms import CourierForm, WarehouseCreationForm, DropPickCreationForm
 from lmsapp.models import Package, User, Warehouse, DropPickZone
 
 from calendar import monthrange
@@ -25,44 +26,6 @@ def is_admin_user(user):
 
 User = get_user_model()
 
-""" 
-A function to handle the logic for an admin dashboard page, including querying and
-displaying packages and functionality depending on the different delivery types, 
-and rendering the corresponding template with the appropriate context
-"""
-
-# @login_required
-# @user_passes_test(is_admin_user)
-# def admin(request):
-#     packages = Package.objects.filter(
-#         Q(status='ongoing') | Q(status='dropped_off') | Q(status='ready_for_pickup') | Q(status='upcoming')
-#     ).order_by(
-#         Case(
-#             When(status='upcoming', then=0),
-#             When(status='dropped_off', then=1),
-#             When(status='ongoing', then=2),
-#             default=3,
-#             output_field=IntegerField()
-#         ),
-#         '-assigned_at'  # Sort by assignment day in descending order
-#     )
-
-#     if request.method == 'POST':
-#         package_id = request.POST.get('package_id')
-#         delivery_type = request.POST.get('delivery_type')
-
-#         # Check the delivery type of the package
-#         if delivery_type == 'standard':
-#             package = get_object_or_404(Package, id=package_id, status='dropped_off')
-#             return redirect('assign_courier', package_id=package.id)
-#         elif delivery_type == 'premium' or delivery_type == 'express':
-#             package = get_object_or_404(Package, id=package_id, status='upcoming')
-#             return redirect('assign_courier', package_id=package.id)
-
-#     context = {
-#         'packages': packages
-#     }
-#     return render(request, 'admin/admin_dashboard.html', context)
 
 @login_required
 @user_passes_test(is_admin_user)
@@ -307,28 +270,6 @@ A Function to retrieve dropped off items and group the packages by their respect
 render them on the 'admin/dropoffs.html' template.
  """
 
-
-# def dropoffs(request):
-#     dropoff_locations = DropPickZone.objects.filter(packages_dropped_off__status='dropped_off').distinct()
-#     packages_by_location = {}
-
-#     for dropoff_location in dropoff_locations:
-#         packages = Package.objects.filter(dropOffLocation=dropoff_location, status='dropped_off')
-#         packages_by_location[dropoff_location.name] = packages
-
-#     context = {
-#         'packages_by_location': packages_by_location,
-#     }
-#     return render(request, 'admin/dropoffs.html', context)
-
-# def dropoffs(request):
-#     packages = Package.objects.filter(status='dropped_off')
-
-#     context = {
-#         'packages': packages,
-#     }
-#     return render(request, 'admin/dropoffs.html', context)
-
 def dropoffs(request):
     packages = Package.objects.filter(status='dropped_off').select_related('dropOffLocation')
     sorted_packages = sorted(packages, key=lambda package: package.dropOffLocation.tag)
@@ -351,25 +292,70 @@ If the request method is not POST or the form is not valid, the form is displaye
 
 
 # allow loading resources from other locations
+# @xframe_options_exempt
+# def create_warehouse(request):
+#     if request.method == 'POST':
+#         user=request.user
+
+#         name = request.POST.get('name')
+#         address = request.POST.get('address')
+#         phone = request.POST.get('phone')
+#         tag = request.POST.get('tag')
+#         longitude = request.POST.get('longitude')
+#         latitude = request.POST.get('latitude')
+
+#         warehouse = Warehouse(name=name, address=address, phone=phone, tag=tag, latitude=latitude, longitude=longitude)
+#         # warehouse.created_by = user
+#         warehouse.save(user=user)
+
+#         return redirect('warehouses')
+
+#     return render(request, 'admin/create_warehouse.html')
+
 @xframe_options_exempt
 def create_warehouse(request):
+
     if request.method == 'POST':
-        user=request.user
+        form = WarehouseCreationForm(request.POST)
+        if form.is_valid():
+            names = form.cleaned_data["name"].split()
+            name = ' '.join([name.capitalize() for name in names])
 
-        name = request.POST.get('name')
-        address = request.POST.get('address')
-        phone = request.POST.get('phone')
-        tag = request.POST.get('tag')
-        longitude = request.POST.get('longitude')
-        latitude = request.POST.get('latitude')
+            longitude = request.POST.get('longitude')
+            latitude = request.POST.get('latitude')
 
-        warehouse = Warehouse(name=name, address=address, phone=phone, tag=tag, latitude=latitude, longitude=longitude)
-        # warehouse.created_by = user
-        warehouse.save(user=user)
+            if not longitude or not latitude:
+                address_error = "Something went wrong, re-enter the address."
+                return render(request, 'admin/create_warehouse.html', {'form': form, 'address_error': address_error})
+            
+            tag = form.cleaned_data["tag"].upper()
 
-        return redirect('warehouses')
+            existing_warehouse = Warehouse.objects.filter(name=name).first()
+            existing_warehouse_tag = Warehouse.objects.filter(tag=tag).first()
+            existing_drop_pick_tag = DropPickZone.objects.filter(tag=tag).first()
+            if existing_warehouse or existing_warehouse_tag or existing_drop_pick_tag:
+                duplicate_error = "Warehouse name or tag already taken."
+                return render(request, 'admin/create_warehouse.html', {'form': form, 'duplicate_error': duplicate_error})
 
-    return render(request, 'admin/create_warehouse.html')
+            warehouse = form.save(commit=False)
+            user = request.user
+
+            address = form.cleaned_data["address"]
+           
+            warehouse.name = name
+            warehouse.tag = tag
+            warehouse.latitude = latitude
+            warehouse.longitude = longitude
+            warehouse.address = address
+            warehouse.save(user=user)
+
+            success_message = "You have successfully registered a warehouse!"
+            return redirect(reverse('warehouses') + f'?success_message={success_message}')
+        else:
+            return render(request, 'admin/create_warehouse.html', {'form': form})
+    else:
+        form = WarehouseCreationForm(None)
+    return render(request, 'admin/create_warehouse.html', {'form': form})
 
 
 """
@@ -382,6 +368,7 @@ def warehouses(request):
     warehouses = Warehouse.objects.all()
     warehouse_users = User.objects.filter(role='warehouse')
     context = {
+        'success_message':request.GET.get("success_message", ""),
         'warehouses': warehouses,
         'warehouse_users': warehouse_users
     }
@@ -396,33 +383,51 @@ Since a drop-pick zone must belong to a warehouse. If the request method is not 
 the form is displayed to the user for input.
 """
 
-
 # allow loading resources from other locations
 @xframe_options_exempt
 def create_drop_pick(request):
     if request.method == 'POST':
-        user=request.user
-        name = request.POST.get('name')
-        address = request.POST.get('address')
-        phone = request.POST.get('phone')
-        tag = request.POST.get('tag')
-        warehouse_id = request.POST.get('warehouse')
-        longitude = request.POST.get('longitude')
-        latitude = request.POST.get('latitude')
+        form = DropPickCreationForm(request.POST)
+        if form.is_valid():
+            names = form.cleaned_data["name"].split()
+            name = ' '.join([name.capitalize() for name in names])
 
-        warehouse = Warehouse.objects.get(id=warehouse_id)
+            longitude = request.POST.get('longitude')
+            latitude = request.POST.get('latitude')
 
-        drop_pick_zone = DropPickZone(name=name, address=address, phone=phone, tag=tag, warehouse=warehouse,
-                                      longitude=longitude, latitude=latitude)
-        drop_pick_zone.save(user=user)
+            if not longitude or not latitude:
+                address_error = "Something went wrong, re-enter the address."
+                return render(request, 'admin/create_drop_pick.html', {'form': form, 'address_error': address_error})
 
-        return redirect('drop_pick_zones')
+            tag = form.cleaned_data["tag"].upper()
 
-    warehouses = Warehouse.objects.all()
-    context = {
-        'warehouses': warehouses
-    }
-    return render(request, 'admin/create_drop_pick.html', context)
+            existing_drop_pick = DropPickZone.objects.filter(name=name).first()
+            existing_warehouse_tag = Warehouse.objects.filter(tag=tag).first()
+            existing_drop_pick_tag = DropPickZone.objects.filter(tag=tag).first()
+            if existing_drop_pick or existing_warehouse_tag or existing_drop_pick_tag:
+                duplicate_error = "Drop-pick name or tag already taken."
+                return render(request, 'admin/create_drop_pick.html', {'form': form, 'duplicate_error': duplicate_error})
+
+            user = request.user
+            warehouse_id = form.cleaned_data['warehouse']
+            address = form.cleaned_data["address"]
+
+            drop_pick_zone = form.save(commit=False) 
+            drop_pick_zone.name = name
+            drop_pick_zone.tag = tag
+            drop_pick_zone.warehouse = warehouse_id
+            drop_pick_zone.latitude = latitude
+            drop_pick_zone.longitude = longitude
+            drop_pick_zone.address = address
+            drop_pick_zone.save(user=user)
+
+            success_message = "You have successfully registered a drop-pick zone!"
+            return redirect(reverse('drop_pick_zones') + f'?success_message={success_message}')
+        else:
+            return render(request, 'admin/create_drop_pick.html', {'form': form})
+    else:
+        form = DropPickCreationForm(None)
+    return render(request, 'admin/create_drop_pick.html', {'form': form})
 
 
 """
@@ -430,11 +435,11 @@ A function to retrieve drop-pick zones from the database by querying the db by t
 for users with the 'drop-pick' role and passing them to the 'admin/drop_pick_zones.html' template.
 """
 
-
 def drop_pick_zones(request):
     drop_pick_zones = DropPickZone.objects.all()
     drop_pick_zone_users = User.objects.filter(role='drop_pick_zone')
     context = {
+        'success_message':request.GET.get("success_message", ""),
         'drop_pick_zones': drop_pick_zones,
         'drop_pick_zone_users': drop_pick_zone_users
     }
@@ -447,7 +452,6 @@ The form data is validated, and if valid, a courier user is created, saved to th
 and the user is redirected to the 'admin/couriers.html' page. If the request method is not POST 
 or the form is not valid, the form is displayed to the user for input.
 """
-
 
 def create_courier(request):
     warehouses = Warehouse.objects.all()
@@ -477,8 +481,6 @@ def create_courier(request):
         form = CourierForm()
 
     return render(request, 'admin/create_courier.html', {'form': form, **context})
-
-
 
 
 def create_warehouse_user(request):

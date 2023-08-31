@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from lmsapp.models import User, Package, DropPickZone
+from lmsapp.models import User, Package, DropPickZone, Warehouse
 from django.contrib.auth import password_validation
 from django.contrib.auth.forms import SetPasswordForm
 from django.utils.translation import gettext_lazy as _
@@ -114,7 +114,7 @@ class PackageForm(forms.ModelForm):
         required = True,
         validators=[
             MinLengthValidator(3, message='Package name should have at least 3 characters.'),
-            MaxLengthValidator(100, message='Package name should have at most 100 characters.')
+            MaxLengthValidator(100, message='Package name cannot have more than 100 characters.')
         ]
     )
 
@@ -122,26 +122,20 @@ class PackageForm(forms.ModelForm):
         required = True,
         validators=[
             MinLengthValidator(3, message='Package description should have at least 3 characters.'),
-            MaxLengthValidator(500, message='Package description should have at most 100 characters.')
+            MaxLengthValidator(500, message='Package description cannot have more than 100 characters.')
         ]
     )
 
     deliveryType = forms.ChoiceField(
         required = True,
         choices=Package.DELIVERY_CHOICES,
-        widget=forms.Select(attrs={'class': 'form-control'}),
-    )
-
-    recipientPickUpLocation = forms.ModelChoiceField(
-        queryset=DropPickZone.objects.all(),
-        widget=forms.TextInput(attrs={'class': 'form-control'}),
     )
 
     recipientName = forms.CharField(
         required = True,
         validators=[
             MinLengthValidator(3, message='recipient name should have at least 3 characters.'),
-            MaxLengthValidator(100, message='recipient name should have at most 100 characters.')
+            MaxLengthValidator(100, message='recipient name cannot have more than 100 characters.')
         ]
     )
 
@@ -162,28 +156,27 @@ class PackageForm(forms.ModelForm):
     recipientAddress = forms.CharField(
         validators=[
             MinLengthValidator(10, message='Recipient address should have at least 10 characters.'),
-            MaxLengthValidator(200, message='Recipient address should have at most 200 characters.')
+            MaxLengthValidator(200, message='Recipient address cannot have more than 200 characters.')
         ]
     )
 
     recipientIdentification = forms.CharField(
         validators=[
             MinLengthValidator(5, message='Recipient identification should have at least 5 characters.'),
-            MaxLengthValidator(50, message='Recipient identification should have at most 50 characters.')
+            MaxLengthValidator(50, message='Recipient identification cannot have more than 50 characters.')
         ]
     )
 
     genderType = forms.ChoiceField(
         required = True,
         choices=Package.DELIVERY_CHOICES,
-        widget=forms.Select(attrs={'class': 'form-control'}),
     )
 
     sendersName = forms.CharField(
         required = True,
         validators=[
             MinLengthValidator(3, message='recipient name should have at least 3 characters.'),
-            MaxLengthValidator(100, message='recipient name should have at most 100 characters.')
+            MaxLengthValidator(100, message='recipient name cannot have more than 100 characters.')
         ]
     )
 
@@ -204,11 +197,127 @@ class PackageForm(forms.ModelForm):
     sendersAddress = forms.CharField(
         validators=[
             MinLengthValidator(10, message='sender address should have at least 10 characters.'),
-            MaxLengthValidator(200, message='sender address should have at most 200 characters.')
+            MaxLengthValidator(200, message='sender address cannot have more than 200 characters.')
         ]
     )
 
     
+class WarehouseCreationForm(forms.ModelForm):
+    
+    name = forms.CharField(
+            required = True,
+            validators=[
+            MinLengthValidator(4, message='Warehouse name should have at least 4 characters.'),
+            MaxLengthValidator(40, message='Warehouse name cannot have more than 100 characters.'),
+            RegexValidator(
+                regex=r'^[A-Za-z\s\-]*$',
+                message='Enter a valid name: Only letters, spaces, hyphens, and dashes are allowed.'
+                ),
+            ],
+        widget=forms.TextInput(attrs={'class': 'form-control form-control-sm', 'name': 'name', 'id': 'name', 'placeholder': 'Name'})
+        )  
+
+    address = forms.CharField(
+        required = True,
+        validators=[
+        MinLengthValidator(3, message='Warehouse address should have at least 3 characters.'),
+        MaxLengthValidator(200, message='Warehouse address cannot have more than 200 characters.')
+            ],
+        widget=forms.TextInput(attrs={'class': 'form-control form-control-sm', 'id': 'address', 'name': 'address', 'placeholder': 'Address'})
+        ) 
+
+    phone = forms.CharField(
+        required = True,
+        validators=[
+        RegexValidator(
+        regex=r'^0\d{9}$',
+        message='Enter a valid phone number with 10 digits.'
+        )],
+        widget=forms.TextInput(attrs={'class': 'form-control form-control-sm', 'name': 'phone', 'placeholder': 'Phone number' })
+        )
+
+    tag = forms.CharField(
+        required = True,
+        validators=[
+        RegexValidator(
+        regex=r'^[A-Za-z\s\-]*$',
+        message='Tag should only contain letters, hyphens, and underscores.',
+        ),
+        MinLengthValidator(3, message='Warehouse tag should have at least 3 characters.'),
+        MaxLengthValidator(10, message='Warehouse tag cannot have more than 10 characters.')
+            ],
+        widget=forms.TextInput(attrs={'class': 'form-control form-control-sm', 'name': 'tag', 'placeholder': 'Tag alias'})
+        )
+
+    class Meta:
+        model = Warehouse
+        fields = ['name', 'phone', 'address', 'tag']
+        
+    
+class DropPickCreationForm(forms.ModelForm):
+    
+    name = forms.CharField(
+            required = True,
+            validators=[
+            MinLengthValidator(4, message='Drop-Pick name should have at least 4 characters.'),
+            MaxLengthValidator(40, message='Drop-Pick name cannot have more than 100 characters.'),
+            RegexValidator(
+                regex=r'^[A-Za-z\s\-]*$',
+                message='Enter a valid name: Only letters, spaces, hyphens, and dashes are allowed.'
+                ),
+            ],
+        widget=forms.TextInput(attrs={'class': 'form-control form-control-sm', 'name': 'name', 'id': 'name', 'placeholder': 'Name'})
+        )  
+
+    address = forms.CharField(
+        required = True,
+        validators=[
+        MinLengthValidator(3, message='Drop-Pick address should have at least 3 characters.'),
+        MaxLengthValidator(200, message='Drop-Pick address cannot have more than 200 characters.')
+            ],
+        widget=forms.TextInput(attrs={'class': 'form-control form-control-sm', 'id': 'address', 'name': 'address', 'placeholder': 'Address'})
+        ) 
+    
+    warehouse = forms.ModelChoiceField(
+        queryset=Warehouse.objects.all(),
+        empty_label="Please select warehouse",
+        widget=forms.Select(attrs={'class': 'form-control form-control-sm selectpicker'})
+    )
+
+    phone = forms.CharField(
+        required = True,
+        validators=[
+        RegexValidator(
+        regex=r'^0\d{9}$',
+        message='Enter a valid phone number with 10 digits.'
+        )],
+        widget=forms.TextInput(attrs={'class': 'form-control form-control-sm', 'name': 'phone', 'placeholder': 'Phone number' })
+        )
+
+    tag = forms.CharField(
+        required = True,
+        validators=[
+        RegexValidator(
+        regex=r'^[A-Za-z\s\-]*$',
+        message='Tag should only contain letters, hyphens, and underscores.',
+        ),
+        MinLengthValidator(3, message='Drop-Pick tag should have at least 3 characters.'),
+        MaxLengthValidator(10, message='Drop-Pick tag cannot have more than 10 characters.')
+            ],
+        widget=forms.TextInput(attrs={'class': 'form-control form-control-sm', 'name': 'tag', 'placeholder': 'Tag alias'})
+        )
+
+
+    class Meta:
+        model = DropPickZone
+        fields = ['name', 'phone', 'address', 'tag', 'warehouse']
+        # widgets={'warehouse': forms.Select(attrs={'class': 'form-control form-control-sm selectpicker'})}
+
+    # def __init__(self, *args, **kwargs):
+    #     self.request = kwargs.pop('request', None)
+    #     super(DropPickCreationForm, self).__init__(*args, **kwargs)
+    #     self.fields['warehouse'].queryset = Warehouse.objects.all()
+
 class WarehouseForm(forms.ModelForm):
     class Meta:
         model = User
