@@ -5,16 +5,13 @@
 
 {% block content %}
 
-
 <div class="row">
   <div class="container mb-3">
     <div class="col-md-12">
     <form class="well form-horizontal" action=" " method="post"  id="contact_form">
       {% csrf_token %}
 
-      {{ form.errors }}
-
-
+      
 <!-- Form Name -->
 <h5>Create Drop-Pick User </h5>
 
@@ -25,8 +22,16 @@
   <div class="col-md-6 inputGroupContainer">
     <div class="input-group">
       <span class="input-group-text">👤</span>
-      <input name="name" placeholder="Name" class="form-control form-control-sm"  type="text">
+      <!-- <input name="name" placeholder="Name" class="form-control form-control-sm"  type="text"> -->
+      {{ form.name }}
     </div>
+
+    {% if form.name.errors %}
+    <div class="alert alert-danger  alert-dismissible fade show mt-2" role="alert">{{ form.name.errors }}
+      <button type="button" class="btn-close" data-coreui-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endif %}
+
   </div>
 </div>
 
@@ -36,18 +41,23 @@
     <div class="col-md-6 inputGroupContainer">
     <div class="input-group">
   <span class="input-group-text">👤</span>
-  <input name="username" placeholder="Username" class="form-control form-control-sm"  type="text">
+  <!-- <input name="username" placeholder="Username" class="form-control form-control-sm"  type="text"> -->
+  {{ form.username }}
     </div>
-  </div>
-</div>
 
-<div class="form-group mt-2">
-  <label class="col-md-6 control-label" >Phone</label> 
-    <div class="col-md-6 inputGroupContainer">
-    <div class="input-group">
-  <span class="input-group-text">📞</span>
-  <input name="phone" placeholder="Phone number" class="form-control form-control-sm"  type="text">
+    {% if form.username.errors %}
+    <div class="alert alert-danger  alert-dismissible fade show mt-2" role="alert">{{ form.username.errors }}
+      <button type="button" class="btn-close" data-coreui-dismiss="alert" aria-label="Close"></button>
     </div>
+    {% endif %}
+
+    {% if duplicate_username %}
+    <div class="alert alert-danger alert-dismissible fade show mt-2" role="alert">
+      {{ duplicate_username }}
+      <button type="button" class="btn-close" data-coreui-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endif %}
+
   </div>
 </div>
 
@@ -56,8 +66,41 @@
     <div class="col-md-6 inputGroupContainer">
     <div class="input-group">
   <span class="input-group-text">📧</span>
-  <input name="email" placeholder="Email" class="form-control form-control-sm"  type="email">
+  <!-- <input name="email" placeholder="Email" class="form-control form-control-sm"  type="email"> -->
+  {{ form.email }}
     </div>
+
+    {% if form.email.errors %}
+    <div class="alert alert-danger  alert-dismissible fade show mt-2" role="alert">{{ form.email.errors }}
+      <button type="button" class="btn-close" data-coreui-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endif %}
+
+    {% if duplicate_email %}
+    <div class="alert alert-danger alert-dismissible fade show mt-2" role="alert">
+      {{ duplicate_email }}
+      <button type="button" class="btn-close" data-coreui-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+
+<div class="form-group mt-2">
+  <label class="col-md-6 control-label" >Phone</label> 
+    <div class="col-md-6 inputGroupContainer">
+    <div class="input-group">
+  <span class="input-group-text">📞</span>
+  <!-- <input name="phone" placeholder="Phone number" class="form-control form-control-sm"  type="text"> -->
+  {{ form.phone }}
+    </div>
+
+    {% if form.phone.errors %}
+    <div class="alert alert-danger  alert-dismissible fade show mt-2" role="alert">{{ form.phone.errors }}
+      <button type="button" class="btn-close" data-coreui-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endif %}
+
   </div>
 </div>
 
@@ -68,6 +111,9 @@
       <div class="col-md-6 selectContainer">
       <div class="input-group">
         <span class="input-group-text">🏪</span>
+        {{ form.drop_pick_zone }}
+
+        {% comment %}
           <!-- <span class="input-group-addon"><i class="glyphicon glyphicon-list"></i></span> -->
           <select name="drop_pick_zone" class="form-control form-control-sm selectpicker">
             <option value="">Please select drop pick zone</option>
@@ -75,7 +121,15 @@
             <option value="{{ drop_pick_zone.id }}">{{ drop_pick_zone.name }}</option>
             {% endfor %}
         </select>
+        {% endcomment %}
     </div>
+
+    {% if form.drop_pick_zone.errors %}
+    <div class="alert alert-danger  alert-dismissible fade show mt-2" role="alert">{{ form.drop_pick_zone.errors }}
+      <button type="button" class="btn-close" data-coreui-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endif %}
+
   </div>
 </div>
 

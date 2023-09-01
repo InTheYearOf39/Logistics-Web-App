@@ -8,6 +8,13 @@
     <div class="col-md-12">
           
           <h5>Couriers</h5>
+
+          {% if success_message %}
+          <div class="alert alert-success alert-dismissible fade show mt-2" role="alert">{{ success_message }}
+            <button type="button" class="btn-close" data-coreui-dismiss="alert" aria-label="Close"></button>
+          </div>
+          {% endif %}
+          
           <!-- /.row--><br>          
           <div class="table-responsive mb-4 bg-white">
             <table class="table border mb-0">

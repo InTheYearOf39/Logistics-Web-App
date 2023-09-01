@@ -311,48 +311,194 @@ class DropPickCreationForm(forms.ModelForm):
     class Meta:
         model = DropPickZone
         fields = ['name', 'phone', 'address', 'tag', 'warehouse']
-        # widgets={'warehouse': forms.Select(attrs={'class': 'form-control form-control-sm selectpicker'})}
 
-    # def __init__(self, *args, **kwargs):
-    #     self.request = kwargs.pop('request', None)
-    #     super(DropPickCreationForm, self).__init__(*args, **kwargs)
-    #     self.fields['warehouse'].queryset = Warehouse.objects.all()
+class WarehouseUserForm(forms.ModelForm):
+    name = forms.CharField(
+            required = True,
+            validators = [
+            MinLengthValidator(3, message='Warehouse admin name should have at least 3 characters.'),
+            MaxLengthValidator(40, message='Warehouse admin name cannot have more than 100 characters.'),
+            RegexValidator(
+                regex=r'^[A-Za-z\s]*$',
+                message='Enter a valid name: Only letters and spaces are allowed.'
+                ),
+            ],
+        widget = forms.TextInput(attrs={'class': 'form-control form-control-sm', 'name': 'name', 'id': 'name', 'placeholder': 'Name'})
+        )
+    
+    username = forms.CharField(
+            required = True,
+            validators = [
+            MinLengthValidator(4, message='Warehouse admin username should have at least 4 characters.'),
+            MaxLengthValidator(40, message='Warehouse admin username cannot have more than 100 characters.'),
+            RegexValidator(
+                regex = r'^[A-Za-z\s\-]*$',
+                message ='Enter a valid username: Only letters, spaces, hyphens, and dashes are allowed.'
+                ),
+            ],
+        widget = forms.TextInput(attrs={'class': 'form-control form-control-sm', 'name': 'username', 'id': 'username', 'placeholder': 'Username'})
+        )  
 
-class WarehouseForm(forms.ModelForm):
+    email = forms.CharField(
+        validators=[EmailValidator(message='Please enter a valid email address.')],
+        widget = forms.EmailInput(attrs={'class': 'form-control form-control-sm', 'name': 'email', 'id': 'email', 'placeholder': 'Email'})
+    ) 
+    
+    warehouse = forms.ModelChoiceField(
+        queryset = Warehouse.objects.all(),
+        empty_label = "Please select Warehouse",
+        widget = forms.Select(attrs={'class': 'form-control form-control-sm selectpicker'})
+    )
+
+    phone = forms.CharField(
+        required = True,
+        validators = [
+        RegexValidator(
+        regex = r'^0\d{9}$',
+        message = 'Enter a valid phone number with 10 digits.'
+        )],
+        widget=forms.TextInput(attrs={'class': 'form-control form-control-sm', 'name': 'phone', 'placeholder': 'Phone number' })
+        )
+ 
     class Meta:
         model = User
-        fields = ['name', 'username', 'phone', 'address', 'tag', 'email']
+        fields = ['name', 'username', 'phone', 'email', 'warehouse']
 
-class DropPickForm(forms.ModelForm):
+class DropPickUserForm(forms.ModelForm):
+    name = forms.CharField(
+            required = True,
+            validators = [
+            MinLengthValidator(3, message='Drop-Pick admin name should have at least 3 characters.'),
+            MaxLengthValidator(40, message='Drop-Pick admin name cannot have more than 100 characters.'),
+            RegexValidator(
+                regex=r'^[A-Za-z\s]*$',
+                message='Enter a valid name: Only letters and spaces are allowed.'
+                ),
+            ],
+        widget = forms.TextInput(attrs={'class': 'form-control form-control-sm', 'name': 'name', 'id': 'name', 'placeholder': 'Name'})
+        )
+    
+    username = forms.CharField(
+            required = True,
+            validators = [
+            MinLengthValidator(4, message='Drop-Pick admin username should have at least 4 characters.'),
+            MaxLengthValidator(40, message='Drop-Pick admin username cannot have more than 100 characters.'),
+            RegexValidator(
+                regex = r'^[A-Za-z\s\-]*$',
+                message ='Enter a valid username: Only letters, spaces, hyphens, and dashes are allowed.'
+                ),
+            ],
+        widget = forms.TextInput(attrs={'class': 'form-control form-control-sm', 'name': 'username', 'id': 'username', 'placeholder': 'Username'})
+        )  
+
+    email = forms.CharField(
+        validators=[EmailValidator(message='Please enter a valid email address.')],
+        widget = forms.EmailInput(attrs={'class': 'form-control form-control-sm', 'name': 'email', 'id': 'email', 'placeholder': 'Email'})
+    ) 
+    
+    drop_pick_zone = forms.ModelChoiceField(
+        queryset = DropPickZone.objects.all(),
+        empty_label = "Please select drop pick zone",
+        widget = forms.Select(attrs={'class': 'form-control form-control-sm selectpicker'})
+    )
+
+    phone = forms.CharField(
+        required = True,
+        validators = [
+        RegexValidator(
+        regex = r'^0\d{9}$',
+        message = 'Enter a valid phone number with 10 digits.'
+        )],
+        widget=forms.TextInput(attrs={'class': 'form-control form-control-sm', 'name': 'phone', 'placeholder': 'Phone number' })
+        )
+ 
     class Meta:
         model = User
-        fields = ['name', 'username', 'phone', 'email', 'address', 'tag', 'warehouse']
-        widgets = {
-            'name': forms.TextInput(attrs={'class': 'form-control'}),
-            'username': forms.TextInput(attrs={'class': 'form-control'}),
-            'phone': forms.TextInput(attrs={'class': 'form-control'}),
-            'email': forms.EmailInput(attrs={'class': 'form-control'}),
-            'address': forms.TextInput(attrs={'class': 'form-control'}),
-            'tag': forms.TextInput(attrs={'class': 'form-control'}),
-            'warehouse': forms.Select(attrs={'class': 'form-control selectpicker'}),
-        }
+        fields = ['name', 'username', 'phone', 'email', 'drop_pick_zone']
 
 class CourierForm(forms.ModelForm):
+    name = forms.CharField(
+            required = True,
+            validators = [
+            MinLengthValidator(3, message="Courier's name should have at least 3 characters."),
+            MaxLengthValidator(40, message="Courier's name cannot have more than 100 characters."),
+            RegexValidator(
+                regex=r'^[A-Za-z\s]*$',
+                message='Enter a valid name: Only letters and spaces are allowed.'
+                ),
+            ],
+        widget = forms.TextInput(attrs={'class': 'form-control form-control-sm', 'name': 'name', 'id': 'name', 'placeholder': 'Name'})
+        )
+    
+    username = forms.CharField(
+            required = True,
+            validators = [
+            MinLengthValidator(4, message="Courier's username should have at least 4 characters."),
+            MaxLengthValidator(40, message="Courier's username cannot have more than 100 characters."),
+            RegexValidator(
+                regex = r'^[A-Za-z\s\-]*$',
+                message ='Enter a valid username: Only letters, spaces, hyphens, and dashes are allowed.'
+                ),
+            ],
+        widget = forms.TextInput(attrs={'class': 'form-control form-control-sm', 'name': 'username', 'id': 'username', 'placeholder': 'Username'})
+        )  
+
+    email = forms.CharField(
+        validators=[EmailValidator(message='Please enter a valid email address.')],
+        widget = forms.EmailInput(attrs={'class': 'form-control form-control-sm', 'name': 'email', 'id': 'email', 'placeholder': 'Email'})
+    )
+
+    phone = forms.CharField(
+        required = True,
+        validators = [
+        RegexValidator(
+            regex = r'^0\d{9}$',
+            message = 'Enter a valid phone number with 10 digits.'
+            )],
+        widget=forms.TextInput(attrs={'class': 'form-control form-control-sm', 'name': 'phone', 'id': 'phone', 'placeholder': 'Phone number' })
+        )
+    
+    address = forms.CharField(
+        required = True,
+        validators=[
+        MinLengthValidator(3, message='Address should have at least 3 characters.'),
+        MaxLengthValidator(200, message='Address cannot have more than 200 characters.')
+            ],
+        widget=forms.TextInput(attrs={'class': 'form-control form-control-sm', 'id': 'address', 'name': 'address', 'placeholder': 'Address'})
+        ) 
+    
+    warehouse = forms.ModelChoiceField(
+        queryset = Warehouse.objects.all(),
+        empty_label = "Please select a warehouse",
+        widget = forms.Select(attrs={'class': 'form-control form-control-sm selectpicker'})
+    )
+
     class Meta:
         model = User
         fields = ['name', 'username', 'phone', 'address', 'warehouse', 'email']
 
-# class CourierForm(forms.ModelForm):
-#     class Meta:
-#         model = User
-#         fields = ['name', 'username', 'phone', 'address']
 
-#     def save(self, commit=True):
-#         user = super().save(commit=False)
-#         user.role = 'courier'  # Set the role here
-#         if commit:
-#             user.save()
-#         return user
+class EditWarehouseUserForm(forms.ModelForm):
+    warehouse = forms.ModelChoiceField(
+        queryset = Warehouse.objects.all(),
+        empty_label = "Please select Warehouse",
+        widget = forms.Select(attrs={'class': 'form-control form-control-sm selectpicker'})
+    )
+
+    phone = forms.CharField(
+        required = True,
+        validators = [
+        RegexValidator(
+        regex = r'^0\d{9}$',
+        message = 'Enter a valid phone number with 10 digits.'
+        )],
+        widget=forms.TextInput(attrs={'class': 'form-control form-control-sm', 'name': 'phone', 'placeholder': 'Phone number' })
+        )
+ 
+    class Meta:
+        model = User
+        fields = ['phone',  'warehouse']
+
 
 class ChangePasswordForm(SetPasswordForm):
     error_messages = {

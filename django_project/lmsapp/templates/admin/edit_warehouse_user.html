@@ -9,8 +9,6 @@
     <div class="col-md-12">
       <form class="well form-horizontal" action="{% url 'edit_warehouse_user' user.id %}" method="post" id="contact_form">
         {% csrf_token %}
-        {{ form.errors }}
-
 
 
           <!-- Form Name -->
@@ -22,7 +20,8 @@
             <div class="col-md-6 inputGroupContainer">
               <div class="input-group">
                 <span class="input-group-text">👤</span>
-                <input name="name" placeholder="Name" class="form-control form-control-sm" type="text" value="{{ user.name }}">
+                <input name="name" placeholder="Name" class="form-control form-control-sm" type="text" value="{{ user.name }}" disabled>
+                <!-- {{ form.name }} -->
               </div>
             </div>
           </div>
@@ -33,8 +32,40 @@
             <div class="col-md-6 inputGroupContainer">
               <div class="input-group">
                 <span class="input-group-text">👤</span>
-                <input name="username" placeholder="Username" class="form-control form-control-sm" type="text" value="{{ user.username }}">
+                <input name="username" placeholder="Username" class="form-control form-control-sm" type="text" value="{{ user.username }}" disabled>
+                <!-- {{ form.username }} -->
               </div>
+
+            </div>
+          </div>
+
+          <div class="form-group mt-2">
+            <label class="col-md-6 control-label" >Email</label> 
+              <div class="col-md-6 inputGroupContainer">
+              <div class="input-group">
+            <span class="input-group-text">📧</span>
+            <input name="email" placeholder="Email" class="form-control form-control-sm"  type="email" value="{{ user.email }}" disabled>
+            <!-- {{ form.email }} -->
+              </div>
+          
+            </div>
+          </div>
+          
+          <div class="form-group mt-2">
+            <label class="col-md-6 control-label" >Phone</label> 
+              <div class="col-md-6 inputGroupContainer">
+              <div class="input-group">
+            <span class="input-group-text">📞</span>
+            <!-- <input name="phone" placeholder="Phone number" class="form-control form-control-sm"  type="text"> -->
+            {{ form.phone }}
+              </div>
+          
+              {% if form.phone.errors %}
+              <div class="alert alert-danger  alert-dismissible fade show mt-2" role="alert">{{ form.phone.errors }}
+                <button type="button" class="btn-close" data-coreui-dismiss="alert" aria-label="Close"></button>
+              </div>
+              {% endif %}
+          
             </div>
           </div>
 
@@ -44,6 +75,9 @@
             <div class="col-md-6 selectContainer">
               <div class="input-group">
                 <span class="input-group-text">🏬</span>
+                {{ form.warehouse }}
+
+                {% comment %}
                 <span class="input-group-addon"><i class="glyphicon glyphicon-list"></i></span>
                 <select name="warehouse" class="form-control form-control-sm selectpicker">
                   <option value="">Please select warehouse</option>
@@ -55,7 +89,16 @@
                     {% endif %}
                   {% endfor %}
                 </select>
+                {% endcomment %}
+
               </div>
+
+              {% if form.warehouse.errors %}
+              <div class="alert alert-danger  alert-dismissible fade show mt-2" role="alert">{{ form.warehouse.errors }}
+                <button type="button" class="btn-close" data-coreui-dismiss="alert" aria-label="Close"></button>
+              </div>
+              {% endif %}
+
             </div>
           </div>
 
