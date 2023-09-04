@@ -12,7 +12,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.contrib import messages
-from lmsapp.forms import CourierForm, WarehouseCreationForm, DropPickCreationForm, DropPickUserForm, WarehouseUserForm, EditWarehouseUserForm
+from lmsapp.forms import CourierForm, WarehouseCreationForm, DropPickCreationForm, DropPickUserForm, WarehouseUserForm, EditWarehouseUserForm, EditDropPickUserForm
 from lmsapp.models import Package, User, Warehouse, DropPickZone
 
 from calendar import monthrange
@@ -671,7 +671,7 @@ def edit_warehouse_user(request, user_id):
         if form.is_valid():
             phone = form.cleaned_data["phone"]
             warehouse_id = form.cleaned_data['warehouse']
-            
+
             user = form.save(commit=False)
             user.phone = phone
             user.warehouse = warehouse_id  
@@ -743,41 +743,67 @@ def delete_drop_pick_zone(request, drop_pick_zone_id):
     return render(request, 'admin/delete_drop_pick_zone.html', {'drop_pick_zone': drop_pick_zone})
 
 
+# def edit_drop_pick_zone_user(request, drop_pick_zone_user_id):
+#     drop_pick_zone_user = get_object_or_404(User, id=drop_pick_zone_user_id, role='drop_pick_zone')
+
+#     if request.method == 'POST':
+#         if 'delete' in request.POST:
+#             # Delete the drop-pick zone user
+#             drop_pick_zone_user.delete()
+#             return redirect('drop_pick_users')
+
+#         # If 'delete' was not in the request.POST, it means we're updating the user details
+#         # Get form data
+#         name = request.POST.get('name')
+#         username = request.POST.get('username')
+#         drop_pick_zone_id = request.POST.get('drop_pick_zone')
+
+#         if drop_pick_zone_id:
+#             drop_pick_zone = get_object_or_404(DropPickZone, id=drop_pick_zone_id)
+
+#             # Update the drop-pick zone user details
+#             drop_pick_zone_user.name = name
+#             drop_pick_zone_user.username = username
+#             drop_pick_zone_user.drop_pick_zone = drop_pick_zone
+#             drop_pick_zone_user.modified_by = request.user
+#             drop_pick_zone_user.save()
+
+#             return redirect('drop_pick_users')
+
+#     # Retrieve the drop pick zones
+#     drop_pick_zones = DropPickZone.objects.all()
+
+#     context = {
+#         'drop_pick_zone_user': drop_pick_zone_user,
+#         'drop_pick_zones': drop_pick_zones,
+#     }
+#     return render(request, 'admin/edit_drop_pick_zone_user.html', context)
+
 def edit_drop_pick_zone_user(request, drop_pick_zone_user_id):
-    drop_pick_zone_user = get_object_or_404(User, id=drop_pick_zone_user_id, role='drop_pick_zone')
-
+    drop_pick_zone_user = get_object_or_404(User, id=drop_pick_zone_user_id)
     if request.method == 'POST':
-        if 'delete' in request.POST:
-            # Delete the drop-pick zone user
-            drop_pick_zone_user.delete()
-            return redirect('drop_pick_users')
+        form = EditDropPickUserForm(request.POST)
+        # remove error foir certain fields
+        if form.errors and "username" in form.errors:
+                del form.errors["username"]
+        if form.is_valid():
+            if form.has_changed():
+                phone = form.cleaned_data["phone"]
+                drop_pick_zone_id = form.cleaned_data['drop_pick_zone']
 
-        # If 'delete' was not in the request.POST, it means we're updating the user details
-        # Get form data
-        name = request.POST.get('name')
-        username = request.POST.get('username')
-        drop_pick_zone_id = request.POST.get('drop_pick_zone')
+                obj = User.objects.get(id=drop_pick_zone_user_id) 
+                obj.phone = phone
+                obj.drop_pick_zone = drop_pick_zone_id  
+                obj.modified_by = request.user
+                obj.save()
 
-        if drop_pick_zone_id:
-            drop_pick_zone = get_object_or_404(DropPickZone, id=drop_pick_zone_id)
-
-            # Update the drop-pick zone user details
-            drop_pick_zone_user.name = name
-            drop_pick_zone_user.username = username
-            drop_pick_zone_user.drop_pick_zone = drop_pick_zone
-            drop_pick_zone_user.modified_by = request.user
-            drop_pick_zone_user.save()
-
-            return redirect('drop_pick_users')
-
-    # Retrieve the drop pick zones
-    drop_pick_zones = DropPickZone.objects.all()
-
-    context = {
-        'drop_pick_zone_user': drop_pick_zone_user,
-        'drop_pick_zones': drop_pick_zones,
-    }
-    return render(request, 'admin/edit_drop_pick_zone_user.html', context)
+                success_message = f"You have successfully updated {obj.name}'s details"
+                return redirect(reverse('drop_pick_users') + f"?success_message={success_message}")
+        else:
+            return render(request, 'admin/edit_drop_pick_zone_user.html', {'form': form})
+    else:
+        form = EditDropPickUserForm(instance = drop_pick_zone_user)
+        return render(request, 'admin/edit_drop_pick_zone_user.html', {'form': form })
 
 
 def delete_drop_pick_zone_user(request, drop_pick_zone_user_id):

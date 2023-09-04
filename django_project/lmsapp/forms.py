@@ -1,3 +1,4 @@
+from typing import Any, Dict
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from lmsapp.models import User, Package, DropPickZone, Warehouse
@@ -468,6 +469,7 @@ class CourierForm(forms.ModelForm):
         ) 
     
     warehouse = forms.ModelChoiceField(
+        required = True,
         queryset = Warehouse.objects.all(),
         empty_label = "Please select a warehouse",
         widget = forms.Select(attrs={'class': 'form-control form-control-sm selectpicker'})
@@ -480,6 +482,7 @@ class CourierForm(forms.ModelForm):
 
 class EditWarehouseUserForm(forms.ModelForm):
     warehouse = forms.ModelChoiceField(
+        required = True,
         queryset = Warehouse.objects.all(),
         empty_label = "Please select Warehouse",
         widget = forms.Select(attrs={'class': 'form-control form-control-sm selectpicker'})
@@ -498,6 +501,41 @@ class EditWarehouseUserForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ['phone',  'warehouse']
+
+class EditDropPickUserForm(forms.ModelForm):
+    name = forms.CharField(
+        widget = forms.TextInput(attrs={'class': 'form-control form-control-sm bg-light', 'name': 'name', 'id': 'name', 'placeholder': 'Name', 'readonly': True })
+        )
+    
+    username = forms.CharField(
+        widget = forms.TextInput(attrs={'class': 'form-control form-control-sm bg-light', 'name': 'username', 'id': 'username', 'placeholder': 'Username', 'readonly': True })
+        )  
+
+    email = forms.CharField(
+        widget = forms.EmailInput(attrs={'class': 'form-control form-control-sm bg-light', 'name': 'email', 'id': 'email', 'placeholder': 'Email', 'readonly': True })
+    ) 
+
+    drop_pick_zone = forms.ModelChoiceField(
+        required = True,
+        queryset = DropPickZone.objects.all(),
+        empty_label = "Please select a drop pick zone",
+        widget = forms.Select(attrs={'class': 'form-control form-control-sm selectpicker'})
+    )
+
+    phone = forms.CharField(
+        required = True,
+        validators = [
+        RegexValidator(
+        regex = r'^0\d{9}$',
+        message = 'Enter a valid phone number with 10 digits.'
+        )],
+        widget=forms.TextInput(attrs={'class': 'form-control form-control-sm', 'name': 'phone', 'placeholder': 'Phone number' })
+        )
+    
+    
+    class Meta:
+        model = User
+        fields = ['phone',  'drop_pick_zone', 'email', 'username', 'name']
 
 
 class ChangePasswordForm(SetPasswordForm):
