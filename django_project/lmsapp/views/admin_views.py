@@ -665,26 +665,30 @@ def delete_warehouse(request, warehouse_id):
 #     return render(request, 'admin/edit_warehouse_user.html', context)
 
 def edit_warehouse_user(request, user_id):
-    user = get_object_or_404(User, id=user_id)
+    obj = get_object_or_404(User, id=user_id)
+
     if request.method == 'POST':
-        form = EditWarehouseUserForm(request.POST, instance=user)
+        form = EditWarehouseUserForm(request.POST, instance=obj)
         if form.is_valid():
-            phone = form.cleaned_data["phone"]
-            warehouse_id = form.cleaned_data['warehouse']
+            if form.has_changed():
+                if form.changed_data != ["username"]:
 
-            user = form.save(commit=False)
-            user.phone = phone
-            user.warehouse = warehouse_id  
-            user.modified_by = request.user
-            user.save()
+                    phone = form.cleaned_data["phone"]
+                    warehouse_id = form.cleaned_data['warehouse']
 
-            success_message = f"You have successfully updated {user.name}'s details"
-            return redirect(reverse('warehouse_users') + f"?success_message={success_message}")
+                    user = User.objects.get(id=user_id) 
+                    user.phone = phone
+                    user.warehouse = warehouse_id  
+                    user.modified_by = request.user
+                    user.save()
+
+                    success_message = f"You have successfully updated {user.name}'s details"
+                    return redirect(reverse('warehouse_users') + f"?success_message={success_message}")
         else:
             return render(request, 'admin/edit_warehouse_user.html', {'form': form})
     else:
-        form = EditWarehouseUserForm(instance = user)
-    return render(request, 'admin/edit_warehouse_user.html', {'form': form, 'user': user })
+        form = EditWarehouseUserForm(instance = obj)
+        return render(request, 'admin/edit_warehouse_user.html', {'form': form })
 
 def delete_warehouse_user(request, user_id):
     user = get_object_or_404(User, id=user_id)
@@ -780,30 +784,56 @@ def delete_drop_pick_zone(request, drop_pick_zone_id):
 #     return render(request, 'admin/edit_drop_pick_zone_user.html', context)
 
 def edit_drop_pick_zone_user(request, drop_pick_zone_user_id):
-    drop_pick_zone_user = get_object_or_404(User, id=drop_pick_zone_user_id)
+    obj = get_object_or_404(User, id=drop_pick_zone_user_id)
+
     if request.method == 'POST':
-        form = EditDropPickUserForm(request.POST)
-        # remove error foir certain fields
-        if form.errors and "username" in form.errors:
-                del form.errors["username"]
+        form = EditDropPickUserForm(request.POST, instance=obj) 
         if form.is_valid():
             if form.has_changed():
-                phone = form.cleaned_data["phone"]
-                drop_pick_zone_id = form.cleaned_data['drop_pick_zone']
+                if form.changed_data != ["username"]:
 
-                obj = User.objects.get(id=drop_pick_zone_user_id) 
-                obj.phone = phone
-                obj.drop_pick_zone = drop_pick_zone_id  
-                obj.modified_by = request.user
-                obj.save()
+                    phone = form.cleaned_data["phone"]
+                    drop_pick_zone_id = form.cleaned_data['drop_pick_zone']
 
-                success_message = f"You have successfully updated {obj.name}'s details"
-                return redirect(reverse('drop_pick_users') + f"?success_message={success_message}")
+                    user = User.objects.get(id=drop_pick_zone_user_id) 
+                    user.phone = phone
+                    user.drop_pick_zone = drop_pick_zone_id  
+                    user.modified_by = request.user
+                    user.save()
+
+                    success_message = f"You have successfully updated {user.name}'s details"
+                    return redirect(reverse('drop_pick_users') + f"?success_message={success_message}")
         else:
             return render(request, 'admin/edit_drop_pick_zone_user.html', {'form': form})
     else:
-        form = EditDropPickUserForm(instance = drop_pick_zone_user)
+        form = EditDropPickUserForm(instance=obj)
         return render(request, 'admin/edit_drop_pick_zone_user.html', {'form': form })
+    
+# def edit_drop_pick_zone_user(request, drop_pick_zone_user_id):
+#     drop_pick_zone_user = get_object_or_404(User, id=drop_pick_zone_user_id)
+#     if request.method == 'POST':
+#         form = EditDropPickUserForm(request.POST)
+#         # remove error foir certain fields
+#         if form.errors and "username" in form.errors:
+#                 del form.errors["username"]
+#         if form.is_valid():
+#             if form.has_changed():
+#                 phone = form.cleaned_data["phone"]
+#                 drop_pick_zone_id = form.cleaned_data['drop_pick_zone']
+
+#                 obj = User.objects.get(id=drop_pick_zone_user_id) 
+#                 obj.phone = phone
+#                 obj.drop_pick_zone = drop_pick_zone_id  
+#                 obj.modified_by = request.user
+#                 obj.save()
+
+#                 success_message = f"You have successfully updated {obj.name}'s details"
+#                 return redirect(reverse('drop_pick_users') + f"?success_message={success_message}")
+#         else:
+#             return render(request, 'admin/edit_drop_pick_zone_user.html', {'form': form})
+#     else:
+#         form = EditDropPickUserForm(instance = drop_pick_zone_user)
+#         return render(request, 'admin/edit_drop_pick_zone_user.html', {'form': form })
 
 
 def delete_drop_pick_zone_user(request, drop_pick_zone_user_id):

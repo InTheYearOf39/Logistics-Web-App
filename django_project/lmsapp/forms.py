@@ -481,6 +481,18 @@ class CourierForm(forms.ModelForm):
 
 
 class EditWarehouseUserForm(forms.ModelForm):
+    name = forms.CharField(
+        widget = forms.TextInput(attrs={'class': 'form-control form-control-sm bg-light', 'name': 'name', 'id': 'name', 'placeholder': 'Name', 'readonly': True })
+        )
+    
+    username = forms.CharField(
+        widget = forms.TextInput(attrs={'class': 'form-control form-control-sm bg-light', 'name': 'username', 'id': 'username', 'placeholder': 'Username', 'readonly': True })
+        )  
+
+    email = forms.CharField(
+        widget = forms.EmailInput(attrs={'class': 'form-control form-control-sm bg-light', 'name': 'email', 'id': 'email', 'placeholder': 'Email', 'readonly': True })
+    ) 
+
     warehouse = forms.ModelChoiceField(
         required = True,
         queryset = Warehouse.objects.all(),
@@ -500,7 +512,7 @@ class EditWarehouseUserForm(forms.ModelForm):
  
     class Meta:
         model = User
-        fields = ['phone',  'warehouse']
+        fields = ['phone',  'warehouse', 'email', 'username', 'name']
 
 class EditDropPickUserForm(forms.ModelForm):
     name = forms.CharField(
