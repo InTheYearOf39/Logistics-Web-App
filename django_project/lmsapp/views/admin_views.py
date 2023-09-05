@@ -12,7 +12,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.contrib import messages
-from lmsapp.forms import CourierForm, WarehouseCreationForm, DropPickCreationForm, DropPickUserForm, WarehouseUserForm, EditWarehouseUserForm, EditDropPickUserForm
+from lmsapp.forms import CourierForm, WarehouseCreationForm, DropPickCreationForm, DropPickUserForm, WarehouseUserForm, EditWarehouseUserForm, EditDropPickUserForm, EditCourierForm
 from lmsapp.models import Package, User, Warehouse, DropPickZone
 
 from calendar import monthrange
@@ -398,7 +398,24 @@ def create_drop_pick(request):
             return render(request, 'admin/create_drop_pick.html', {'form': form})
     else:
         form = DropPickCreationForm(None)
-    return render(request, 'admin/create_drop_pick.html', {'form': form})
+        return render(request, 'admin/create_drop_pick.html', {'form': form})
+
+def warehouse_users(request):
+    warehouse_users = User.objects.filter(role='warehouse')
+    context = {
+        'warehouse_users': warehouse_users,
+        'success_message': request.GET.get("success_message", "")
+    }
+    return render(request, 'admin/warehouse_users.html', context)
+
+
+def drop_pick_users(request):
+    drop_pick_users = User.objects.filter(role='drop_pick_zone')
+    context = {
+        'drop_pick_users': drop_pick_users,
+        'success_message':request.GET.get("success_message", "")
+    }
+    return render(request, 'admin/drop_pick_users.html', context)
 
 
 """
@@ -424,34 +441,6 @@ and the user is redirected to the 'admin/couriers.html' page. If the request met
 or the form is not valid, the form is displayed to the user for input.
 """
 
-# def create_courier(request):
-#     warehouses = Warehouse.objects.all()
-#     context = {
-#         'warehouses': warehouses
-#     }
-
-#     if request.method == 'POST':
-#         form = CourierForm(request.POST)
-#         if form.is_valid():
-#             user = form.save(commit=False)
-#             user.role = 'courier'
-#             # Set default password for the courier user
-#             user.set_password('courier@courier')
-
-#             # Get the latitude and longitude from the form data
-#             latitude = request.POST.get('latitude')
-#             longitude = request.POST.get('longitude')
-#             user.latitude = latitude
-#             user.longitude = longitude
-#             user.created_by = request.user
-
-#             form.save()
-#             return redirect('couriers')
-#     else:
-#         form = CourierForm()
-
-#     return render(request, 'admin/create_courier.html', {'form': form, **context})
-
 def create_courier(request):
     if request.method == 'POST':
         form = CourierForm(request.POST)
@@ -462,6 +451,7 @@ def create_courier(request):
             email = form.cleaned_data['email']
             phone = form.cleaned_data["phone"]
             warehouse_id = form.cleaned_data['warehouse']
+            address = form.cleaned_data["address"]
 
             existing_username = User.objects.filter(username = username).first()
             existing_email = User.objects.filter(email = email).first()
@@ -487,6 +477,7 @@ def create_courier(request):
             courier.username = username
             courier.phone = phone
             courier.warehouse = warehouse_id
+            courier.address = address
             courier.role = 'courier'
             courier.password = 'courier@courier'
             courier.longitude = longitude        
@@ -585,256 +576,205 @@ def create_drop_pick_user(request):
         form = DropPickUserForm(None)
     return render(request, 'admin/create_drop_pick_user.html', {'form': form})
 
-
-# views.py
+@xframe_options_exempt
 def edit_warehouse(request, warehouse_id):
-    warehouse = get_object_or_404(Warehouse, id=warehouse_id)
+    obj = get_object_or_404(Warehouse, id=warehouse_id)
 
     if request.method == 'POST':
-        user = request.user
-        # Get the form data from the request.POST dictionary
-        name = request.POST['name']
-        address = request.POST['address']
-        phone = request.POST['phone']
-        tag = request.POST['tag']
-        latitude = request.POST['latitude']
-        longitude = request.POST['longitude']
-
-        # Update the warehouse model instance with the new data
-        warehouse.name = name
-        warehouse.address = address
-        warehouse.phone = phone
-        warehouse.tag = tag
-        warehouse.latitude = latitude
-        warehouse.longitude = longitude
-
-        # Save the updated warehouse details to the database
-        warehouse.save(user=user)
-
-        # Redirect to the warehouses list page after editing
-        return redirect('warehouses')
-
-    return render(request, 'admin/edit_warehouse.html', {'warehouse': warehouse})
-
-
-def delete_warehouse(request, warehouse_id):
-    warehouse = get_object_or_404(Warehouse, id=warehouse_id)
-
-    if request.method == 'POST':
-        # Delete the warehouse
-        warehouse.delete()
-        return redirect('warehouses')
-
-    return render(request, 'admin/warehouses.html', {'warehouse': warehouse})
-
-
-# def edit_warehouse_user(request, user_id):
-#     user = get_object_or_404(User, id=user_id)
-
-#     if request.method == 'POST':
-#         # Check if the form was submitted for deletion
-#         if 'delete_user' in request.POST:
-#             # Delete the warehouse user
-#             user.delete()
-#             return redirect('warehouse_users_list')
-
-#         # If not deletion, handle the form for updating the user details
-#         name = request.POST.get('name')
-#         username = request.POST.get('username')
-#         warehouse_id = request.POST.get('warehouse')
-
-#         if warehouse_id:
-#             warehouse = get_object_or_404(Warehouse, id=warehouse_id)
-
-#             # Update the user details
-#             user.name = name
-#             user.username = username
-#             user.warehouse = warehouse
-#             user.modified_by = request.user
-#             user.save()
-
-#             return redirect('warehouse_users')
-
-#     # Retrieve the warehouses
-#     warehouses = Warehouse.objects.all()
-
-#     context = {
-#         'user': user,
-#         'warehouses': warehouses
-#     }
-#     return render(request, 'admin/edit_warehouse_user.html', context)
-
-def edit_warehouse_user(request, user_id):
-    obj = get_object_or_404(User, id=user_id)
-
-    if request.method == 'POST':
-        form = EditWarehouseUserForm(request.POST, instance=obj)
+        form = WarehouseCreationForm(request.POST, instance=obj)
         if form.is_valid():
-            if form.has_changed():
-                if form.changed_data != ["username"]:
+            names = form.cleaned_data["name"].split()
+            name = ' '.join([name.capitalize() for name in names])
 
-                    phone = form.cleaned_data["phone"]
-                    warehouse_id = form.cleaned_data['warehouse']
+            longitude = request.POST.get('longitude')
+            latitude = request.POST.get('latitude')
 
-                    user = User.objects.get(id=user_id) 
-                    user.phone = phone
-                    user.warehouse = warehouse_id  
-                    user.modified_by = request.user
-                    user.save()
+            if not longitude or not latitude:
+                address_error = "Something went wrong, re-enter the address."
+                return render(request, 'admin/edit_warehouse.html', {'form': form, 'address_error': address_error})
+            
+            tag = form.cleaned_data["tag"].upper()
 
-                    success_message = f"You have successfully updated {user.name}'s details"
-                    return redirect(reverse('warehouse_users') + f"?success_message={success_message}")
+             # Exclude the current warehouse from the queries
+            existing_warehouse = Warehouse.objects.filter(~Q(id=warehouse_id), name=name).first()
+            existing_warehouse_tag = Warehouse.objects.filter(~Q(id=warehouse_id), tag=tag).first()
+            existing_drop_pick_tag = DropPickZone.objects.filter(tag=tag).first()
+            
+            duplicate_name_error = None
+            duplicate_tag_error = None
+
+
+            if existing_warehouse: 
+                duplicate_name_error = "Warehouse name already taken! Please use another."
+            
+            if existing_warehouse_tag or existing_drop_pick_tag:
+                duplicate_tag_error = "The Tag you chose is already in use! Please Choose another."
+                return render(request, 'admin/edit_warehouse.html', {'form': form, 'duplicate_tag_error': duplicate_tag_error, 'duplicate_name_error': duplicate_name_error})
+
+        
+            address = form.cleaned_data["address"]
+
+            warehouse = Warehouse.objects.get(id=warehouse_id)
+            warehouse.name = name
+            warehouse.tag = tag
+            warehouse.latitude = latitude
+            warehouse.longitude = longitude
+            warehouse.address = address
+            warehouse.modified_by = request.user
+            warehouse.save()
+
+            success_message = f"You have successfully updated {warehouse.name} warehouse's details!"
+            return redirect(reverse('warehouses') + f'?success_message={success_message}')
+            
         else:
-            return render(request, 'admin/edit_warehouse_user.html', {'form': form})
+            return render(request, 'admin/edit_warehouse.html', {'form': form})
     else:
-        form = EditWarehouseUserForm(instance = obj)
-        return render(request, 'admin/edit_warehouse_user.html', {'form': form })
+        form = WarehouseCreationForm(instance = obj)
+        return render(request, 'admin/edit_warehouse.html', {'form': form})
 
-def delete_warehouse_user(request, user_id):
-    user = get_object_or_404(User, id=user_id)
-
+@xframe_options_exempt
+def edit_drop_pick_zone(request, drop_pick_zone_id):
+    obj = get_object_or_404(DropPickZone, id=drop_pick_zone_id)
+    
     if request.method == 'POST':
-        # Delete the warehouse user
-        user.delete()
-        return redirect('warehouse_users')
+        form = DropPickCreationForm(request.POST, instance=obj)
+        if form.is_valid():
+            names = form.cleaned_data["name"].split()
+            name = ' '.join([name.capitalize() for name in names])
 
-    # If the request method is not POST, show the confirmation modal
-    return render(request, 'admin/delete_warehouse_user.html', {'user': user})
+            longitude = request.POST.get('longitude')
+            latitude = request.POST.get('latitude')
 
+            if not longitude or not latitude:
+                address_error = "Something went wrong, re-enter the address."
+                return render(request, 'admin/create_drop_pick.html', {'form': form, 'address_error': address_error})
 
-def edit_drop_pick_zones(request, drop_pick_zone_id):
-    drop_pick_zone = get_object_or_404(DropPickZone, id=drop_pick_zone_id)
+            tag = form.cleaned_data["tag"].upper()
 
-    if request.method == 'POST':
-        # Get form data
-        user = request.user
-        name = request.POST.get('name')
-        address = request.POST.get('address')
-        phone = request.POST.get('phone')
-        tag = request.POST.get('tag')
-        warehouse_id = request.POST.get('warehouse')
+            existing_drop_pick = DropPickZone.objects.filter(~Q(id=drop_pick_zone_id),name=name).first()
+            existing_warehouse_tag = Warehouse.objects.filter(tag=tag).first()
+            existing_drop_pick_tag = DropPickZone.objects.filter(~Q(id=drop_pick_zone_id),tag=tag).first()
 
-        if warehouse_id:
-            warehouse = get_object_or_404(Warehouse, id=warehouse_id)
+            duplicate_name_error = None
+            duplicate_tag_error = None
 
-            # Update the drop-pick zone details
+            if existing_drop_pick: 
+                duplicate_name_error = "Drop-pick name already taken! Please use another."
+            
+            if existing_warehouse_tag or existing_drop_pick_tag:
+                duplicate_tag_error = "The Tag you chose is already in use! Please Choose another."
+                return render(request, 'admin/edit_drop_pick_zone.html', {'form': form, 'duplicate_tag_error': duplicate_tag_error, 'duplicate_name_error': duplicate_name_error})
+
+            warehouse_id = form.cleaned_data['warehouse']
+            address = form.cleaned_data["address"]
+
+            drop_pick_zone = DropPickZone.objects.get(id=drop_pick_zone_id) 
             drop_pick_zone.name = name
-            drop_pick_zone.address = address
-            drop_pick_zone.phone = phone
             drop_pick_zone.tag = tag
-            drop_pick_zone.warehouse = warehouse
-            drop_pick_zone.save(user=user)
+            drop_pick_zone.warehouse = warehouse_id
+            drop_pick_zone.latitude = latitude
+            drop_pick_zone.longitude = longitude
+            drop_pick_zone.address = address
+            drop_pick_zone.modified_by = request.user
+            drop_pick_zone.save()
 
-            return redirect('drop_pick_zones')
-
-    # Retrieve the warehouses
-    warehouses = Warehouse.objects.all()
-
-    context = {
-        'drop_pick_zone': drop_pick_zone,
-        'warehouses': warehouses,
-    }
-    return render(request, 'admin/edit_drop_pick_zones.html', context)
-
-
-def delete_drop_pick_zone(request, drop_pick_zone_id):
-    drop_pick_zone = get_object_or_404(DropPickZone, id=drop_pick_zone_id)
-    if request.method == 'POST':
-        # Perform the delete operation
-        drop_pick_zone.delete()
-        return redirect('drop_pick_zones')
-
-    return render(request, 'admin/delete_drop_pick_zone.html', {'drop_pick_zone': drop_pick_zone})
-
-
-# def edit_drop_pick_zone_user(request, drop_pick_zone_user_id):
-#     drop_pick_zone_user = get_object_or_404(User, id=drop_pick_zone_user_id, role='drop_pick_zone')
-
-#     if request.method == 'POST':
-#         if 'delete' in request.POST:
-#             # Delete the drop-pick zone user
-#             drop_pick_zone_user.delete()
-#             return redirect('drop_pick_users')
-
-#         # If 'delete' was not in the request.POST, it means we're updating the user details
-#         # Get form data
-#         name = request.POST.get('name')
-#         username = request.POST.get('username')
-#         drop_pick_zone_id = request.POST.get('drop_pick_zone')
-
-#         if drop_pick_zone_id:
-#             drop_pick_zone = get_object_or_404(DropPickZone, id=drop_pick_zone_id)
-
-#             # Update the drop-pick zone user details
-#             drop_pick_zone_user.name = name
-#             drop_pick_zone_user.username = username
-#             drop_pick_zone_user.drop_pick_zone = drop_pick_zone
-#             drop_pick_zone_user.modified_by = request.user
-#             drop_pick_zone_user.save()
-
-#             return redirect('drop_pick_users')
-
-#     # Retrieve the drop pick zones
-#     drop_pick_zones = DropPickZone.objects.all()
-
-#     context = {
-#         'drop_pick_zone_user': drop_pick_zone_user,
-#         'drop_pick_zones': drop_pick_zones,
-#     }
-#     return render(request, 'admin/edit_drop_pick_zone_user.html', context)
-
+            success_message = f"You have successfully updated {drop_pick_zone.name} drop-pick zone's details!"
+            return redirect(reverse('drop_pick_zones') + f'?success_message={success_message}')
+        else:
+            return render(request, 'admin/edit_drop_pick_zone.html', {'form': form})
+    else:
+        form = DropPickCreationForm(instance=obj)
+        return render(request, 'admin/edit_drop_pick_zone.html', {'form': form})
+    
 def edit_drop_pick_zone_user(request, drop_pick_zone_user_id):
     obj = get_object_or_404(User, id=drop_pick_zone_user_id)
 
     if request.method == 'POST':
         form = EditDropPickUserForm(request.POST, instance=obj) 
         if form.is_valid():
-            if form.has_changed():
-                if form.changed_data != ["username"]:
 
-                    phone = form.cleaned_data["phone"]
-                    drop_pick_zone_id = form.cleaned_data['drop_pick_zone']
+            phone = form.cleaned_data["phone"]
+            drop_pick_zone_id = form.cleaned_data['drop_pick_zone']
 
-                    user = User.objects.get(id=drop_pick_zone_user_id) 
-                    user.phone = phone
-                    user.drop_pick_zone = drop_pick_zone_id  
-                    user.modified_by = request.user
-                    user.save()
+            user = User.objects.get(id=drop_pick_zone_user_id) 
+            user.phone = phone
+            user.drop_pick_zone = drop_pick_zone_id  
+            user.modified_by = request.user
+            user.save()
 
-                    success_message = f"You have successfully updated {user.name}'s details"
-                    return redirect(reverse('drop_pick_users') + f"?success_message={success_message}")
+            success_message = f"You have successfully updated {user.name}'s details"
+            return redirect(reverse('drop_pick_users') + f"?success_message={success_message}")
         else:
             return render(request, 'admin/edit_drop_pick_zone_user.html', {'form': form})
     else:
         form = EditDropPickUserForm(instance=obj)
         return render(request, 'admin/edit_drop_pick_zone_user.html', {'form': form })
     
-# def edit_drop_pick_zone_user(request, drop_pick_zone_user_id):
-#     drop_pick_zone_user = get_object_or_404(User, id=drop_pick_zone_user_id)
-#     if request.method == 'POST':
-#         form = EditDropPickUserForm(request.POST)
-#         # remove error foir certain fields
-#         if form.errors and "username" in form.errors:
-#                 del form.errors["username"]
-#         if form.is_valid():
-#             if form.has_changed():
-#                 phone = form.cleaned_data["phone"]
-#                 drop_pick_zone_id = form.cleaned_data['drop_pick_zone']
+def edit_warehouse_user(request, user_id):
+    obj = get_object_or_404(User, id=user_id)
 
-#                 obj = User.objects.get(id=drop_pick_zone_user_id) 
-#                 obj.phone = phone
-#                 obj.drop_pick_zone = drop_pick_zone_id  
-#                 obj.modified_by = request.user
-#                 obj.save()
+    if request.method == 'POST':
+        form = EditWarehouseUserForm(request.POST, instance=obj)
+        if form.is_valid():        
 
-#                 success_message = f"You have successfully updated {obj.name}'s details"
-#                 return redirect(reverse('drop_pick_users') + f"?success_message={success_message}")
-#         else:
-#             return render(request, 'admin/edit_drop_pick_zone_user.html', {'form': form})
-#     else:
-#         form = EditDropPickUserForm(instance = drop_pick_zone_user)
-#         return render(request, 'admin/edit_drop_pick_zone_user.html', {'form': form })
+            phone = form.cleaned_data["phone"]
+            warehouse_id = form.cleaned_data['warehouse']
 
+            user = User.objects.get(id=user_id) 
+            user.phone = phone
+            user.warehouse = warehouse_id  
+            user.modified_by = request.user
+            user.save()
+
+            success_message = f"You have successfully updated {user.name}'s details"
+            return redirect(reverse('warehouse_users') + f"?success_message={success_message}")
+        else:
+            return render(request, 'admin/edit_warehouse_user.html', {'form': form})
+    else:
+        form = EditWarehouseUserForm(instance = obj)
+        return render(request, 'admin/edit_warehouse_user.html', {'form': form })
+
+def edit_courier(request, courier_id):
+    obj = get_object_or_404(User, id=courier_id)
+
+    if request.method == 'POST':
+        form = EditCourierForm(request.POST, instance = obj)
+        if form.is_valid():
+            phone = form.cleaned_data["phone"]
+            warehouse_id = form.cleaned_data['warehouse']
+            address = form.cleaned_data["address"]
+            longitude = request.POST.get('longitude')
+            latitude = request.POST.get('latitude')
+
+            if not longitude or not latitude:
+                address_error = "Something went wrong, re-enter the address."
+                return render(request, 'admin/edit_courier.html', {'form': form, 'address_error': address_error})
+
+            courier = User.objects.get(id=courier_id)
+            courier.phone = phone
+            courier.warehouse = warehouse_id
+            courier.address = address
+            courier.longitude = longitude        
+            courier.latitude = latitude        
+            courier.modified_by = request.user
+            courier.save()
+
+            success_message = f"You have successfully updated {courier.name}'s details"
+            return redirect(reverse('couriers') + f"?success_message={success_message}")
+        else:
+            return render(request, 'admin/edit_courier.html', {'form': form})
+    else:
+        form = EditCourierForm(instance = obj)
+        return render(request, 'admin/edit_courier.html', {'form': form})
+
+def delete_courier(request, courier_id):
+    courier = get_object_or_404(User, id=courier_id, role='courier')
+
+    if request.method == 'POST':
+        courier.delete()
+        return redirect('couriers')
+
+    return redirect('couriers')
 
 def delete_drop_pick_zone_user(request, drop_pick_zone_user_id):
     drop_pick_zone_user = get_object_or_404(User, id=drop_pick_zone_user_id, role='drop_pick_zone')
@@ -851,119 +791,35 @@ def delete_drop_pick_zone_user(request, drop_pick_zone_user_id):
 
     return redirect('drop_pick_users')  # Redirect back to the drop_pick_zones page.
 
-
-def warehouse_users(request):
-    warehouse_users = User.objects.filter(role='warehouse')
-    context = {
-        'warehouse_users': warehouse_users,
-        'success_message': request.GET.get("success_message", "")
-    }
-    return render(request, 'admin/warehouse_users.html', context)
-
-
-def drop_pick_users(request):
-    drop_pick_users = User.objects.filter(role='drop_pick_zone')
-    context = {
-        'drop_pick_users': drop_pick_users,
-        'success_message':request.GET.get("success_message", "")
-    }
-    return render(request, 'admin/drop_pick_users.html', context)
-
-
-# def edit_courier(request, courier_id):
-#     courier = get_object_or_404(User, id=courier_id, role='courier')
-#     warehouses = Warehouse.objects.all()
-
-#     if request.method == 'POST':
-#         # Get form data
-#         name = request.POST.get('name')
-#         username = request.POST.get('username')
-#         phone = request.POST.get('phone')
-#         address = request.POST.get('address')
-
-#         # Update the courier details
-#         courier.name = name
-#         courier.username = username
-#         courier.phone = phone
-#         courier.address = address
-        
-#         # Get the selected warehouse ID from the form data
-#         selected_warehouse_id = request.POST.get('warehouse')
-#         if selected_warehouse_id:
-#             selected_warehouse = get_object_or_404(Warehouse, id=selected_warehouse_id)
-#             courier.warehouse = selected_warehouse
-        
-#         courier.modified_by = request.user
-#         courier.save()
-
-#         return redirect('couriers')
-
-#     context = {
-#         'courier': courier,
-#         'warehouses': warehouses
-#     }
-#     return render(request, 'admin/edit_courier.html', context)
-
-def edit_courier(request, courier_id):
-    courier = get_object_or_404(User, id=courier_id)
+def delete_warehouse_user(request, user_id):
+    user = get_object_or_404(User, id=user_id)
 
     if request.method == 'POST':
-        form = CourierForm(request.POST, instance = courier)
-        if form.is_valid():
-            names = form.cleaned_data["name"].split()
-            name = ' '.join([name.capitalize() for name in names])
-            username = form.cleaned_data["username"]
-            email = form.cleaned_data['email']
-            phone = form.cleaned_data["phone"]
-            warehouse_id = form.cleaned_data['warehouse']
+        # Delete the warehouse user
+        user.delete()
+        return redirect('warehouse_users')
 
-            existing_username = User.objects.filter(username = username).first()
-            existing_email = User.objects.filter(email = email).first()
+    # If the request method is not POST, show the confirmation modal
+    return render(request, 'admin/delete_warehouse_user.html', {'user': user})
 
-            if existing_username:
-                duplicate_username = "username already taken! Please choose another."
-                return render(request, 'admin/edit_courier.html', {'form': form, 'duplicate_username': duplicate_username})
-            
-            if existing_email:
-                duplicate_email = "email already taken! Please choose another."
-                return render(request, 'admin/edit_courier.html', {'form': form, 'duplicate_email': duplicate_email})
-            
-            longitude = request.POST.get('longitude')
-            latitude = request.POST.get('latitude')
-
-            if not longitude or not latitude:
-                address_error = "Something went wrong, re-enter the address."
-                return render(request, 'admin/edit_courier.html', {'form': form, 'address_error': address_error})
-
-            courier = form.save(commit=False)
-            courier.name = name
-            courier.email = email
-            courier.username = username
-            courier.phone = phone
-            courier.warehouse = warehouse_id
-            courier.role = 'courier'
-            courier.password = 'courier@courier'
-            courier.longitude = longitude        
-            courier.latitude = latitude        
-            courier.created_by = request.user
-            courier.save()
-
-            success_message = f"You have successfully updated {courier.name}'s details"
-            return redirect(reverse('couriers') + f"?success_message={success_message}")
-        else:
-            return render(request, 'admin/edit_courier.html', {'form': form})
-    else:
-        form = CourierForm(instance = courier)
-    return render(request, 'admin/edit_courier.html', {'form': form})
-
-def delete_courier(request, courier_id):
-    courier = get_object_or_404(User, id=courier_id, role='courier')
+def delete_warehouse(request, warehouse_id):
+    warehouse = get_object_or_404(Warehouse, id=warehouse_id)
 
     if request.method == 'POST':
-        courier.delete()
-        return redirect('couriers')
+        # Delete the warehouse
+        warehouse.delete()
+        return redirect('warehouses')
 
-    return redirect('couriers')
+    return render(request, 'admin/warehouses.html', {'warehouse': warehouse})
+
+def delete_drop_pick_zone(request, drop_pick_zone_id):
+    drop_pick_zone = get_object_or_404(DropPickZone, id=drop_pick_zone_id)
+    if request.method == 'POST':
+        # Perform the delete operation
+        drop_pick_zone.delete()
+        return redirect('drop_pick_zones')
+
+    return render(request, 'admin/delete_drop_pick_zone.html', {'drop_pick_zone': drop_pick_zone})
 
 
 def package_reports(request):

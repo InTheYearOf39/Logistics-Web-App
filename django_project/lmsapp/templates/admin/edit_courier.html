@@ -12,8 +12,6 @@
     <form class="well form-horizontal" action=" " method="post"  id="contact_form">
       {% csrf_token %}
 
-      {{ form.errors }}
-
 <!-- Form Name -->
 <h5>Edit Courier </h5>
 
@@ -28,12 +26,6 @@
             {{ form.name }}
           </div>
 
-          {% if form.name.errors %}
-          <div class="alert alert-danger  alert-dismissible fade show mt-2" role="alert">{{ form.name.errors }}
-            <button type="button" class="btn-close" data-coreui-dismiss="alert" aria-label="Close"></button>
-          </div>
-          {% endif %}
-
     </div>
 </div>
 
@@ -46,19 +38,6 @@
             <!-- <input name="username" placeholder="Username" class="form-control form-control-sm" type="text" value="{{ courier.username }}"> -->
             {{ form.username }}
           </div>
-      
-          {% if form.username.errors %}
-          <div class="alert alert-danger  alert-dismissible fade show mt-2" role="alert">{{ form.username.errors }}
-            <button type="button" class="btn-close" data-coreui-dismiss="alert" aria-label="Close"></button>
-          </div>
-          {% endif %}
-      
-          {% if duplicate_username %}
-          <div class="alert alert-danger alert-dismissible fade show mt-2" role="alert">
-            {{ duplicate_username }}
-            <button type="button" class="btn-close" data-coreui-dismiss="alert" aria-label="Close"></button>
-          </div>
-          {% endif %}
 
     </div>
 </div>
@@ -72,19 +51,6 @@
   <!-- <input name="email" placeholder="Email" class="form-control form-control-sm" type="email"> -->
   {{ form.email }}
     </div>
-
-    {% if form.email.errors %}
-    <div class="alert alert-danger  alert-dismissible fade show mt-2" role="alert">{{ form.email.errors }}
-      <button type="button" class="btn-close" data-coreui-dismiss="alert" aria-label="Close"></button>
-    </div>
-    {% endif %}
-
-    {% if duplicate_email %}
-    <div class="alert alert-danger alert-dismissible fade show mt-2" role="alert">
-      {{ duplicate_email }}
-      <button type="button" class="btn-close" data-coreui-dismiss="alert" aria-label="Close"></button>
-    </div>
-    {% endif %}
 
   </div>
 </div>

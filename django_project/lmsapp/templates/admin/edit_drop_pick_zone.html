@@ -1,19 +1,17 @@
+<!-- edit_drop_pick_zones.html -->
 {% extends 'dashboard_base.html' %}
-
 {% load static %}
 
-
 {% block content %}
-
 <div class="row">
-<div class="container mb-3">
+<div class="container mb-5">
     <div class="col-md-12">
-    <form class="well form-horizontal" action=" " method="post"  id="contact_form">
+    <form class="well form-horizontal" action="" method="post" id="contact_form">
       {% csrf_token %}
 
-
+      
 <!-- Form Name -->
-<h5>Create Warehouse </h5>
+<h5>Edit Drop-Pick</h5>
 
 <!-- Text input-->
 
@@ -31,13 +29,13 @@
     </div>
     {% endif %}
 
-    {% if duplicate_error %}
+    {% if duplicate_name %}
     <div class="alert alert-danger alert-dismissible fade show mt-2" role="alert">
-      {{ duplicate_error }}
+      {{ duplicate_name }}
       <button type="button" class="btn-close" data-coreui-dismiss="alert" aria-label="Close"></button>
     </div>
     {% endif %}
-    
+
   </div>
 </div>
 
@@ -62,14 +60,12 @@
       <button type="button" class="btn-close" data-coreui-dismiss="alert" aria-label="Close"></button>
     </div>
     {% endif %}
-    </div>
   </div>
-
+</div>
 
 <input id="latitude" name="latitude" placeholder="latitude" class="form-control" type="text" hidden>
 
 <input id="longitude" name="longitude" placeholder="longitude" class="form-control" type="text" hidden>
-
 
 <!-- Text input-->
        
@@ -82,42 +78,65 @@
   {{ form.phone }}
     </div>
     {% if form.phone.errors %}
-    <div class="alert alert-danger  alert-dismissible fade show mt-2" role="alert">{{form.phone.errors}}
+    <div class="alert alert-danger  alert-dismissible fade show mt-2" role="alert">{{ form.phone.errors }}
       <button type="button" class="btn-close" data-coreui-dismiss="alert" aria-label="Close"></button>
-    </div> 
-    {% endif %}
     </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Select Basic -->
+   
+<div class="form-group mt-2"> 
+  <label class="col-md-6 control-label">Warehouse</label>
+    <div class="col-md-6 selectContainer">
+    <div class="input-group">
+        <span class="input-group-text">🏬</span>
+        {{ form.warehouse }}
+
+
+        {% comment %}
+        <select name="warehouse" class="form-control form-control-sm selectpicker">
+          <option value="">Please select warehouse</option>  
+          {% for warehouse in warehouses %}
+            <option value="{{ warehouse.id }}">{{ warehouse.name }}</option>
+          {% endfor %}
+        </select>
+        {% endcomment %}
   </div>
 
-
+  {% if form.warehouse.errors %}
+  <div class="alert alert-danger  alert-dismissible fade show mt-2" role="alert">{{ form.warehouse.errors }}
+    <button type="button" class="btn-close" data-coreui-dismiss="alert" aria-label="Close"></button>
+  </div>
+  {% endif %}
+</div>
+</div>
 
 <!-- Text input-->
 <div class="form-group mt-2">
-  <label class="col-md-6 control-label">Tag</label>  
-    <div class="col-md-6 inputGroupContainer">
-    <div class="input-group">
-        <span class="input-group-text">🏷️</span>
-  <!-- <input name="tag" placeholder="Tag alias" class="form-control form-control-sm" type="text"> -->
-  {{ form.tag }}
-    </div>
-    {% if form.tag.errors %}
-    <div class="alert alert-danger alert-dismissible fade show mt-2" role="alert">
-      {{ form.tag.errors }}
-      <button type="button" class="btn-close" data-coreui-dismiss="alert" aria-label="Close"></button>
-    </div>
-    {% endif %}
+    <label class="col-md-6 control-label">Tag</label>  
+      <div class="col-md-6 inputGroupContainer">
+      <div class="input-group">
+          <span class="input-group-text">🏷️</span>
+    <!-- <input name="tag" placeholder="Tag alias" class="form-control form-control-sm" type="text"> -->
+    {{ form.tag }}
+      </div>
+      {% if form.tag.errors %}
+      <div class="alert alert-danger  alert-dismissible fade show mt-2" role="alert">{{ form.tag.errors }}
+        <button type="button" class="btn-close" data-coreui-dismiss="alert" aria-label="Close"></button>
+      </div>
+      {% endif %}
 
-    {% if duplicate_error %}
+      {% if duplicate_tag %}
     <div class="alert alert-danger alert-dismissible fade show mt-2" role="alert">
-      {{ duplicate_error }}
+      {{ duplicate_tag }}
       <button type="button" class="btn-close" data-coreui-dismiss="alert" aria-label="Close"></button>
     </div>
     {% endif %}
+    
     </div>
   </div>
-
-
-<!-- Text input-->
 
 <!-- Success message -->
 <!-- <div class="alert alert-success" role="alert" id="success_message">Success <i class="glyphicon glyphicon-thumbs-up"></i> Thanks for contacting us, we will get back to you shortly.</div> -->
@@ -126,39 +145,29 @@
 <div class="form-group mt-2">
   <label class="col-md-6 control-label"></label>
   <div class="col-md-6">
-    <button type="submit" class="btn btn-primary btn-sm text-white" >Create <span class="glyphicon glyphicon-send"></span></button>
+    <button type="submit" class="btn btn-primary btn-sm text-white" >Update <span class="glyphicon glyphicon-send"></span></button>
   </div>
 </div>
 
 
 </form>
     </div>
+  </div>
 </div>
-</div>
-    <!-- /.container -->
+<!-- /.container -->
 
-    <script>
-      //load after page loads
-      $(function () { 
+<script>
+  //load after page loads
+  $(function () { 
+    //initiate auto complete 
+    var from_autocomplete = new google.maps.places.Autocomplete($("#address")[0], {});
 
-        //initiate auto complete 
-      var from_autocomplete = new google.maps.places.Autocomplete($("#address")[0], {});
-
-      google.maps.event.addListener(from_autocomplete, 'place_changed', function() {
+    google.maps.event.addListener(from_autocomplete, 'place_changed', function() {
       var place = from_autocomplete.getPlace();
-      //console.log(place);
-      //console.log("latitude:"+place.geometry.location.lat());
-      //console.log("longitude:"+place.geometry.location.lng());
-      //set values into the feilds
       $("#latitude").val(place.geometry.location.lat());
       $("#longitude").val(place.geometry.location.lng());
-
-
-      });
-
-       
-      });
-    </script>
-
+    });
+  });
+</script>
 
 {% endblock %}

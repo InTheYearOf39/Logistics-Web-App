@@ -23,6 +23,8 @@
                   <tr>
                     <th>Name</th>
                     <th>Username</th>
+                    <th>Email</th>
+                    <th>Contact</th>
                     <th>Warehouse</th>
                     <th></th>
                   </tr>
@@ -35,6 +37,12 @@
                     </td>
                     <td class="text-start">
                       <div class="small text-medium-emphasis"><span>{{ user.username }}</span></div>
+                    </td>
+                    <td class="text-start">
+                      <div class="small text-medium-emphasis"><span>{{ user.email }}</span></div>
+                    </td>
+                    <td class="text-start">
+                      <div class="small text-medium-emphasis"><span>{{ user.phone }}</span></div>
                     </td>
                     <td class="text-start">
                       <div class="small text-medium-emphasis"><span>{{ user.warehouse.name }}</span></div>

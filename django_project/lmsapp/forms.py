@@ -550,6 +550,50 @@ class EditDropPickUserForm(forms.ModelForm):
         fields = ['phone',  'drop_pick_zone', 'email', 'username', 'name']
 
 
+class EditCourierForm(forms.ModelForm):
+    name = forms.CharField(
+        widget = forms.TextInput(attrs={'class': 'form-control form-control-sm bg-light', 'name': 'name', 'id': 'name', 'placeholder': 'Name', 'readonly': True })
+        )
+    
+    username = forms.CharField(
+        widget = forms.TextInput(attrs={'class': 'form-control form-control-sm bg-light', 'name': 'username', 'id': 'username', 'placeholder': 'Username', 'readonly': True })
+        )  
+
+    email = forms.CharField(
+        widget = forms.EmailInput(attrs={'class': 'form-control form-control-sm bg-light', 'name': 'email', 'id': 'email', 'placeholder': 'Email', 'readonly': True })
+    ) 
+
+    phone = forms.CharField(
+        required = True,
+        validators = [
+        RegexValidator(
+            regex = r'^0\d{9}$',
+            message = 'Enter a valid phone number with 10 digits.'
+            )],
+        widget=forms.TextInput(attrs={'class': 'form-control form-control-sm', 'name': 'phone', 'id': 'phone', 'placeholder': 'Phone number' })
+        )
+    
+    address = forms.CharField(
+        required = True,
+        validators=[
+        MinLengthValidator(3, message='Address should have at least 3 characters.'),
+        MaxLengthValidator(200, message='Address cannot have more than 200 characters.')
+            ],
+        widget=forms.TextInput(attrs={'class': 'form-control form-control-sm', 'id': 'address', 'name': 'address', 'placeholder': 'Address'})
+        ) 
+    
+    warehouse = forms.ModelChoiceField(
+        required = True,
+        queryset = Warehouse.objects.all(),
+        empty_label = "Please select a warehouse",
+        widget = forms.Select(attrs={'class': 'form-control form-control-sm selectpicker'})
+    )
+
+    class Meta:
+        model = User
+        fields = ['name', 'username', 'phone', 'address', 'warehouse', 'email']
+
+
 class ChangePasswordForm(SetPasswordForm):
     error_messages = {
         'password_mismatch': _("The two password fields didn't match."),
