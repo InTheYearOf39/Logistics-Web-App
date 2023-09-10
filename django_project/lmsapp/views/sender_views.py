@@ -137,19 +137,12 @@ def register_package(request):
 
             return redirect('sender_dashboard')
         else:
-            error_message = 'Error processing your request'
+            form = PackageForm()
+            return render(request, 'sender/register_package.html', {'form': form, 'api_key': google_api_key})
     else:
         form = PackageForm()
-        error_message = None
-    
-        context = {
-            'form': form, 
-            'error_message': error_message, 
-            # 'drop_pick_zones': drop_pick_zones, 
-            'api_key': google_api_key
-        }
+        return render(request, 'sender/register_package.html', {'form': form, 'api_key': google_api_key})
 
-        return render(request, 'sender/register_package.html', context)
 
 # def register_package(request):
 #     google_api_key = settings.API_KEY
