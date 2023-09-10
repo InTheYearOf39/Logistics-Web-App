@@ -7,6 +7,7 @@ from django.contrib.auth.forms import SetPasswordForm
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
 from django.core.validators import EmailValidator, RegexValidator, MinLengthValidator, MaxLengthValidator
+import re
 
 class LoginForm(forms.Form):
     username = forms.CharField(
@@ -86,50 +87,58 @@ class SignUpForm(UserCreationForm):
         fields = ('name', 'username', 'email', 'password1', 'password2', 'tag')
 
 
+def validate_not_entirely_numeric(value):
+    if value.isdigit():
+        raise ValidationError("Package name cannot be entirely numeric.")
+    
+
 class PackageForm(forms.ModelForm):
 
-    class Meta:
-        model = Package
-        fields = ['packageName', 'deliveryType', 'dropOffLocation', 'packageDescription', 'recipientName', 'recipientAddress', 'sendersAddress', 'recipientEmail', 'recipientTelephone', 'recipientPickUpLocation', 'recipientIdentification', 'genderType', 'sendersContact', 'deliveryFee', 'sendersName', 'sendersEmail', 'warehouse', 'user']
-        widgets = {
-            'packageName': forms.TextInput(attrs={'class': 'form-control'}),
-            'deliveryType': forms.TextInput(attrs={'class': 'form-control'}),
-            'dropOffLocation': forms.TextInput(attrs={'class': 'form-control form-control-sm'}),
-            'recipientPickUpLocation': forms.TextInput(attrs={'class': 'form-control'}),
-            'packageDescription': forms.TextInput(attrs={'class': 'form-control'}),
-            'recipientName': forms.TextInput(attrs={'class': 'form-control'}),
-            'recipientEmail': forms.TextInput(attrs={'class': 'form-control'}),
-            'recipientTelephone': forms.TextInput(attrs={'class': 'form-control'}),
-            'recipientAddress': forms.TextInput(attrs={'class': 'form-control'}),
-            'recipientIdentification': forms.TextInput(attrs={'class': 'form-control'}),
-            'deliveryFee': forms.TextInput(attrs={'class': 'form-control form-control-sm'}),
-            'genderType': forms.TextInput(attrs={'class': 'form-control'}),
-            'sendersName': forms.TextInput(attrs={'class': 'form-control form-control-sm'}),
-            'sendersEmail': forms.TextInput(attrs={'class': 'form-control'}),
-            'sendersAddress': forms.TextInput(attrs={'class': 'form-control form-control-sm'}),
-            'sendersContact': forms.TextInput(attrs={'class': 'form-control'}),
-            'warehouse': forms.TextInput(attrs={'class': 'form-control form-control-sm'}),
-        }
+    DELIVERY_TYPE_CHOICES = [
+        ('', '-- Select Delivery Type --'),
+        ('standard', 'Standard'),
+        ('premium', 'Premium'),
+        ('express', 'Express'),
+    ]
+
+    GENDER_TYPE_CHOICES = [
+        ('', '-- Select Gender --' ),
+        ('male', 'Male'),
+        ('female', 'Female'),
+    ]
 
     packageName = forms.CharField(
         required = True,
         validators=[
             MinLengthValidator(3, message='Package name should have at least 3 characters.'),
-            MaxLengthValidator(100, message='Package name cannot have more than 100 characters.')
-        ]
+            MaxLengthValidator(100, message='Package name cannot have more than 100 characters.'),
+            RegexValidator(regex=re.compile(r'(.*[a-zA-Z0-9]){2,}'), message='Package name cannot be entirely special characters.'), 
+            validate_not_entirely_numeric
+        ],
+        widget = forms.TextInput(attrs={'class': 'form-control form-control-sm', 'id': 'packageName', 'name': 'packageName', 'placeholder': 'Package Name'})
     )
 
     packageDescription = forms.CharField(
         required = True,
         validators=[
-            MinLengthValidator(3, message='Package description should have at least 3 characters.'),
-            MaxLengthValidator(500, message='Package description cannot have more than 100 characters.')
-        ]
+            MinLengthValidator(5, message='Package description should have at least 5 characters.'),
+            MaxLengthValidator(500, message='Package description cannot have more than 100 characters.'),
+            validate_not_entirely_numeric
+        ],
+        widget=forms.Textarea(attrs={'class': 'form-control form-control-sm', 'style': 'resize: vertical; height: 60px;', 'id': 'packageDescription', 'name': 'packageDescription', 'placeholder': 'Enter Description'}),
     )
 
     deliveryType = forms.ChoiceField(
         required = True,
-        choices=Package.DELIVERY_CHOICES,
+        choices=DELIVERY_TYPE_CHOICES,
+        widget = forms.Select(attrs={'class': 'form-select form-select-sm selectpicker', 'id': 'deliveryType', 'name': 'deliveryType' }),
+    )
+
+    dropOffLocation = forms.ModelChoiceField(
+        required = False,
+        queryset = DropPickZone.objects.all(),
+        empty_label = "-- Select Drop Off Location --",
+        widget = forms.Select(attrs={'class': 'form-control form-control-sm selectpicker', 'id': 'dropOffLocation', 'name': 'dropOffLocation'})
     )
 
     recipientName = forms.CharField(
@@ -137,70 +146,123 @@ class PackageForm(forms.ModelForm):
         validators=[
             MinLengthValidator(3, message='recipient name should have at least 3 characters.'),
             MaxLengthValidator(100, message='recipient name cannot have more than 100 characters.')
-        ]
+        ],
+        widget = forms.TextInput(attrs={'class': 'form-control form-control-sm', 'id': 'recipientName', 'name': 'recipientName', 'placeholder': 'Recipient Name'})
     )
 
     recipientEmail = forms.CharField(
-        validators=[EmailValidator(message='Please enter a valid email address.')]
+        required = False,
+        validators=[EmailValidator(message='Please enter a valid email address.')],
+        widget = forms.TextInput(attrs={'class': 'form-control form-control-sm', 'id': 'recipientEmail', 'name': 'recipientEmail', 'placeholder': 'Recipient Email'})
     )
 
     recipientTelephone = forms.CharField(
         required = True,
         validators=[
             RegexValidator(
-                regex=r'^\+?\d{9,15}$',
-                message='Please enter a valid phone number.'
+                regex=r'^0\d{9}$',
+                message='Please enter a valid ten-digit telephone number'
             )
-        ]
+        ],
+        widget = forms.TextInput(attrs={'class': 'form-control form-control-sm', 'id': 'recipientTelephone', 'name': 'recipientTelephone', 'placeholder': 'Recipient Telephone'})
     )
 
     recipientAddress = forms.CharField(
+        required = True,
         validators=[
-            MinLengthValidator(10, message='Recipient address should have at least 10 characters.'),
+            MinLengthValidator(4, message='Recipient address should have at least 4 characters.'),
             MaxLengthValidator(200, message='Recipient address cannot have more than 200 characters.')
-        ]
+        ],
+        widget = forms.TextInput(attrs={'class': 'form-control form-control-sm', 'id': 'recipientAddress', 'name': 'recipientAddress', 'placeholder': 'Recipient Address', 'onkeyup': 'calculateDeliveryFee()' })
     )
 
     recipientIdentification = forms.CharField(
+        required = False,
         validators=[
             MinLengthValidator(5, message='Recipient identification should have at least 5 characters.'),
             MaxLengthValidator(50, message='Recipient identification cannot have more than 50 characters.')
-        ]
+        ],
+        widget = forms.TextInput(attrs={'class': 'form-control form-control-sm', 'id': 'recipientIdentification', 'name': 'recipientIdentification', 'placeholder':'Enter Recipient ID' })
     )
 
     genderType = forms.ChoiceField(
-        required = True,
-        choices=Package.DELIVERY_CHOICES,
+        required = False,
+        choices=GENDER_TYPE_CHOICES,
+        widget = forms.Select(attrs={'class': 'form-control form-control-sm', 'id': 'genderType', 'name': 'genderType'})
     )
 
     sendersName = forms.CharField(
-        required = True,
+        required = False,
         validators=[
             MinLengthValidator(3, message='recipient name should have at least 3 characters.'),
             MaxLengthValidator(100, message='recipient name cannot have more than 100 characters.')
-        ]
+        ],
+        widget = forms.TextInput(attrs={'class': 'form-control form-control-sm', 'id': 'sendersName', 'name': 'sendersName', 'placeholder': "Sender's Name" })
     )
 
     sendersEmail = forms.CharField(
-        validators=[EmailValidator(message='Please enter a valid email address.')]
+        required = False,
+        validators=[EmailValidator(message='Please enter a valid email address.')],
+        widget = forms.TextInput(attrs={'class': 'form-control form-control-sm', 'id': 'senderEmail', 'name': 'senderEmail', 'placeholder': "Sender's Email"})
     )
 
     sendersContact = forms.CharField(
         required = True,
         validators=[
             RegexValidator(
-                regex=r'^\+?\d{9,15}$',
-                message='Please enter a valid phone number.'
+                regex=r'^0\d{9}$',
+                message='Please enter a valid ten-digit telephone number'
             )
-        ]
+        ],
+        widget = forms.TextInput(attrs={'class': 'form-control form-control-sm', 'id': 'sendersContact', 'name': 'sendersContact', 'placeholder': 'Sender Contact'})
     )
 
     sendersAddress = forms.CharField(
+        required = False,
         validators=[
-            MinLengthValidator(10, message='sender address should have at least 10 characters.'),
+            MinLengthValidator(4, message='sender address should have at least 4 characters.'),
             MaxLengthValidator(200, message='sender address cannot have more than 200 characters.')
-        ]
+        ],
+        widget = forms.TextInput(attrs={'class': 'form-control form-control-sm', 'id': 'senderAddress', 'name': 'senderAddress', 'placeholder': "Sender's Address",'onkeyup': 'calculateDeliveryFee()'})
     )
+
+    recipientPickUpLocation = forms.ModelChoiceField(
+        required = False,
+        queryset = DropPickZone.objects.all(),
+        empty_label = "-- Select Recipient Pick-up Location --",
+        widget = forms.Select(attrs={'class': 'form-control form-control-sm', 'id': 'recipientPickUpLocation', 'name': 'recipientPickUpLocation' })
+    )
+
+    deliveryFee = forms.CharField(
+        required = False,
+        widget=forms.TextInput(attrs={'class': 'form-control form-control-sm', 'id': 'deliveryFeeInput', 'name': 'deliveryFee','placeholder': 'Delivery Fee', 'disabled': True })
+    )
+
+
+    def clean(self):
+        cleaned_data = super().clean()
+        delivery_type = cleaned_data.get('deliveryType')
+        recipient_pick_up_location = cleaned_data.get('recipientPickUpLocation')
+        # drop_off_location = cleaned_data.get('dropOffLocation')
+
+        # if delivery_type == 'standard' and not drop_off_location:
+        #     self.add_error('dropOffLocation', "Drop off location is required for standard delivery.")
+
+        if delivery_type == 'standard' and not recipient_pick_up_location:
+            self.add_error('recipientPickUpLocation', "Pick Up location is required for standard delivery.")
+
+        return cleaned_data
+
+    class Meta:
+        model = Package
+        fields = [
+                  'packageName', 'deliveryType', 'dropOffLocation', 'packageDescription', 'recipientName', 
+                  'recipientAddress', 'sendersAddress', 'recipientEmail', 'recipientTelephone', 'recipientPickUpLocation',
+                  'recipientIdentification', 'genderType', 'sendersContact', 'deliveryFee', 'sendersName', 'sendersEmail', 
+                  'warehouse', 'user',
+                  ]
+        widgets = {'warehouse': forms.TextInput(attrs={'class': 'form-control form-control-sm'})}
+
 
     
 class WarehouseCreationForm(forms.ModelForm):
@@ -232,7 +294,7 @@ class WarehouseCreationForm(forms.ModelForm):
         validators=[
         RegexValidator(
         regex=r'^0\d{9}$',
-        message='Enter a valid phone number with 10 digits.'
+        message='Please enter a valid ten-digit telephone number'
         )],
         widget=forms.TextInput(attrs={'class': 'form-control form-control-sm', 'name': 'phone', 'placeholder': 'Phone number' })
         )
@@ -290,7 +352,7 @@ class DropPickCreationForm(forms.ModelForm):
         validators=[
         RegexValidator(
         regex=r'^0\d{9}$',
-        message='Enter a valid phone number with 10 digits.'
+        message='Please enter a valid ten-digit telephone number'
         )],
         widget=forms.TextInput(attrs={'class': 'form-control form-control-sm', 'name': 'phone', 'placeholder': 'Phone number' })
         )
@@ -356,7 +418,7 @@ class WarehouseUserForm(forms.ModelForm):
         validators = [
         RegexValidator(
         regex = r'^0\d{9}$',
-        message = 'Enter a valid phone number with 10 digits.'
+        message = 'Please enter a valid ten-digit telephone number'
         )],
         widget=forms.TextInput(attrs={'class': 'form-control form-control-sm', 'name': 'phone', 'placeholder': 'Phone number' })
         )
@@ -408,7 +470,7 @@ class DropPickUserForm(forms.ModelForm):
         validators = [
         RegexValidator(
         regex = r'^0\d{9}$',
-        message = 'Enter a valid phone number with 10 digits.'
+        message = 'Please enter a valid ten-digit telephone number'
         )],
         widget=forms.TextInput(attrs={'class': 'form-control form-control-sm', 'name': 'phone', 'placeholder': 'Phone number' })
         )
@@ -454,7 +516,7 @@ class CourierForm(forms.ModelForm):
         validators = [
         RegexValidator(
             regex = r'^0\d{9}$',
-            message = 'Enter a valid phone number with 10 digits.'
+            message = 'Please enter a valid ten-digit telephone number'
             )],
         widget=forms.TextInput(attrs={'class': 'form-control form-control-sm', 'name': 'phone', 'id': 'phone', 'placeholder': 'Phone number' })
         )
@@ -505,7 +567,7 @@ class EditWarehouseUserForm(forms.ModelForm):
         validators = [
         RegexValidator(
         regex = r'^0\d{9}$',
-        message = 'Enter a valid phone number with 10 digits.'
+        message = 'Please enter a valid ten-digit telephone number'
         )],
         widget=forms.TextInput(attrs={'class': 'form-control form-control-sm', 'name': 'phone', 'placeholder': 'Phone number' })
         )
@@ -539,7 +601,7 @@ class EditDropPickUserForm(forms.ModelForm):
         validators = [
         RegexValidator(
         regex = r'^0\d{9}$',
-        message = 'Enter a valid phone number with 10 digits.'
+        message = 'Please enter a valid ten-digit telephone number'
         )],
         widget=forms.TextInput(attrs={'class': 'form-control form-control-sm', 'name': 'phone', 'placeholder': 'Phone number' })
         )
@@ -568,7 +630,7 @@ class EditCourierForm(forms.ModelForm):
         validators = [
         RegexValidator(
             regex = r'^0\d{9}$',
-            message = 'Enter a valid phone number with 10 digits.'
+            message = 'Please enter a valid ten-digit telephone number'
             )],
         widget=forms.TextInput(attrs={'class': 'form-control form-control-sm', 'name': 'phone', 'id': 'phone', 'placeholder': 'Phone number' })
         )

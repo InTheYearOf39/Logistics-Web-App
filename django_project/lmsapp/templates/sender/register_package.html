@@ -15,57 +15,83 @@
               
 
               <div class="col-md-4">
-                <label for="sendersAddress" class="form-label form-label-sm"> Sender's Address</label>
-                <input id="senderAddress" name="sendersAddress" placeholder="Sender's Address" class="form-control form-control-sm" type="text" onkeyup="calculateDeliveryFee()" required>
-                <div class="invalid-feedback">
-                  Please enter your shipping address.
+                <label for="sendersAddress" class="form-label form-label-sm"> Sender's Address<span class="text-danger">*</span></label>
+                <!-- <input id="senderAddress" name="sendersAddress" placeholder="Sender's Address" class="form-control form-control-sm" type="text" onkeyup="calculateDeliveryFee()" required> -->
+                {{ form.sendersAddress}}
+                
+                {% if form.sendersAddress.errors %}
+                <div class="alert alert-danger  alert-dismissible fade show mt-2" role="alert">{{ form.sendersAddress.errors }}
+                  <button type="button" class="btn-close" data-coreui-dismiss="alert" aria-label="Close"></button>
                 </div>
+                {% endif %}
+
               </div>
 
               <div class="col-md-4">
-                <label for="sendersContact" class="form-label form-label-sm"> Sender's Contact</label>
-                <input id="senderContact" name="sendersContact" placeholder="Sender Contact" class="form-control form-control-sm" type="tel" required>
-                <div class="invalid-feedback">
-                  Please enter your Contact.
+                <label for="sendersContact" class="form-label form-label-sm"> Sender's Contact<span class="text-danger">*</span></label>
+                <!-- <input id="senderContact" name="sendersContact" placeholder="Sender Contact" class="form-control form-control-sm" type="tel" required> -->
+                {{ form.sendersContact }}
+                
+                {% if form.sendersContact.errors %}
+                <div class="alert alert-danger  alert-dismissible fade show mt-2" role="alert">{{ form.sendersContact.errors }}
+                  <button type="button" class="btn-close" data-coreui-dismiss="alert" aria-label="Close"></button>
                 </div>
+                {% endif %}
+
               </div>
 
               <div class="form-group col-md-4">
-                <label for="packageName" class="form-label">Package Name</label>
-                <input type="text" class="form-control form-control-sm" id="packageName" name="packageName" placeholder="Package Name" value="" required>
-                <div class="invalid-feedback">
-                  Valid Package name is required.
+                <label for="packageName" class="form-label">Package Name<span class="text-danger">*</span></label>
+                <!-- <input type="text" class="form-control form-control-sm" id="packageName" name="packageName" placeholder="Package Name" value="" required> -->
+                {{ form.packageName }}
+                
+                {% if form.packageName.errors %}
+                <div class="alert alert-danger  alert-dismissible fade show mt-2" role="alert">{{ form.packageName.errors }}
+                  <button type="button" class="btn-close" data-coreui-dismiss="alert" aria-label="Close"></button>
                 </div>
+                {% endif %}
+                
               </div>
 
               <div class="col-md-12">
-                <label for="packageDescripton" class="form-label form-label-sm">Package Description</label>
+                <label for="packageDescripton" class="form-label form-label-sm">Package Description<span class="text-danger">*</span></label>
                 <div class="input-group has-validation">
                   <!-- <input type="text" class="form-control form-control-sm" id="packageDescription" name="packageDescription" placeholder="Enter Description" required> -->
-                  <textarea id="packageDescription" name="packageDescription" placeholder="Enter Description" class="form-control form-control-sm" required></textarea>
-
-                  <div class="invalid-feedback">
-                  Package Description is required.
-                  </div>
+                  <!-- <textarea id="packageDescription" name="packageDescription" placeholder="Enter Description" class="form-control form-control-sm" required></textarea> -->
+                  {{ form.packageDescription }}
+                  
                 </div>
+
+                {% if form.packageDescription.errors %}
+                <div class="alert alert-danger  alert-dismissible fade show mt-2" role="alert">{{ form.packageDescription.errors }}
+                  <button type="button" class="btn-close" data-coreui-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endif %}
+
               </div>
 
               <div class="form-group col-md-3">
-                <label for="deliveryType" class="form-label form-label-sm">Delivery Type</label>
-                <select class="form-select form-select-sm" id="deliveryType" name="deliveryType" required>
+                <label for="deliveryType" class="form-label form-label-sm">Delivery Type<span class="text-danger">*</span></label>
+                <!-- <select class="form-select form-select-sm" id="deliveryType" name="deliveryType" required>
                   <option value="" selected disabled> -- Select Delivery Type -- </option>
                   <option value="standard">Standard</option>
                   <option value="premium">Premium</option>
                   <option value="express">Express</option>
-                </select>
-                <div class="invalid-feedback">
-                  Please select a delivery type.
+                </select> -->
+
+                {{ form.deliveryType }}
+
+                {% if form.deliveryType.errors %}
+                <div class="alert alert-danger  alert-dismissible fade show mt-2" role="alert">{{ form.deliveryType.errors }}
+                  <button type="button" class="btn-close" data-coreui-dismiss="alert" aria-label="Close"></button>
                 </div>
+                {% endif %}
+
               </div>
 
               <div class="col-md-9" id="dropOffLocationContainer">
                 <label for="dropOffLocation" class="form-label form-label-sm">Drop Off Location</label>
-                <select class="form-control form-control-sm" id="dropOffLocation" name="dropOffLocation" required>
+                <!-- <select class="form-control form-control-sm" id="dropOffLocation" name="dropOffLocation" required>
                   <option value="" selected disabled>-- Select Drop Off Location --</option>
                   {% for drop_pick_zone in drop_pick_zones %}
                     <option value="{{ drop_pick_zone.id }}">{{ drop_pick_zone.name }}</option>
@@ -73,7 +99,16 @@
                 </select>
                 <div class="invalid-feedback">
                   Please select a delivery location.
-                </div>              
+                </div>               -->
+
+                {{ form.dropOffLocation }}
+
+                {% if form.dropOffLocation.errors %}
+                <div class="alert alert-danger  alert-dismissible fade show mt-2" role="alert">{{ form.dropOffLocation.errors }}
+                  <button type="button" class="btn-close" data-coreui-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endif %}
+
               </div>
 
             </div>
@@ -86,80 +121,127 @@
             
           
             <div class="col-md-4">
-              <label for="recipientName" class="form-label form-label-sm">Recipient Name</label>
+              <label for="recipientName" class="form-label form-label-sm">Recipient Name<span class="text-danger">*</span></label>
               <div class="input-group has-validation">
-                <input type="text" class="form-control form-control-sm" id="recipientName" name="recipientName" placeholder="Recipient Name" required>
-              <div class="invalid-feedback">
-                  Recipient Name is required.
-                </div>
+                <!-- <input type="text" class="form-control form-control-sm" id="recipientName" name="recipientName" placeholder="Recipient Name" required> -->
+                {{ form.recipientName }}
+
               </div>
+
+              {% if form.recipientName.errors %}
+              <div class="alert alert-danger  alert-dismissible fade show mt-2" role="alert">{{ form.recipientName.errors }}
+                <button type="button" class="btn-close" data-coreui-dismiss="alert" aria-label="Close"></button>
+              </div>
+              {% endif %}
+
             </div>
 
             <div class="col-md-4">
               <label for="recipientEmail" class="form-label form-label-sm">Recipient Email</label>
               <div class="input-group has-validation">
-                <input type="email" class="form-control form-control-sm" id="recipientEmail" name="recipientEmail" placeholder="Recipient Email">
-              <div class="invalid-feedback">
-                  Recipient Email is required.
-                </div>
+                <!-- <input type="email" class="form-control form-control-sm" id="recipientEmail" name="recipientEmail" placeholder="Recipient Email"> -->
+                {{ form.recipientEmail }}
+
               </div>
+
+              {% if form.recipientEmail.errors %}
+              <div class="alert alert-danger  alert-dismissible fade show mt-2" role="alert">{{ form.recipientEmail.errors }}
+                <button type="button" class="btn-close" data-coreui-dismiss="alert" aria-label="Close"></button>
+              </div>
+              {% endif %}
+
             </div>
 
             <div class="col-md-4">
-              <label for="recipientTelephone" class="form-label form-label-sm">Recipient Telephone</label>
+              <label for="recipientTelephone" class="form-label form-label-sm">Recipient Telephone<span class="text-danger">*</span></label>
+              
               <div class="input-group has-validation">
-                <input type="tel" class="form-control form-control-sm" id="recipientTelephone" name="recipientTelephone" placeholder="Recipient Telephone" pattern="[0-9]{10}" required>
-                <div class="invalid-feedback">
-                  Please enter a valid ten-digit telephone number.
-                </div>
+                <!-- <input type="tel" class="form-control form-control-sm" id="recipientTelephone" name="recipientTelephone" placeholder="Recipient Telephone" pattern="[0-9]{10}" required> -->
+                {{ form.recipientTelephone }}
+
               </div>
+
+              {% if form.recipientTelephone.errors %}
+              <div class="alert alert-danger  alert-dismissible fade show mt-2" role="alert">{{ form.recipientTelephone.errors }}
+                <button type="button" class="btn-close" data-coreui-dismiss="alert" aria-label="Close"></button>
+              </div>
+              {% endif %}
+
             </div>
 
             <div class="col-md-6">
-              <label for="recipientAddress" class="form-label form-label-sm">Recipient Address</label>
-              <input id="recipientAddress" name="recipientAddress" placeholder="Recipient Address" class="form-control form-control-sm" type="text" onkeyup="calculateDeliveryFee()" required>
-              <div class="invalid-feedback">
-                Please enter a valid email address for shipping updates.
+              <label for="recipientAddress" class="form-label form-label-sm">Recipient Address<span class="text-danger">*</span></label>
+              <!-- <input id="recipientAddress" name="recipientAddress" placeholder="Recipient Address" class="form-control form-control-sm" type="text" onkeyup="calculateDeliveryFee()" required> -->
+              {{ form.recipientAddress }}
+
+              {% if form.recipientAddress.errors %}
+              <div class="alert alert-danger  alert-dismissible fade show mt-2" role="alert">{{ form.recipientAddress.errors }}
+                <button type="button" class="btn-close" data-coreui-dismiss="alert" aria-label="Close"></button>
               </div>
+              {% endif %}
+
             </div>
 
             <div class="col-md-4">
               <label for="recipientIdentification" class="form-label form-label-sm">National ID/Passport</label>
-              <input id="recipientIdentification" name="recipientIdentification" placeholder="Enter Recipient Id" class="form-control form-control-sm" type="text">
-              <div class="invalid-feedback">
-                Please enter a valid email address for shipping updates.
+              <!-- <input id="recipientIdentification" name="recipientIdentification" placeholder="Enter Recipient Id" class="form-control form-control-sm" type="text"> -->
+              {{ form.recipientIdentification }}
+
+              {% if form.recipientIdentification.errors %}
+              <div class="alert alert-danger  alert-dismissible fade show mt-2" role="alert">{{ form.recipientIdentification.errors }}
+                <button type="button" class="btn-close" data-coreui-dismiss="alert" aria-label="Close"></button>
               </div>
+              {% endif %}
+
             </div>
 
             <div class="form-group col-md-2">
-              <label for="genderType" class="form-label form-label-sm">Gender</label>
-              <select class="form-select form-select-sm" id="genderType" name="genderType">
+              <label for="genderType" class="form-label form-label-sm">Recipient Gender</label>
+              <!-- <select class="form-select form-select-sm" id="genderType" name="genderType">
                 <option value="" selected disabled> -- Select Gender -- </option>
                 <option value="female">Female</option>
                 <option value="male">Male</option>
-              </select>
-              <div class="invalid-feedback">
-                Please select a Gender.
+              </select> -->
+              {{ form.genderType }}
+
+              {% if form.genderType.errors %}
+              <div class="alert alert-danger  alert-dismissible fade show mt-2" role="alert">{{ form.genderType.errors }}
+                <button type="button" class="btn-close" data-coreui-dismiss="alert" aria-label="Close"></button>
               </div>
+              {% endif %}
+
             </div>
 
-            <!-- Add this new <div> for the recipient drop-off location -->
+            
               <div class="col-md-6" id="recipientPickUpLocationContainer">
                 <label for="recipientPickUpLocation" class="form-label form-label-sm">Recipient Pick-up Location</label>
-                <select class="form-control form-control-sm" id="recipientPickUpLocation" name="recipientPickUpLocation" required>
+                <!-- <select class="form-control form-control-sm" id="recipientPickUpLocation" name="recipientPickUpLocation" required>
                   <option value="" selected disabled>-- Select Recipient Pick-up Location --</option>
                   {% for drop_pick_zone in drop_pick_zones %}
                     <option value="{{ drop_pick_zone.id }}">{{ drop_pick_zone.name }}</option>
                   {% endfor %}
-                </select>
-                <div class="invalid-feedback">
-                  Please select a recipient pick-up location.
+                </select> -->
+                {{ form.recipientPickUpLocation }}
+
+                {% if form.recipientPickUpLocation.errors %}
+                <div class="alert alert-danger  alert-dismissible fade show mt-2" role="alert">{{ form.recipientPickUpLocation.errors }}
+                  <button type="button" class="btn-close" data-coreui-dismiss="alert" aria-label="Close"></button>
                 </div>
+                {% endif %}
+
               </div>
 
               <div class="col-md-6" id="deliveryFee">
                 <label for="deliveryFee" class="form-label form-label-sm">Delivery Fee</label>
-                <input id="deliveryFeeInput" name="deliveryFee" placeholder="Delivery Fee" class="form-control form-control-sm" type="text" disabled>
+                <!-- <input id="deliveryFeeInput" name="deliveryFee" placeholder="Delivery Fee" class="form-control form-control-sm" type="text" disabled> -->
+                {{ form.deliveryFee }}
+
+                {% if form.deliveryFee.errors %}
+                <div class="alert alert-danger  alert-dismissible fade show mt-2" role="alert">{{ form.deliveryFee.errors }}
+                  <button type="button" class="btn-close" data-coreui-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endif %}
+
               </div>           
 
           </div>
@@ -177,17 +259,7 @@
           </div>
             
           </form>
-          {% if form.errors %}
-          <div class="alert alert-danger mt-3">
-              <ul>
-                  {% for field in form %}
-                      {% if field.errors %}
-                          <li>{{ field.label }}: {{ field.errors|join:", " }}</li>
-                      {% endif %}
-                  {% endfor %}
-              </ul>
-          </div>
-          {% endif %}
+
         </div>
       </div>
   </div>

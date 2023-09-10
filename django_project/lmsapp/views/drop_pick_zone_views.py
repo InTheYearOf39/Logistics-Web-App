@@ -294,27 +294,41 @@ def generate_package_number():
 @xframe_options_exempt 
 @user_passes_test(is_drop_pick_user)
 def add_package_droppick(request):
+    user_drop_pick_zone = None
+    
     senders = User.objects.filter(role='sender')
     if request.method == 'POST':
         form = PackageForm(request.POST)
 
         if form.is_valid():
             package = form.save(commit=False)
-            package.created_by = request.user
-            package.package_number = generate_package_number()
 
             # Automatically set the dropOffLocation to the one the user belongs to
             user_drop_pick_zone = request.user.drop_pick_zone
-            if user_drop_pick_zone:
-                package.dropOffLocation = user_drop_pick_zone
-            else:
-                # Handle the case where the user does not have a drop_pick_zone
-                pass
 
+            delivery_type = request.POST.get('deliveryType')
             recipient_latitude = request.POST.get('recipient_latitude')
             recipient_longitude = request.POST.get('recipient_longitude')
+
+            package.sendersName = form.cleaned_data["sendersName"]
+            package.sendersEmail = form.cleaned_data["sendersEmail"]
+            package.sendersContact = form.cleaned_data["sendersContact"]
+            package.packageName = form.cleaned_data["packageName"]
+            package.packageDescription = form.cleaned_data["packageDescription"]
+            package.deliveryType = delivery_type
+            package.dropOffLocation = user_drop_pick_zone
+            package.recipientName = form.cleaned_data["recipientName"]
+            package.recipientEmail = form.cleaned_data["recipientEmail"]
+            package.recipientTelephone = form.cleaned_data["recipientTelephone"]
+            package.recipientAddress = form.cleaned_data["recipientAddress"]
+            package.recipientIdentification = form.cleaned_data["recipientIdentification"]
+            package.genderType = form.cleaned_data["genderType"]
+            package.recipientPickUpLocation = form.cleaned_data["recipientPickUpLocation"]
+            package.user = request.user
             package.recipient_latitude = recipient_latitude
             package.recipient_longitude = recipient_longitude
+            package.package_number = generate_package_number()
+            package.created_by = request.user
 
             package.status = 'dropped_off'
 
@@ -361,16 +375,99 @@ def add_package_droppick(request):
                 print("Error:", str(e))
 
 
-            return redirect('received_packages')  # Redirect to a success page or wherever you want
+            return redirect('received_packages')
+        else:
+            drop_pick_zones = DropPickZone.objects.all()
+            context = { 'form': form, 'user_drop_pick_zone': request.user.drop_pick_zone, 'drop_pick_zones': drop_pick_zones }
+            return render(request, 'drop_pick_zone/add_package.html', context)
 
     else:
         form = PackageForm()
-        user_drop_pick_zone = request.user.drop_pick_zone  # Get the user's drop_pick_zone
+        user_drop_pick_zone = request.user.drop_pick_zone
 
-    # Get the drop_pick_zones data to populate the recipientPickUpLocation dropdown
-    drop_pick_zones = DropPickZone.objects.all()  # Adjust this based on your model
-    context = {'form': form, 'drop_pick_zones': drop_pick_zones, 'user_drop_pick_zone': user_drop_pick_zone, 'senders': senders}
-    return render(request, 'drop_pick_zone/add_package.html', context)
+        # Get the drop_pick_zones data to populate the recipientPickUpLocation dropdown
+        drop_pick_zones = DropPickZone.objects.all()  
+        context = {'form': form, 'drop_pick_zones': drop_pick_zones, 'user_drop_pick_zone': user_drop_pick_zone, 'senders': senders}
+        return render(request, 'drop_pick_zone/add_package.html', context)
+
+# def add_package_droppick(request):
+#     senders = User.objects.filter(role='sender')
+#     if request.method == 'POST':
+#         form = PackageForm(request.POST)
+
+#         if form.is_valid():
+#             package = form.save(commit=False)
+#             package.created_by = request.user
+#             package.package_number = generate_package_number()
+
+#             # Automatically set the dropOffLocation to the one the user belongs to
+#             user_drop_pick_zone = request.user.drop_pick_zone
+#             if user_drop_pick_zone:
+#                 package.dropOffLocation = user_drop_pick_zone
+#             else:
+#                 # Handle the case where the user does not have a drop_pick_zone
+#                 pass
+
+#             recipient_latitude = request.POST.get('recipient_latitude')
+#             recipient_longitude = request.POST.get('recipient_longitude')
+#             package.recipient_latitude = recipient_latitude
+#             package.recipient_longitude = recipient_longitude
+
+#             package.status = 'dropped_off'
+
+#             selected_user_id = request.POST.get('user')
+#             if selected_user_id:
+#                 selected_user = User.objects.get(id=selected_user_id)
+
+#                 package.sendersEmail = selected_user.email
+#                 package.sendersName = selected_user.username
+#             package.save()
+
+
+#             subject = 'Package Registered'
+#             message = (
+#                 f"Dear Customer, your package has been successfully registered.\n\n"
+#                 f"Package Number: {package.package_number}\n"
+#                 f"Recipient: {package.recipientName}\n"
+#                 f"Recipient Address: {package.recipientAddress}\n"
+#                 f"If you have any questions, please contact our customer support team.\n"
+#             )
+
+#             if package.dropOffLocation:
+#                 message += f"Drop-off Location: {package.dropOffLocation.name}\n"
+
+#             message += f"Status: {package.status}"
+            
+#             from_email = settings.DEFAULT_FROM_EMAIL
+#             recipient_list = [package.recipientEmail, package.sendersEmail]
+                           
+#             sender_contact = str(package.sendersContact).strip()
+
+#             if len(sender_contact) == 10 and sender_contact.startswith('0'):
+#                 sender_contact = '+256' + sender_contact[1:]
+
+#             send_sms([sender_contact], message, "LASTMILE-PUDONET")
+
+#             try:    
+#                 send_mail(subject, message, from_email, recipient_list, fail_silently=False)
+#             except BadHeaderError as e:
+#                 # Handle the BadHeaderError
+#                 print("Error: BadHeaderError:", str(e))
+#             except Exception as e:
+#                 # Handle other exceptions
+#                 print("Error:", str(e))
+
+
+#             return redirect('received_packages')  # Redirect to a success page or wherever you want
+
+#     else:
+#         form = PackageForm()
+#         user_drop_pick_zone = request.user.drop_pick_zone  # Get the user's drop_pick_zone
+
+#     # Get the drop_pick_zones data to populate the recipientPickUpLocation dropdown
+#     drop_pick_zones = DropPickZone.objects.all()  # Adjust this based on your model
+#     context = {'form': form, 'drop_pick_zones': drop_pick_zones, 'user_drop_pick_zone': user_drop_pick_zone, 'senders': senders}
+#     return render(request, 'drop_pick_zone/add_package.html', context)
 
 
 

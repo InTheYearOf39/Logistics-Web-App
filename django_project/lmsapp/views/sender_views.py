@@ -76,15 +76,12 @@ and saving the package to the database with the appropriate details.
 @user_passes_test(is_sender_user)
 @xframe_options_exempt
 def register_package(request):
-    api_key = settings.API_KEY
-    drop_pick_zones = DropPickZone.objects.all().values()  # Retrieve users with the role of 'drop_pick_zone'
+    google_api_key = settings.API_KEY
 
     if request.method == 'POST':
         form = PackageForm(request.POST)
         if form.is_valid():
-            package = form.save(commit=False)
-            package.user = request.user
-            package.package_number = generate_package_number()
+            package = form.save(commit=False)        
 
             sender_longitude = request.POST.get('sender_longitude') 
             sender_latitude = request.POST.get('sender_latitude')
@@ -92,16 +89,12 @@ def register_package(request):
             recipient_longitude = request.POST.get('recipient_longitude') 
             recipient_latitude = request.POST.get('recipient_latitude')
 
-            package.recipient_latitude = recipient_latitude
-            package.recipient_longitude = recipient_longitude
-            package.sender_latitude = sender_latitude
-            package.sender_longitude = sender_longitude
-            
-            # Check if the selected courier is already assigned to a package
-            courier = package.courier
-            if courier and courier.assigned_packages.exists():
-                messages.error(request, 'Selected courier is already assigned to a package.')
-                return redirect('register_package')
+            delivery_type = form.cleaned_data["deliveryType"]
+            drop_off_location = form.cleaned_data["dropOffLocation"]
+
+            if delivery_type == 'standard' and not drop_off_location:
+                form.add_error('dropOffLocation', "Drop off location is required for standard delivery.")
+                return render(request, 'sender/register_package.html', {'form': form})
 
             # Determine eligible warehouse based on delivery type and user's location
             user_coordinates = (float(sender_latitude), float(sender_longitude))
@@ -120,8 +113,25 @@ def register_package(request):
 
             package.status = 'upcoming'
             # Save the additional fields to the package object
-            package.recipientIdentification = form.cleaned_data['recipientIdentification']
-            package.genderType = form.cleaned_data['genderType']
+
+            package.sendersContact = form.cleaned_data["sendersContact"]
+            package.packageName = form.cleaned_data["packageName"]
+            package.packageDescription = form.cleaned_data["packageDescription"]
+            package.deliveryType = delivery_type
+            package.dropOffLocation = drop_off_location
+            package.recipientName = form.cleaned_data["recipientName"]
+            package.recipientEmail = form.cleaned_data["recipientEmail"]
+            package.recipientTelephone = form.cleaned_data["recipientTelephone"]
+            package.recipientAddress = form.cleaned_data["recipientAddress"]
+            package.recipientIdentification = form.cleaned_data["recipientIdentification"]
+            package.genderType = form.cleaned_data["genderType"]
+            package.recipientPickUpLocation = form.cleaned_data["recipientPickUpLocation"]
+            package.user = request.user
+            package.recipient_latitude = recipient_latitude
+            package.recipient_longitude = recipient_longitude
+            package.sender_latitude = sender_latitude
+            package.sender_longitude = sender_longitude
+            package.package_number = generate_package_number()
             package.created_by = request.user
             package.save()
 
@@ -132,14 +142,80 @@ def register_package(request):
         form = PackageForm()
         error_message = None
     
-    context = {
-        'form': form, 
-        'error_message': error_message, 
-        'drop_pick_zones': drop_pick_zones, 
-        'api_key': api_key
-    }
+        context = {
+            'form': form, 
+            'error_message': error_message, 
+            # 'drop_pick_zones': drop_pick_zones, 
+            'api_key': google_api_key
+        }
 
-    return render(request, 'sender/register_package.html', context)
+        return render(request, 'sender/register_package.html', context)
+
+# def register_package(request):
+#     google_api_key = settings.API_KEY
+#     # drop_pick_zones = DropPickZone.objects.all().values()  # Retrieve users with the role of 'drop_pick_zone'
+
+#     if request.method == 'POST':
+#         form = PackageForm(request.POST)
+#         if form.is_valid():
+#             package = form.save(commit=False)
+#             package.user = request.user
+#             package.package_number = generate_package_number()
+
+#             sender_longitude = request.POST.get('sender_longitude') 
+#             sender_latitude = request.POST.get('sender_latitude')
+
+#             recipient_longitude = request.POST.get('recipient_longitude') 
+#             recipient_latitude = request.POST.get('recipient_latitude')
+
+#             package.recipient_latitude = recipient_latitude
+#             package.recipient_longitude = recipient_longitude
+#             package.sender_latitude = sender_latitude
+#             package.sender_longitude = sender_longitude
+            
+#             # Check if the selected courier is already assigned to a package
+#             courier = package.courier
+#             if courier and courier.assigned_packages.exists():
+#                 messages.error(request, 'Selected courier is already assigned to a package.')
+#                 return redirect('register_package')
+
+#             # Determine eligible warehouse based on delivery type and user's location
+#             user_coordinates = (float(sender_latitude), float(sender_longitude))
+#             warehouses = Warehouse.objects.all()
+
+#             eligible_warehouses = []
+#             for warehouse in warehouses:
+#                 warehouse_coordinates = (warehouse.latitude, warehouse.longitude)
+#                 distance = geodesic(user_coordinates, warehouse_coordinates).kilometers
+#                 if distance <= 10 and package.deliveryType in ['premium', 'express']:
+#                     eligible_warehouses.append(warehouse)
+
+#             if eligible_warehouses:
+#                 selected_warehouse = eligible_warehouses[0]  # You can choose any logic to select a warehouse
+#                 package.warehouse = selected_warehouse
+
+#             package.status = 'upcoming'
+#             # Save the additional fields to the package object
+#             package.recipientIdentification = form.cleaned_data['recipientIdentification']
+#             package.genderType = form.cleaned_data['genderType']
+#             package.created_by = request.user
+#             package.save()
+
+#             return redirect('sender_dashboard')
+#         else:
+#             error_message = 'Error processing your request'
+#     else:
+#         form = PackageForm()
+#         error_message = None
+    
+#     context = {
+#         'form': form, 
+#         'error_message': error_message, 
+#         # 'drop_pick_zones': drop_pick_zones, 
+#         'api_key': google_api_key
+#     }
+
+#     return render(request, 'sender/register_package.html', context)
 
 
 

@@ -95,7 +95,6 @@ class User(AbstractUser):
     email = models.EmailField(max_length=254, null=True, blank=True )
 
     # Add warehouse-specific fields
-    tag = models.CharField(max_length=20, null=True, blank=True)
     phone = models.CharField(max_length=20, null=True, blank=True)
     drop_pick_zone = models.ForeignKey(DropPickZone, related_name='users', on_delete=models.SET_NULL, null=True, blank=True)
     address = models.CharField(max_length=200, null=True, blank=True)
@@ -163,7 +162,7 @@ class Package(models.Model):
     courier = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='assigned_packages', null=True, blank=True)
     packageName = models.CharField(max_length=100, null=True, blank=True)
     deliveryType = models.CharField(max_length=20, choices=DELIVERY_CHOICES, null=True, blank=True)
-    dropOffLocation = models.ForeignKey(DropPickZone, on_delete=models.SET_NULL, null=True, blank=True, default=None, related_name='packages_dropped_off')
+    dropOffLocation = models.ForeignKey(DropPickZone, on_delete=models.SET_NULL, null=True, blank=True, default=None, related_name='dropped_off_at')
     recipientPickUpLocation = models.ForeignKey(DropPickZone, on_delete=models.SET_NULL, null=True, blank=True, default=None, related_name='packages_picked_up')
     warehouse = models.ForeignKey(Warehouse, on_delete=models.SET_NULL, null=True, blank=True, related_name='packages_in_house')
     packageDescription = models.TextField(max_length=500, null=True, blank=True)

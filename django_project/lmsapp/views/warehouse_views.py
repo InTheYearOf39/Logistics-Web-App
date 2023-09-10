@@ -426,8 +426,7 @@ def generate_package_number():
 @xframe_options_exempt 
 @user_passes_test(is_warehouse_user)
 def add_package(request):
-    msg = None
-    user_warehouse = None  # Initialize user_warehouse
+    user_warehouse = None  
     
     senders = User.objects.filter(role='sender')
     if request.method == 'POST':
@@ -435,21 +434,33 @@ def add_package(request):
 
         if form.is_valid():
             package = form.save(commit=False)
-            package.created_by = request.user
-            package.package_number = generate_package_number()
 
             # Automatically set the warehouse to the one the user belongs to
             user_warehouse = request.user.warehouse
-            if user_warehouse:
-                package.warehouse = user_warehouse
-            else:
-                # Handle the case where the user does not have a warehouse
-                pass
-
+           
+            delivery_type = request.POST.get('deliveryType')
             recipient_latitude = request.POST.get('recipient_latitude')
             recipient_longitude = request.POST.get('recipient_longitude')
+            
+            package.sendersName = form.cleaned_data["sendersName"]
+            package.sendersEmail = form.cleaned_data["sendersEmail"]
+            package.sendersContact = form.cleaned_data["sendersContact"]
+            package.packageName = form.cleaned_data["packageName"]
+            package.packageDescription = form.cleaned_data["packageDescription"]
+            package.deliveryType = delivery_type
+            package.warehouse = user_warehouse
+            package.recipientName = form.cleaned_data["recipientName"]
+            package.recipientEmail = form.cleaned_data["recipientEmail"]
+            package.recipientTelephone = form.cleaned_data["recipientTelephone"]
+            package.recipientAddress = form.cleaned_data["recipientAddress"]
+            package.recipientIdentification = form.cleaned_data["recipientIdentification"]
+            package.genderType = form.cleaned_data["genderType"]
+            package.recipientPickUpLocation = form.cleaned_data["recipientPickUpLocation"]
+            package.user = request.user
             package.recipient_latitude = recipient_latitude
             package.recipient_longitude = recipient_longitude
+            package.package_number = generate_package_number()
+            package.created_by = request.user
 
             package.status = 'in_house'
 
@@ -461,8 +472,7 @@ def add_package(request):
                 package.sendersName = selected_user.username
             package.save()
 
-            
-            # Send an email to the sender
+
             subject = 'Package Registered'
             message = (
                 f"Dear Customer, your package has been successfully registered.\n\n"
@@ -472,8 +482,8 @@ def add_package(request):
                 f"If you have any questions, please contact our customer support team.\n"
             )
 
-            if package.dropOffLocation:
-                message += f"Drop-off Location: {package.dropOffLocation.name}\n"
+            if package.warehouse:
+                message += f"Drop-off Location: {package.warehouse.name}\n"
 
             message += f"Status: {package.status}"
             
@@ -496,18 +506,103 @@ def add_package(request):
                 # Handle other exceptions
                 print("Error:", str(e))
 
-            msg = 'Package registered'
             return redirect('in_house')
         else:
-            msg = 'Form is not valid'
+            warehouse = Warehouse.objects.all()
+            context = { 'form': form, 'user_warehouse': request.user.warehouse, 'warehouse': warehouse }
+            return render(request, 'warehouse/add_package.html', context)
     else:
         form = PackageForm()
         user_warehouse = request.user.warehouse
 
     # Get the warehouse data to populate the warehouse dropdown
-    warehouse = Warehouse.objects.all()  # Adjust this based on your model
+    warehouse = Warehouse.objects.all()
     context = {'form': form, 'warehouse': warehouse, 'user_warehouse': user_warehouse, 'senders': senders}
     return render(request, 'warehouse/add_package.html', context)
+
+# def add_package(request):
+#     msg = None
+#     user_warehouse = None  # Initialize user_warehouse
+    
+#     senders = User.objects.filter(role='sender')
+#     if request.method == 'POST':
+#         form = PackageForm(request.POST)
+
+#         if form.is_valid():
+#             package = form.save(commit=False)
+#             package.created_by = request.user
+#             package.package_number = generate_package_number()
+
+#             # Automatically set the warehouse to the one the user belongs to
+#             user_warehouse = request.user.warehouse
+#             if user_warehouse:
+#                 package.warehouse = user_warehouse
+#             else:
+#                 # Handle the case where the user does not have a warehouse
+#                 pass
+
+#             recipient_latitude = request.POST.get('recipient_latitude')
+#             recipient_longitude = request.POST.get('recipient_longitude')
+#             package.recipient_latitude = recipient_latitude
+#             package.recipient_longitude = recipient_longitude
+
+#             package.status = 'in_house'
+
+#             selected_user_id = request.POST.get('user')
+#             if selected_user_id:
+#                 selected_user = User.objects.get(id=selected_user_id)
+
+#                 package.sendersEmail = selected_user.email
+#                 package.sendersName = selected_user.username
+#             package.save()
+
+            
+#             # Send an email to the sender
+#             subject = 'Package Registered'
+#             message = (
+#                 f"Dear Customer, your package has been successfully registered.\n\n"
+#                 f"Package Number: {package.package_number}\n"
+#                 f"Recipient: {package.recipientName}\n"
+#                 f"Recipient Address: {package.recipientAddress}\n"
+#                 f"If you have any questions, please contact our customer support team.\n"
+#             )
+
+#             if package.dropOffLocation:
+#                 message += f"Drop-off Location: {package.dropOffLocation.name}\n"
+
+#             message += f"Status: {package.status}"
+            
+#             from_email = settings.DEFAULT_FROM_EMAIL
+#             recipient_list = [package.recipientEmail, package.sendersEmail]
+                           
+#             sender_contact = str(package.sendersContact).strip()
+
+#             if len(sender_contact) == 10 and sender_contact.startswith('0'):
+#                 sender_contact = '+256' + sender_contact[1:]
+
+#             send_sms([sender_contact], message, settings.AFRICASTALKING_SENDER)
+           
+#             try:
+#                 send_mail(subject, message, from_email, recipient_list, fail_silently=False)
+#             except BadHeaderError as e:
+#                 # Handle the BadHeaderError
+#                 print("Error: BadHeaderError:", str(e))
+#             except Exception as e:
+#                 # Handle other exceptions
+#                 print("Error:", str(e))
+
+#             msg = 'Package registered'
+#             return redirect('in_house')
+#         else:
+#             msg = 'Form is not valid'
+#     else:
+#         form = PackageForm()
+#         user_warehouse = request.user.warehouse
+
+#     # Get the warehouse data to populate the warehouse dropdown
+#     warehouse = Warehouse.objects.all()  # Adjust this based on your model
+#     context = {'form': form, 'warehouse': warehouse, 'user_warehouse': user_warehouse, 'senders': senders}
+#     return render(request, 'warehouse/add_package.html', context)
 
 @login_required
 @user_passes_test(is_warehouse_user)
