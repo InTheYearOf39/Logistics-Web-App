@@ -70,42 +70,6 @@ def register(request):
         form = SignUpForm()
         return render(request, 'auth/register.html', {'form': form })
 
-
-# def register(request):
-#     msg = None
-#     if request.method == 'POST':
-#         form = SignUpForm(request.POST)
-#         if form.is_valid():
-#             user = form.save(commit=False)
-#             user.role = 'sender'
-#             user.is_active = False  
-
-#             user.generate_verification_token()
-#             user.save()
-#             # create email recoird
-#             EmailAddress(user = user,
-#                              email = user.email,
-#                              verified = False,
-#                              primary = True
-#             ).save()
-#             # Send verification email
-#             current_site = get_current_site(request)
-#             subject = 'Activate your account'
-#             message = f"A new account matching this email was detected on our system,\n"\
-#                       f"Click the following link to activate your account:\n\n" \
-#                       f"{current_site.domain}/verify-email?verification_token={user.verification_token}\n"\
-#                       f"If this wasn't you, ignore this message"
-            
-#             send_mail(subject, message, settings.EMAIL_HOST_USER, [user.email])
-            
-#             msg = 'user created'
-#             return redirect('email_verification_sent')
-#         else:
-#             msg = 'form is not valid'
-#     else:
-#         form = SignUpForm()
-#     return render(request, 'auth/register.html', {'form': form, 'msg': msg})
-
 def verify_email(request):
     token = request.GET.get('verification_token')
     user = User.objects.get(verification_token=token)
@@ -123,32 +87,69 @@ def verify_email(request):
 A function to handle user login. The form data is validated, and if valid, the user is authenticated and logged in. 
 The user is then redirected to their respective dashboard based on their role. If the form is not valid or the request method is not POST, the login form is displayed.
  """
+# def login_view(request):
+#     form = LoginForm(request.POST or None)
+#     msg = None
+#     if request.method == 'POST':
+#         if form.is_valid():
+#             username = form.cleaned_data.get('username')
+#             password = form.cleaned_data.get('password')
+#             user = authenticate(username=username, password=password)
+#             if user is not None:
+#                 login(request, user)
+#                 dashboard_mapping = {
+#                         'admin': 'admin_dashboard',
+#                         'courier': 'courier_dashboard',
+#                         'sender': 'sender_dashboard',
+#                         'drop_pick_zone': 'drop_pick_zone_dashboard',
+#                         'warehouse': 'warehouse_dashboard',
+#                     }
+#                 dashboard_url = dashboard_mapping.get(user.role)
+#                 if dashboard_url:
+#                     return redirect(dashboard_url)
+#             else:
+#                 msg = "No user matching given details"
+#                 return render(request, 'auth/login.html', {'form': form, 'msg': msg })
+#         else:
+#             return render(request, 'auth/login.html', {'form': form, })
+#     else:
+#         return render(request, 'auth/login.html', {'form': form, })
+
 def login_view(request):
     form = LoginForm(request.POST or None)
+    
     if request.method == 'POST':
         if form.is_valid():
             username = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password')
+            
             user = authenticate(username=username, password=password)
+            
             if user is not None:
                 login(request, user)
                 dashboard_mapping = {
-                        'admin': 'admin_dashboard',
-                        'courier': 'courier_dashboard',
-                        'sender': 'sender_dashboard',
-                        'drop_pick_zone': 'drop_pick_zone_dashboard',
-                        'warehouse': 'warehouse_dashboard',
-                    }
+                    'admin': 'admin_dashboard',
+                    'courier': 'courier_dashboard',
+                    'sender': 'sender_dashboard',
+                    'drop_pick_zone': 'drop_pick_zone_dashboard',
+                    'warehouse': 'warehouse_dashboard',
+                }
                 dashboard_url = dashboard_mapping.get(user.role)
+                
                 if dashboard_url:
                     return redirect(dashboard_url)
+                else:
+                    form.add_error(None, 'Invalid user request. Please contact support.')
+                    return render(request, 'auth/login.html', {'form': form })
             else:
-                msg = "No user matching given details"
-                return render(request, 'auth/login.html', {'form': form, 'msg': msg })
+                # User authentication failed
+                form.add_error(None, 'Invalid username or password. Please try again.')
+                # form.add_error("username", 'Invalid username or password. Please try again.')
+                return render(request, 'auth/login.html', {'form': form })
         else:
-            return render(request, 'auth/login.html', {'form': form, })
+            return render(request, 'auth/login.html', {'form': form })
     else:
-        return render(request, 'auth/login.html', {'form': form, })
+        return render(request, 'auth/login.html', {'form': form })
 
 """A function to notify a user when an account verification token has been sent"""
 def email_verification_sent(request):

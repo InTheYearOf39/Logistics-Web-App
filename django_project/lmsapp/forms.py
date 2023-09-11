@@ -25,18 +25,24 @@ def validate_custom_password(password):
 
 class LoginForm(forms.Form):
     username = forms.CharField(
+        required = True,
         widget= forms.TextInput(
             attrs={
-                "class": "form-control",
-                "placeholder": "username"
+                "class": "form-control control-sm",
+                "placeholder": "username",
+                'id': 'username',
+                'name': 'username'
             }
         )
     )
     password = forms.CharField(
+        required = True,
         widget=forms.PasswordInput(
             attrs={
-                "class": "form-control",
-                "placeholder": "password"
+                "class": "form-control control-sm",
+                "placeholder": "password",
+                'id': 'password',
+                'name': 'password'
             }
         )
     )
