@@ -19,22 +19,40 @@ and An email is sent to the user with a verification token. The user is then red
 If the form is not valid or the request method is not POST, the registration form is displayed.
 """
 def register(request):
-    msg = None
+    if request.user.is_authenticated:
+        dashboard_mapping = {
+            'admin': 'admin_dashboard',
+            'courier': 'courier_dashboard',
+            'sender': 'sender_dashboard',
+            'drop_pick_zone': 'drop_pick_zone_dashboard',
+            'warehouse': 'warehouse_dashboard',
+        }
+        dashboard_url = dashboard_mapping.get(request.user.role)
+        if dashboard_url:
+            return redirect(dashboard_url)
+    
     if request.method == 'POST':
         form = SignUpForm(request.POST)
         if form.is_valid():
             user = form.save(commit=False)
+
+            names = form.cleaned_data.get('name').split()
+            name = ' '.join([name.capitalize() for name in names])
+
+            user.name = name
             user.role = 'sender'
-            user.is_active = False  
+            user.is_active = False
 
             user.generate_verification_token()
             user.save()
-            # create email recoird
+
+            # create email record
             EmailAddress(user = user,
                              email = user.email,
                              verified = False,
                              primary = True
             ).save()
+
             # Send verification email
             current_site = get_current_site(request)
             subject = 'Activate your account'
@@ -44,14 +62,49 @@ def register(request):
                       f"If this wasn't you, ignore this message"
             
             send_mail(subject, message, settings.EMAIL_HOST_USER, [user.email])
-            
-            msg = 'user created'
+
             return redirect('email_verification_sent')
         else:
-            msg = 'form is not valid'
+            return render(request, 'auth/register.html', {'form': form })
     else:
         form = SignUpForm()
-    return render(request, 'auth/register.html', {'form': form, 'msg': msg})
+        return render(request, 'auth/register.html', {'form': form })
+
+
+# def register(request):
+#     msg = None
+#     if request.method == 'POST':
+#         form = SignUpForm(request.POST)
+#         if form.is_valid():
+#             user = form.save(commit=False)
+#             user.role = 'sender'
+#             user.is_active = False  
+
+#             user.generate_verification_token()
+#             user.save()
+#             # create email recoird
+#             EmailAddress(user = user,
+#                              email = user.email,
+#                              verified = False,
+#                              primary = True
+#             ).save()
+#             # Send verification email
+#             current_site = get_current_site(request)
+#             subject = 'Activate your account'
+#             message = f"A new account matching this email was detected on our system,\n"\
+#                       f"Click the following link to activate your account:\n\n" \
+#                       f"{current_site.domain}/verify-email?verification_token={user.verification_token}\n"\
+#                       f"If this wasn't you, ignore this message"
+            
+#             send_mail(subject, message, settings.EMAIL_HOST_USER, [user.email])
+            
+#             msg = 'user created'
+#             return redirect('email_verification_sent')
+#         else:
+#             msg = 'form is not valid'
+#     else:
+#         form = SignUpForm()
+#     return render(request, 'auth/register.html', {'form': form, 'msg': msg})
 
 def verify_email(request):
     token = request.GET.get('verification_token')
@@ -72,7 +125,6 @@ The user is then redirected to their respective dashboard based on their role. I
  """
 def login_view(request):
     form = LoginForm(request.POST or None)
-    msg = None
     if request.method == 'POST':
         if form.is_valid():
             username = form.cleaned_data.get('username')
@@ -91,10 +143,12 @@ def login_view(request):
                 if dashboard_url:
                     return redirect(dashboard_url)
             else:
-                msg= 'invalid credentials'
+                msg = "No user matching given details"
+                return render(request, 'auth/login.html', {'form': form, 'msg': msg })
         else:
-            msg = 'error validating form'
-    return render(request, 'auth/login.html', {'form': form, 'msg': msg})
+            return render(request, 'auth/login.html', {'form': form, })
+    else:
+        return render(request, 'auth/login.html', {'form': form, })
 
 """A function to notify a user when an account verification token has been sent"""
 def email_verification_sent(request):

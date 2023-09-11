@@ -1,4 +1,3 @@
-from typing import Any, Dict
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from lmsapp.models import User, Package, DropPickZone, Warehouse
@@ -8,6 +7,21 @@ from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
 from django.core.validators import EmailValidator, RegexValidator, MinLengthValidator, MaxLengthValidator
 import re
+
+
+
+def validate_custom_password(password):
+
+    if password.isdigit():
+        raise ValidationError(_("Password cannot be entirely numeric."))
+
+    if not re.search(r'[A-Z]', password):
+        raise ValidationError(_("Password must contain at least one capital letter."))
+
+    if not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
+        raise ValidationError(_("Password must contain at least one special character."))
+
+
 
 class LoginForm(forms.Form):
     username = forms.CharField(
@@ -31,60 +45,79 @@ class LoginForm(forms.Form):
 class SignUpForm(UserCreationForm):
 
     name = forms.CharField(
+        required = True,
         widget=forms.TextInput(
             attrs={
-                "class": "form-control",
-                "placeholder": "name"
+                "class": "form-control control-sm",
+                "placeholder": "Full Name",
+                'id': 'name',
+                'name': 'name'
             }
         )
     )
 
     username = forms.CharField(
+        required = True,
         widget=forms.TextInput(
             attrs={
-                "class": "form-control",
-                "placeholder": "username"
-            }
-        )
-    )
-    password1 = forms.CharField(
-        widget=forms.PasswordInput(
-            attrs={
-                "class": "form-control",
-                "placeholder": "password"
-            }
-        )
-    )
-    password2 = forms.CharField(
-        widget=forms.PasswordInput(
-            attrs={
-                "class": "form-control",
-                "placeholder": "confirm password"
-            }
-        )
-    )
-    email = forms.CharField(
-        widget=forms.TextInput(
-            attrs={
-                "class": "form-control",
-                "placeholder": "email"
+                "class": "form-control control-sm",
+                "placeholder": "Username",
+                'id': 'username',
+                'name': 'username'
             }
         )
     )
 
-    tag = forms.CharField(
-        required=False,
-        widget=forms.TextInput(
-            attrs={
-                "class": "form-control",
-                "placeholder": "tag"
-            }
-        )
+    email = forms.CharField(
+    required = True,
+    widget=forms.TextInput(
+        attrs={
+            "class": "form-control control-sm",
+            "placeholder": "Email"
+        }
+    ),
+    validators=[EmailValidator(message='Please enter a valid email address.')],
     )
+
+    password1 = forms.CharField(
+        required = True,
+        widget=forms.PasswordInput(
+            attrs={
+                "class": "form-control control-sm",
+                "placeholder": "Password",
+                'id': 'password1',
+                'name': 'password1'
+
+            }
+        ),
+        validators=[
+            MinLengthValidator(8, message='Password must be at least 8 characters long'),
+            MaxLengthValidator(100, message='Password cannot be more than 100 characters long'),
+            validate_custom_password
+        ]
+    )
+
+    password2 = forms.CharField(
+        required = True,
+        widget=forms.PasswordInput(
+            attrs={
+                "class": "form-control control-sm",
+                "placeholder": "Confirm Password",
+                'id': 'password2',
+                'name': 'password2'
+            }
+        ),
+        validators=[
+            MinLengthValidator(8, message='Password must be at least 8 characters long'),
+            MaxLengthValidator(100, message='Password cannot be more than 100 characters long'),
+            validate_custom_password
+        ]
+    )
+
 
     class Meta:
         model = User
-        fields = ('name', 'username', 'email', 'password1', 'password2', 'tag')
+        fields = ('name', 'username', 'email', 'password1', 'password2')
 
 
 def validate_not_entirely_numeric(value):

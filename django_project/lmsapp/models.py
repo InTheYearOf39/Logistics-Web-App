@@ -111,12 +111,9 @@ class User(AbstractUser):
                                     related_name='user_modified_by', null=True)
     
     
-
-
     def generate_verification_token(self, length=64):
         token = get_random_string(length)
         self.verification_token = token
-        print(token)
         return token
     
     def save(self, *args, **kwargs):
