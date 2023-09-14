@@ -243,3 +243,13 @@ class UserGoogleSheet(models.Model):
 
     def __str__(self):
         return f"Google sheet: {str(self.user.username)}"
+    
+
+class CourierLocationData(models.Model):
+    courier = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    latitude = models.FloatField( null=True, blank=True)
+    longitude = models.FloatField( null=True, blank=True)
+    date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Selected courier: {str(self.courier.username)}"   

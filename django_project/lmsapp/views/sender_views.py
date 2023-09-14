@@ -40,13 +40,10 @@ def sender_dashboard(request):
     # Count the number of registered packages for the logged-in user
     num_registered_packages = Package.objects.filter(user=request.user).count()
 
-    # Retrieve the upcoming packages for the logged-in user
-    upcoming_packages = Package.objects.filter(user=request.user, status='upcoming')
 
     context = {
         'packages': packages,
         'num_registered_packages': num_registered_packages,
-        'upcoming_packages': upcoming_packages,
     }
 
     return render(request, 'sender/sender_dashboard.html', context)

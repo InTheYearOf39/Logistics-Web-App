@@ -95,6 +95,8 @@ urlpatterns = [
     path('confirm_delivery/<int:package_id>/', courier_views.confirm_delivery, name='confirm_delivery'),
     path('courier_history/', courier_views.courier_history, name='courier_history'),
     path('notify_dropoff_delivery/<int:package_id>/', courier_views.notify_dropoff_delivery, name='notify_dropoff_delivery'),
+    path('get_courier_location/', courier_views.get_courier_location, name='get_courier_location'),
+    path('live_directions_test/', courier_views.live_directions_view, name='live_directions_view'),
 
 
     # Warehouse routes

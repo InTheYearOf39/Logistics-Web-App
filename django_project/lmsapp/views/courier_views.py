@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, redirect
-from lmsapp.models import Package, User
+from lmsapp.models import Package, CourierLocationData
 from django.contrib.auth.decorators import login_required, user_passes_test
 import random
 from django.shortcuts import redirect, get_object_or_404
@@ -9,6 +9,9 @@ from django.conf import settings
 from django.core.mail import send_mail, BadHeaderError
 from django.http import HttpResponse
 from lmsapp.utils import send_sms
+from django.views.decorators.clickjacking import xframe_options_exempt
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
 
 def is_courier_user(user):
     return user.role == 'courier'
@@ -22,9 +25,13 @@ to the courier on their dashboard.
 @login_required
 @user_passes_test(is_courier_user)
 def courier_dashboard(request):
+    courier_id = request.user.id
+    google_api_key = settings.API_KEY
     assigned_packages = Package.objects.filter(courier=request.user, status__in=['dispatched', 'ongoing', 'arrived', 'en_route', 'warehouse_arrival', 'in_transit', 'at_pickup'])
     context = {
         'assigned_packages': assigned_packages,
+        'api_key': google_api_key,
+        'courier_id': courier_id
     }
     return render(request, 'courier/courier_dashboard.html', context)
 
@@ -191,3 +198,70 @@ def courier_history(request):
         'assigned_packages': assigned_packages,
     }
     return render(request, 'courier/courier_history.html', context)
+
+
+
+def live_directions_view(request):
+    return render(request, 'courier/courier_tracking.html')
+
+
+
+@xframe_options_exempt
+@csrf_exempt
+def courier_location_api(request):
+    import json
+    from django.http import JsonResponse
+    # check wat action I am doing now
+    params = {}
+    #determine what type of call
+    if request.method == "POST":
+        params = dict(request.POST.items())
+    elif request.method == "GET":
+        params = dict(request.GET.items())
+
+    # declare reponse
+    
+    response = {"error":True, "error_msg":"API error occured"}
+    if params.get("action","") == "":
+        response["error"] = True
+        response["error_msg"] = "No action specified"
+    
+    elif params.get("action","") == "get_courier_location":
+        # do your stuff
+        if params.get("lat","") == "" or params.get("lng","") == "":
+            response["error"] = True
+            response["error_msg"] = "Please provide GPS data"
+        else:
+            response["error"] = False
+            response["success_msg"] = "completed successfully "
+            response["data"] = get_courier_location(params.get("latitude"), params.get("longitude"), params.get("courier_id"))
+    
+    return JsonResponse(response, safe=False)
+
+
+@csrf_exempt
+def get_courier_location(request):
+    if request.method == 'POST':
+        try:
+            # Get the GPS data from the POST request
+            latitude = request.POST.get('latitude')
+            longitude = request.POST.get('longitude')
+            courier_id = request.POST.get('courier_id')
+
+            # Check if a location entry already exists for the courier
+            CourierLocationData.objects.create(
+                courier_id=courier_id,
+                latitude= latitude,
+                longitude= longitude
+            ).save()
+
+            
+           
+            # Optionally, you can return a JSON response to indicate success
+            return JsonResponse({'success': True, 'message': 'Location data saved successfully'})
+        except Exception as e:
+            # Handle any exceptions that may occur during data saving
+            return JsonResponse({'success': False, 'error_message': str(e)})
+    else:
+        return JsonResponse({'success': False, 'error_message': 'Invalid request method'})
+

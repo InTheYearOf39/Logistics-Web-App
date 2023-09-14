@@ -1,0 +1,188 @@
+{% extends 'dashboard_base.html' %}
+
+{% load static %}
+
+
+
+{% block static_links %}
+<!-- <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY"></script> -->
+<style>
+    /* Set the map size */
+    #map {
+        height: 800px;
+        width: 100%;
+    }
+</style>
+{% endblock %}
+
+
+
+{% block content %}
+<div id="map"></div>
+
+
+{% block script_links %}
+<script>
+
+    function plotMapLatLongPoints(all_markers, center_point) {
+
+
+        let map = new google.maps.Map(document.getElementById("map"), {
+
+            center: { lat: center_point.lat, lng: center_point.lng },
+
+            zoom: 15
+
+        });
+
+
+        //keep all markers
+
+        var markers = all_markers.map((a_marker, i) => {
+
+            var contentString = a_marker.info_body;
+
+
+
+            var infowindow = new google.maps.InfoWindow({
+
+                content: contentString
+
+            });
+
+
+
+
+            var marker = new google.maps.Marker({
+
+                position: { lat: a_marker.lat, lng: a_marker.lng },
+
+                map: map,
+
+                title: a_marker.title,
+
+            });
+
+            marker.addListener('click', function () {
+
+                infowindow.open(map, marker);
+
+            });
+
+            return marker
+
+        });
+
+    }
+
+
+
+    function get_map_data() {
+      
+        $.ajax({
+
+            type: "POST",
+            cache: false,
+            url: "get_courier_location",
+            dataType: "json",
+            data: {
+                rand_time: new Date().getTime(),
+                action: "courier_location_api", latitude: lat, longitude: lng,
+                // filter_abc: "filter val"  //example for more data passed as parameters
+            },
+            success: function (response) {
+
+                console.log(response);
+
+                //read data out
+
+                if (response.error == false) {
+                    //  var marker_data  = [
+                    //     {lat:1.218517, lng:32.373456, title:"sample title", info_body: "<b>html info body</b>"}
+                    //  ];
+                    //  var smple_centert = {lat:1.218517, lng:32.373456};
+
+                    var all_markers = response.data.all_markers;
+
+                    var center_point = response.data.center_point;
+
+                    plotMapLatLongPoints(all_markers, center_point);
+                }
+
+                else {
+
+                    $("#map_report_content").html("<div class='alert alert-danger'><h5><i class='icon fa fa-ban'></i> No GPS data Found!</h5>No GPS data found for selected filter</div>");
+
+                    alert('failed to pick get_map_activity_route error:' + response.error_msg);
+                }
+
+            },
+
+            error: function (data) {
+
+                console.log('failed to pick get_map_activity_route', data);
+
+            }
+
+        });
+
+
+    }
+
+//draw map now
+
+//get_map_data();
+
+</script>
+{% endblock %}
+
+
+
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// // Initialize the map
+// const map = new google.maps.Map(document.getElementById("map"), {
+// center: { lat: 0.343109062987824, lng: 32.5681438738126 },
+// zoom: 18,
+// });
+
+// let marker;
+
+// // Create a WebSocket connection
+// const socket = new WebSocket("ws://127.0.0.1:8000/ws/track_courier/23/");
+
+// // Listen for messages from the WebSocket
+// socket.addEventListener("message", function(event) {
+// const data = JSON.parse(event.data);
+// if (data.type === "location") {
+// // Update the courier's position on the map
+// const newPosition = new google.maps.LatLng(data.latitude, data.longitude);
+// map.setCenter(newPosition);
+// if (!marker) {
+// // Create a marker for the courier if it doesn't exist
+// marker = new google.maps.Marker({
+// position: newPosition,
+// map: map,
+// title: "courier Location",
+// });
+// } else {
+// // Move the existing marker to the new position
+// marker.setPosition(newPosition);
+// }
+// }
+// });
