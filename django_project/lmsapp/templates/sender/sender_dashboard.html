@@ -273,17 +273,17 @@ body{margin-top:20px;}
     // Get all the timeline events
     const events = document.querySelectorAll(".timeline .event");
 
-    // Define the current status of the package using Django template tag
-    const currentStatus = "{{ package.status }}"; // This will be replaced with the actual status value by Django
+ 
+    const currentStatus = "{{ package.status }}";
 
     // Loop through each event and set the background color based on data-status
     events.forEach((event) => {
       const status = event.getAttribute("data-status");
 
       if (status === currentStatus) {
-        event.style.setProperty("--event-background-color", "#727cf5"); // Different color for current status
+        event.style.setProperty("--event-background-color", "#727cf5");
       } else {
-        event.style.setProperty("--event-background-color", "#fff"); // Gray for other statuses
+        event.style.setProperty("--event-background-color", "#fff"); 
       }
     });
   });
