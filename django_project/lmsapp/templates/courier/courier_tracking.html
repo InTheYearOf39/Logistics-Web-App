@@ -5,7 +5,7 @@
 
 
 {% block static_links %}
-<!-- <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY"></script> -->
+
 <style>
     /* Set the map size */
     #map {
@@ -83,11 +83,10 @@
 
             type: "POST",
             cache: false,
-            url: "get_courier_location",
+            url: "api",
             dataType: "json",
             data: {
                 rand_time: new Date().getTime(),
-                action: "courier_location_api", latitude: lat, longitude: lng,
                 // filter_abc: "filter val"  //example for more data passed as parameters
             },
             success: function (response) {
@@ -139,50 +138,3 @@
 
 
 {% endblock %}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// // Initialize the map
-// const map = new google.maps.Map(document.getElementById("map"), {
-// center: { lat: 0.343109062987824, lng: 32.5681438738126 },
-// zoom: 18,
-// });
-
-// let marker;
-
-// // Create a WebSocket connection
-// const socket = new WebSocket("ws://127.0.0.1:8000/ws/track_courier/23/");
-
-// // Listen for messages from the WebSocket
-// socket.addEventListener("message", function(event) {
-// const data = JSON.parse(event.data);
-// if (data.type === "location") {
-// // Update the courier's position on the map
-// const newPosition = new google.maps.LatLng(data.latitude, data.longitude);
-// map.setCenter(newPosition);
-// if (!marker) {
-// // Create a marker for the courier if it doesn't exist
-// marker = new google.maps.Marker({
-// position: newPosition,
-// map: map,
-// title: "courier Location",
-// });
-// } else {
-// // Move the existing marker to the new position
-// marker.setPosition(newPosition);
-// }
-// }
-// });

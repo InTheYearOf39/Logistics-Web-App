@@ -59,24 +59,24 @@
                               <button type="submit" class="btn btn-sm btn-info text-white">Notify Arrival</button>
                             </td>
                         </form>
-                    {% elif package.status == 'warehouse_arrival' %}
-                        <img src="{% static 'img/loading.png' %}" alt="" width="25px" height="25px">
-                    {% elif package.status == 'in_transit' %}
-                        <img src="{% static 'img/transit.png' %}" alt="" width="25px" height="25px">
-                    {% elif package.status == 'at_pickup' %}
-                        <img src="{% static 'img/loading.png' %}" alt="" width="25px" height="25px">
-                    {% elif package.status == 'ongoing' %}
-                        <form action="{% url 'notify_recipient' package_id=package.id %}" method="post">
-                            {% csrf_token %}
-                            <button class="btn btn-sm btn-info text-white">Notify Arrival</button>
-                        </form>
-                    {% elif package.status == 'arrived' %}
-                      <img src="{% static 'img/loading.png' %}" alt="" width="25px" height="25px">     
-                      <td>
-                        <button type="button" class="btn btn-sm btn-warning text-white" data-coreui-toggle="modal" data-coreui-target="#staticBackdrop{{ package.id }}">
-                          Confirm Drop-Off
-                        </button>
-                      </td>  
+                        {% elif package.status == 'warehouse_arrival' %}
+                            <img src="{% static 'img/loading.png' %}" alt="" width="25px" height="25px">
+                        {% elif package.status == 'in_transit' %}
+                            <img src="{% static 'img/transit.png' %}" alt="" width="25px" height="25px">
+                        {% elif package.status == 'at_pickup' %}
+                            <img src="{% static 'img/loading.png' %}" alt="" width="25px" height="25px">
+                        {% elif package.status == 'ongoing' %}
+                            <form action="{% url 'notify_recipient' package_id=package.id %}" method="post">
+                                {% csrf_token %}
+                                <button class="btn btn-sm btn-info text-white">Notify Arrival</button>
+                            </form>
+                        {% elif package.status == 'arrived' %}
+                          <img src="{% static 'img/loading.png' %}" alt="" width="25px" height="25px">     
+                          <td>
+                            <button type="button" class="btn btn-sm btn-warning text-white" data-coreui-toggle="modal" data-coreui-target="#staticBackdrop{{ package.id }}">
+                              Confirm Drop-Off
+                            </button>
+                          </td>  
                       
   
                         <form action="{% url 'confirm_delivery' package_id=package.id %}" method="post">
@@ -135,7 +135,7 @@
 
   {% block script_links %}
   <script data-courier_id="{{ courier_id }}">
-    
+    const data = document.currentScript.dataset;
     // Define a global variable to store the interval ID
     let locationInterval;
 
@@ -163,7 +163,8 @@
 
           const latitude = position.coords.latitude;
           const longitude = position.coords.longitude;
-          const courier_id = {{ courier_id }};
+          // const courier_id = {{ courier_id }};
+          const courier_id = data.courier_id
 
           document.getElementById("courier_latitude").value = latitude;
           document.getElementById("courier_longitude").value = longitude;
