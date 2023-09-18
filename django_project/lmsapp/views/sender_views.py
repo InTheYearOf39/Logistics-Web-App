@@ -481,11 +481,11 @@ def receive_data_view(request):
                 "recipientEmail": str,
                 "recipientAddress": str,
                 "recipientContact": str,
-                "recipientIdentification": str, 
+                # "recipientIdentification": str, 
                 # #this is the required field and we shall have to revert to it,
                 # have used the one below just to allow mordern coast system to test since they dont capture ids at the moment
 
-                # "recipientIdentification": Union[str, None],
+                "recipientIdentification": Union[str, None],
                 "packageName": str,
                 "packageDescription": str,
                 "packageNumber": str,
@@ -511,7 +511,7 @@ def receive_data_view(request):
             recipient_email = data.get('recipientEmail')
             recipient_address = data.get('recipientAddress')
             recipient_contact = data.get('recipientContact')
-            recipient_ID = data.get('recipientIdentification')
+            recipient_ID = data.get('recipientIdentification', None)
             package_name = data.get('packageName')
             package_description = data.get('packageDescription')
             package_number = data.get('packageNumber')
