@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, redirect
-from lmsapp.models import Package, CourierLocationData
+from lmsapp.models import User, Package, CourierLocationData
 from django.contrib.auth.decorators import login_required, user_passes_test
 import random
 from django.shortcuts import redirect, get_object_or_404
@@ -202,7 +202,8 @@ def courier_history(request):
 
 
 def live_directions_view(request):
-    return render(request, 'courier/courier_tracking.html')
+    couriers = User.objects.filter(role='courier')
+    return render(request, 'courier/courier_tracking.html', {'couriers': couriers})
 
 
 
@@ -240,7 +241,7 @@ def courier_location_api(request):
 
 
 @csrf_exempt
-def get_courier_location(request):
+def get_courier_location(request):  #function to get courier location and save it to database
     if request.method == 'POST':
         try:
             # Get the GPS data from the POST request
@@ -265,3 +266,113 @@ def get_courier_location(request):
     else:
         return JsonResponse({'success': False, 'error_message': 'Invalid request method'})
 
+
+
+#function to query the cordinates hstory of a courier and return it.
+#It will then be used to plot a map. by the front end get_map_data function
+from django.db.models import OuterRef, Subquery
+@csrf_exempt
+def get_gps_coordinates(request): 
+    courier_id = request.GET.get('selected_courier_user', "")
+    print(courier_id)
+
+    
+    try:
+        courier_coordinates = []
+        sql = """select loc_dt.*, ldt.latitude, ldt.longitude, ldt.date from
+        (SELECT u.id, u.name
+        , (select loc.id from lmsapp_courierlocationdata as loc where loc.courier_id = u.id order by loc.date desc limit 1) as latest_loc_id 
+        from lmsapp_user u where u.role = 'courier'
+        ) as loc_dt join lmsapp_courierlocationdata ldt on ldt.id = loc_dt.latest_loc_id """
+        sql_params = []
+        if courier_id != "":
+            sql += """ where loc_dt.id = %s """
+            sql_params.append(courier_id)        
+        
+        courier_coordinates = my_custom_sql(sql,sql_params)
+        # Now, 'courier_coordinates' contains a queryset of all the coordinates for the selected courier
+        # You can format the data as needed and return it in the JSON response
+        gps_data = []
+        center_point = {}
+        if len(courier_coordinates) > 0:
+            for coordinate in courier_coordinates:
+                # default center point to last seen location
+                center_point["lat"] = coordinate["latitude"]
+                center_point["lng"] = coordinate["longitude"]
+                last_seen = time_elapsed_str(coordinate["date"])
+                info_html = """
+                <div class='card'>
+                <div>Name:{}</div>
+                <div>Date:{}</div>
+                <div>Last Seen:{}</div>
+                <div>Current Orders:</div>
+                </div>
+                """.format(coordinate['name'], coordinate['date'], last_seen)
+                title = f"{coordinate['name']} ({last_seen})"
+                data_point = {
+                    "lat": coordinate["latitude"],
+                    "lng": coordinate["longitude"],
+                    "title": title,
+                    "info_body": info_html
+                }
+                gps_data.append(data_point)
+
+        response_data = {
+            "error": False,
+            "data": {
+                "all_markers": gps_data,
+                "center_point": center_point
+            }
+        }
+
+        return JsonResponse(response_data)
+
+    except User.DoesNotExist:
+        response_data = {
+            "error": True,
+            "error_msg": "Courier not found"
+        }
+        return JsonResponse(response_data)
+
+    
+def my_custom_sql(sql, params = []):
+    from django.db import connection
+    with connection.cursor() as cursor:
+        cursor.execute(sql, params) # "SELECT foo FROM bar WHERE baz = %s", [self.baz]
+        #  "Return all rows from a cursor as a dict"
+        columns = [col[0] for col in cursor.description]
+        return [
+            dict(zip(columns, row))
+            for row in cursor.fetchall()
+        ]
+
+def time_elapsed_str(past_time,full = True,current_time = None):
+    try:
+        import datetime
+        # auto set now_time  to now if not specified
+        if current_time is None:
+            current_time = datetime.datetime.now()
+        # convert to datetime if string
+        import re
+        if type(past_time) is str and re.compile('.*-.*-.* .*:.*:.*').match(past_time) is not None:
+            past_time = datetime.datetime.strptime(past_time, '%Y-%m-%d %H:%M:%S')
+        elif type(past_time) is str and re.compile('.*-.*-.*').match(past_time) is not None:
+            past_time = datetime.datetime.strptime(past_time, '%Y-%m-%d')
+
+        ela = (current_time - past_time)
+        total_seconds = ela.total_seconds()
+        elapsed_str = ""
+        if total_seconds >= (60 * 60 * 24) and (full is False or (full is True and elapsed_str == "")):
+            elapsed_str += " "+ str(int(total_seconds // (60 * 60 * 24))) + "Days"
+            total_seconds -= ((total_seconds // (60 * 60 * 24)) * (60 * 60 * 24))
+        if total_seconds >= (60 * 60) and (full is False or (full is True and elapsed_str == "")):
+            elapsed_str += " "+ str(int(total_seconds // (60 * 60))) + "Hrs"
+            total_seconds -= ((total_seconds // (60 * 60)) * (60 * 60))
+        if total_seconds >= (60) and (full is False or (full is True and elapsed_str == "")):
+            elapsed_str += " "+ str(int(total_seconds // (60))) + "mins"
+            total_seconds -= ((total_seconds // (60)) * (60))
+        if total_seconds >= 0 and (full is False or (full is True and elapsed_str == "")):
+            elapsed_str += " "+ str(int(total_seconds)) + "secs"
+        return str(elapsed_str)
+    except:
+        return "Unknown"
