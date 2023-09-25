@@ -286,7 +286,7 @@ def confirm_pickedup(request, package_id):
     return redirect('drop_pick_zone_dashboard')  # Replace with the appropriate URL for the warehouse dashboard
 
 def generate_package_number():
-    prefix = 'pn'
+    prefix = 'PN'
     digits = ''.join(random.choices(string.digits, k=5))
     return f'{prefix}{digits}'
 

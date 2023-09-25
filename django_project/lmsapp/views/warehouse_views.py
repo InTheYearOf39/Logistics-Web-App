@@ -417,7 +417,7 @@ def new_arrivals(request):
     return render(request, 'warehouse/new_arrivals.html', context)
 
 def generate_package_number():
-    prefix = 'pn'
+    prefix = 'PN'
     digits = ''.join(random.choices(string.digits, k=5))
     return f'{prefix}{digits}'
 

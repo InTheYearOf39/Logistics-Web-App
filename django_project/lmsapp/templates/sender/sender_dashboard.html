@@ -89,7 +89,30 @@ body{margin-top:20px;}
     -webkit-box-shadow: 0 0 0 3px #727cf5;
     box-shadow: 0 0 0 3px #727cf5;
     left: -55.8px;
-    background: var(--event-background-color, #fff);
+    background: #fff;
+    border-radius: 50%;
+    height: 9px;
+    width: 9px;
+    content: "";
+    top: 5px;
+}
+
+/* .timeline .event .active:after {
+    -webkit-box-shadow: 0 0 0 3px #727cf5;
+    box-shadow: 0 0 0 3px #727cf5;
+    left: -55.8px;
+    background: #727cf5;
+    border-radius: 50%;
+    height: 9px;
+    width: 9px;
+    content: "";
+    top: 5px;
+} */
+li.event.active:after {
+    -webkit-box-shadow: 0 0 0 3px #727cf5;
+    box-shadow: 0 0 0 3px #727cf5;
+    left: -55.8px;
+    background: #727cf5;
     border-radius: 50%;
     height: 9px;
     width: 9px;
@@ -174,80 +197,7 @@ body{margin-top:20px;}
                       </button>
 
                       <!-- Modal -->
-                      <div class="modal fade" id="staticBackdrop{{ package.id }}" data-coreui-backdrop="static" data-coreui-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                        <div class="modal-dialog modal-xl">
-                          <div class="modal-content">
-                            <div class="modal-header">
-                              <!-- <h5 class="modal-title" id="staticBackdropLabel">Modal title</h5> -->
-                              <button type="button" class="btn-close" data-coreui-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                              {% comment %}
-                              {% if package.status == 'upcoming' %}
-                                      <div class="d-flex align-items-center justify-content-center">
-                                        <img src="{% static 'img/Upcoming.png' %}" alt="" width="498px" height="498px">
-                                      </div>
-                                    {% elif package.status == 'dropped_off' %}
-                                      <div class="d-flex align-items-center justify-content-center">
-                                        <img src="{% static 'img/DroppedOff.png' %}" alt="" width="498px" height="498px">
-                                      </div>
-                                    {% elif package.status == 'in_house' %}
-                                      <div class="d-flex align-items-center justify-content-center">
-                                        <img src="{% static 'img/InHouse.png' %}" alt="" width="498px" height="498px">
-                                      </div>
-                                    {% elif package.status == 'ready_for_pickup' %}
-                                      <div class="d-flex align-items-center justify-content-center">
-                                        <img src="{% static 'img/Arrived.png' %}" alt="" width="498px" height="498px">
-                                      </div>
-                                    {% elif package.status == 'completed' %}
-                                    <div class="d-flex align-items-center justify-content-center">
-                                      <img src="{% static 'img/Complete.png' %}" alt="" width="498px" height="498px">
-                                    </div>
-                                    {% endif %}
-                                    {% endcomment %}
-
-                                    <div class="container">
-                                      <div class="row">
-                                          <div class="col-md-12">
-                                              <div class="card">
-                                                  <div class="card-body">
-                                                      <h6 class="card-title">Timeline</h6>
-                                                      <div id="content">
-                                                          <ul class="timeline">
-                                                              <li class="event" step="One" data-status="upcoming">
-                                                                  <h3>Registration</h3>
-                                                                  <p>Your package has been registered successfully. Awaiting to be dropped off at drop-off location.</p>
-                                                              </li>
-                                                              <li class="event" step="Two" data-status="dropped_off">
-                                                                  <h3>Package Dropped-Off</h3>
-                                                                  <p>Your package has been dropped off at the DropOff Location.</p>
-                                                              </li>
-                                                              <li class="event" step="Three" data-status="in_house">
-                                                                  <h3>At Warehouse</h3>
-                                                                  <p>Your package has been dropped off at the Warehouse.</p>
-                                                              </li>
-                                                              <li class="event" step="Four" data-status="ready_for_pickup">
-                                                                  <h3>Package at Pick-Up location</h3>
-                                                                  <p>Your package has been dropped off at the PickUp Location. It's ready for pick up.</p>
-                                                              </li>
-                                                              <li class="event" step="Five" data-status="completed">
-                                                                  <h3>Picked UP !</h3>
-                                                                  <p>Thank you for choosing our services. We hope to see you soon!</p>
-                                                              </li>
-                                                          </ul>
-                                    
-                                                      </div>
-                                                  </div>
-                                              </div>
-                                          </div>
-                                      </div>
-                                    </div>
-
-
-                            </div>
-                          </div>
-                        </div>
-                      </div>
+                      {{ package.status_html | safe }}
 
                     </div>
                   </td>
@@ -266,29 +216,43 @@ body{margin-top:20px;}
 
 {% block script_links %}
   {% for package in packages %}
-    <script>
 
-      // Ensure the script runs after the elements are rendered
-      window.addEventListener("DOMContentLoaded", function () {
-        // Get all the timeline events
-        const events = document.querySelectorAll(".timeline .event");
+  <!-- <script>
+    // Ensure the script runs after the elements are rendered
+    window.addEventListener("DOMContentLoaded", function () {
+      // Get all the timeline events
+      const events = document.querySelectorAll(".timeline .event");
 
-    
-        const currentStatus = "{{ package.status }}";
+      const currentStatus = "{{ package.status }}";
+      
+      const eventStatusMap = {
+        "upcoming": ["upcoming"],
+        "dropped_off": ["dropped_off", "dispatched", "en_route", "warehouse_arrival"],
+        "at_pickup": ["at_pickup", "in_transit", "in_house"],
+        "ready_for_pickup": ["ready_for_pickup", "pending_delivery", "out_for_delivery", "ongoing", "arrived"],
+        "completed": ["completed"]
+      };
 
-        // Loop through each event and set the background color based on data-status
-        events.forEach((event) => {
-          const status = event.getAttribute("data-status");
+      events.forEach((event) => {
+      const step = event.getAttribute("data-status");
+      const modal_id = event.getAttribute("modal_id");
+      const validStatuses = eventStatusMap[step] || [];
 
-          if (status === currentStatus) {
-            event.style.setProperty("--event-background-color", "#727cf5");
-          } else {
-            event.style.setProperty("--event-background-color", "#fff"); 
-          }
-        });
-      });
+      console.log("step:", step);
+      console.log("currentStatus:", currentStatus);
 
-    </script>
+      if (validStatuses.includes(currentStatus)) {
+        //find this element in html to modify it
+        $('[modal_id="'+modal_id+ '"]').
+        event.style.setProperty("--event-background-color", "#727cf5");
+      } else {
+        event.style.setProperty("--event-background-color", "#fff");
+      }
+    });
+    });
+  </script> -->
+
+
   {% endfor %}
 {% endblock %}
 

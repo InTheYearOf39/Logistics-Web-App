@@ -35,7 +35,64 @@ def sender_dashboard(request):
         user=request.user
     ).order_by(
         # Your existing order_by logic here
-    )
+    ).values()
+    # loop through all rows and add a ccustom status vlauetatus_htmls for each
+    for ind in range(0,len(packages)):
+        status_html = """
+        <div class="modal fade" id='staticBackdrop""" + str(packages[ind]["id"]) + """' data-coreui-backdrop="static" data-coreui-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-xl">
+                          <div class="modal-content">
+                            <div class="modal-header">
+                              <h5 class="modal-title" id="staticBackdropLabel">Package Status</h5> 
+                              <button type="button" class="btn-close" data-coreui-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+
+                                    <div class="container">
+                                      <div class="row">
+                                          <div class="col-md-12">
+                                              <div class="card">
+                                                  <div class="card-body">
+                                                      <h6 class="card-title">Timeline</h6>
+                                                      <div id="content">
+                                                          <ul class="timeline" >
+                                                              <li class='event  """ + ("active" if packages[ind]["status"] == "upcoming" else "" ) + """'  step="One" data-status="upcoming">
+                                                                  <h3>Registration</h3>
+                                                                  <p>Your package has been registered successfully. Awaiting to be dropped off at drop-off location.</p>
+                                                              </li>
+                                                              <li class='event  """ + ("active" if packages[ind]["status"] in ["dropped_off","dispatched", "en_route", "warehouse_arrival"] else "" ) + """' step="Two" data-status="dropped_off">
+                                                                  <h3>Package Dropped-Off</h3>
+                                                                  <p>Your package has been dropped off at the DropOff Location.</p>
+                                                              </li>
+                                                              <li class='event  """ + ("active" if packages[ind]["status"] in ["in_house", "in_transit", "at_pickup"] else "" ) + """' step="Three" data-status="in_house">
+                                                                  <h3>At Warehouse</h3>
+                                                                  <p>Your package has been dropped off at the Warehouse.</p>
+                                                              </li>
+                                                              <li class='event  """ + ("active" if packages[ind]["status"] in ["ready_for_pickup", "pending_delivery", "out_for_delivery", "ongoing", "arrived"] else "" ) + """' step="Four" data-status="ready_for_pickup">
+                                                                  <h3>Package at Pick-Up location</h3>
+                                                                  <p>Your package has been dropped off at the PickUp Location. It's ready for pick up.</p>
+                                                              </li>
+                                                              <li class='event  """ + ("active" if packages[ind]["status"] == "completed" else "" ) + """' step="Five" data-status="completed">
+                                                                  <h3>Picked UP !</h3>
+                                                                  <p>Thank you for choosing our services. We hope to see you soon!</p>
+                                                              </li>
+                                                          </ul>
+                                    
+                                                      </div>
+                                                  </div>
+                                              </div>
+                                          </div>
+                                      </div>
+                                    </div>
+
+
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+        """
+        # add this value to the list
+        packages[ind]["status_html"] = status_html
 
     # Count the number of registered packages for the logged-in user
     num_registered_packages = Package.objects.filter(user=request.user).count()
@@ -49,7 +106,7 @@ def sender_dashboard(request):
     return render(request, 'sender/sender_dashboard.html', context)
 
 def generate_package_number():
-    prefix = 'pn'
+    prefix = 'PN'
     digits = ''.join(random.choices(string.digits, k=5))
     return f'{prefix}{digits}'
 
