@@ -270,7 +270,8 @@ def get_courier_location(request):  #function to get courier location and save i
 
 #function to query the cordinates hstory of a courier and return it.
 #It will then be used to plot a map. by the front end get_map_data function
-from django.db.models import OuterRef, Subquery
+
+# from django.db.models import OuterRef, Subquery
 @csrf_exempt
 def get_gps_coordinates(request): 
     courier_id = request.GET.get('selected_courier_user', "")

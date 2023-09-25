@@ -73,7 +73,7 @@ body{margin-top:20px;}
     left: -207px;
     content: attr(step);
     text-align: right;
-    font-weight: 100;
+    font-weight: 400;
     font-size: 0.9em;
     min-width: 120px;
 }
@@ -262,35 +262,34 @@ body{margin-top:20px;}
     <!-- /.col-->
   </div>
 
-
+{% endblock %}
 
 {% block script_links %}
-{% for package in packages %}
-<script>
+  {% for package in packages %}
+    <script>
 
-  // Ensure the script runs after the elements are rendered
-  window.addEventListener("DOMContentLoaded", function () {
-    // Get all the timeline events
-    const events = document.querySelectorAll(".timeline .event");
+      // Ensure the script runs after the elements are rendered
+      window.addEventListener("DOMContentLoaded", function () {
+        // Get all the timeline events
+        const events = document.querySelectorAll(".timeline .event");
 
- 
-    const currentStatus = "{{ package.status }}";
+    
+        const currentStatus = "{{ package.status }}";
 
-    // Loop through each event and set the background color based on data-status
-    events.forEach((event) => {
-      const status = event.getAttribute("data-status");
+        // Loop through each event and set the background color based on data-status
+        events.forEach((event) => {
+          const status = event.getAttribute("data-status");
 
-      if (status === currentStatus) {
-        event.style.setProperty("--event-background-color", "#727cf5");
-      } else {
-        event.style.setProperty("--event-background-color", "#fff"); 
-      }
-    });
-  });
+          if (status === currentStatus) {
+            event.style.setProperty("--event-background-color", "#727cf5");
+          } else {
+            event.style.setProperty("--event-background-color", "#fff"); 
+          }
+        });
+      });
 
-</script>
-{% endfor %}
+    </script>
+  {% endfor %}
 {% endblock %}
 
 
-{% endblock %}
