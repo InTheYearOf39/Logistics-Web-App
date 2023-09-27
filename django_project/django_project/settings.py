@@ -48,8 +48,7 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
-    'allauth.socialaccount.providers.google',
-    'channels'
+    'allauth.socialaccount.providers.google'
 ]
 
 SOCIALACCOUNT_PROVIDERS = {
@@ -74,6 +73,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django_session_timeout.middleware.SessionTimeoutMiddleware',
+    'lmsapp.middleware.PasswordChangeMiddleware'
 ]
 
 ROOT_URLCONF = 'django_project.urls'

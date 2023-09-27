@@ -29,6 +29,9 @@ urlpatterns = [
     path('verify-email/', authentication_views.verify_email, name='verify_email'),
     path('settings/generate_api_key/', authentication_views.generate_api_key, name='generate_api_key'),
 
+    # this password chcange route should not be confused for the change password above, this one is for triggering password change for newly created users inroder to access the app.
+    path('password_change/', authentication_views.password_change, name='password_change'),
+
     # reset password routes
     path( 'reset_password/', 
         auth_views.PasswordResetView.as_view(template_name="registration/password_reset_form_.html"), 

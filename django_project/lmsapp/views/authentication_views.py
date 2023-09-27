@@ -43,6 +43,7 @@ def register(request):
             user.name = name
             user.role = 'sender'
             user.is_active = False
+            user.has_set_password = True
 
             user.generate_verification_token()
             user.save()
@@ -241,4 +242,40 @@ class CustomLoginView(LoginView):
 
 class CustomSignupView(SignupView):
     template_name = 'auth/timeout.html'
+
+
+def password_change(request):
+    # Mapping of user roles to dashboard URLs
+    dashboard_urls = {
+        'warehouse': 'warehouse_dashboard',
+        'courier': 'courier_dashboard',
+        'drop_pick_zone': 'drop_pick_zone_dashboard',
+    }
+    
+    if request.method == 'POST':
+        form = ChangePasswordForm(request.user, request.POST)
+        if form.is_valid():
+
+            user = form.save(commit=False)
+            user.has_set_password = True
+            user.save()
+
+            update_session_auth_hash(request, user)  # Important to update the session
+            messages.success(request, 'Your password has been successfully changed.')
+            
+            # Redirect to the user type dashboard based on the user's role
+            user_role = user.role
+            if user_role in dashboard_urls:
+                dashboard_url = dashboard_urls[user_role]
+                return redirect(dashboard_url)
+            else:
+                # Handle the case when the user's role is not in the mapping object
+                return redirect('home')
+        else:
+            messages.error(request, 'Please correct the error below.')
+    else:
+        form = ChangePasswordForm(request.user)
+
+    return render(request, 'auth/password_change.html', {'form': form})
+
 

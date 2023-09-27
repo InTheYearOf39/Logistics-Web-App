@@ -93,6 +93,7 @@ class User(AbstractUser):
     objects = CustomUserManager()
     verification_token = models.CharField(max_length=200, null=True, blank=True)
     email = models.EmailField(max_length=254, null=True, blank=True )
+    has_set_password = models.BooleanField(default=False)
 
     # Add warehouse-specific fields
     phone = models.CharField(max_length=20, null=True, blank=True)
