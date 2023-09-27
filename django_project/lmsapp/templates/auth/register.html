@@ -86,28 +86,6 @@
       </div>
     </div>
   </div>
-
-  <script>
-    $(document).ready(function() {
-      // Hide the tag field initially
-      var tagField = $('#tagField');
-      tagField.hide();
-
-      // Listen for changes in the role field
-      var roleField = $('input[name="role"]');
-      roleField.on('change', function() {
-        // Check if the selected value is 'drop_pick_zone'
-        var selectedRole = roleField.filter(':checked').val();
-        if (selectedRole === 'drop_pick_zone') {
-          // Show the tag field
-          tagField.show();
-        } else {
-          // Hide the tag field
-          tagField.hide();
-        }
-      });
-    });
-  </script>
     
   </body>
 </html>

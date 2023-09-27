@@ -43,6 +43,10 @@ urlpatterns = [
         auth_views.PasswordResetCompleteView.as_view(template_name="registration/password_reset_complete_.html"), 
         name ="password_reset_complete"),
 
+    # redirect the default all auth account logins and sign up to my custom templates
+    path('accounts/login/', authentication_views.CustomLoginView.as_view(), name='account_login'),
+    path('accounts/signup/', authentication_views.CustomSignupView.as_view(), name='account_signup'),
+
 
     # admin routes
     path('admin_dashboard/', admin_views.admin_dashboard, name='admin_dashboard'),

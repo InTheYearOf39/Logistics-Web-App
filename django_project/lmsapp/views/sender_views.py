@@ -73,7 +73,7 @@ def sender_dashboard(request):
                                                                   <p>Your package has been dropped off at the PickUp Location. It's ready for pick up.</p>
                                                               </li>
                                                               <li class='event  """ + ("active" if packages[ind]["status"] == "completed" else "" ) + """' step="Five" data-status="completed">
-                                                                  <h3>Picked UP !</h3>
+                                                                  <h3>Picked Up !</h3>
                                                                   <p>Thank you for choosing our services. We hope to see you soon!</p>
                                                               </li>
                                                           </ul>

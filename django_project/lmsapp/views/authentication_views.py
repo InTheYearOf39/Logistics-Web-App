@@ -12,6 +12,7 @@ from django.conf import settings
 from lmsapp.utils import generate_and_store_api_key
 from lmsapp.forms import ApiForm
 from django.contrib.auth.decorators import login_required
+from allauth.account.views import LoginView, SignupView
 
 """
 A function to handle user registration. The form data is validated, and if valid, a user is created, saved to the database, 
@@ -232,3 +233,12 @@ def generate_api_key(request):
         form = ApiForm()
 
     return render(request, 'auth/generate_api_key.html', {'form': form})
+
+
+
+class CustomLoginView(LoginView):
+    template_name = 'auth/timeout.html' 
+
+class CustomSignupView(SignupView):
+    template_name = 'auth/timeout.html'
+
