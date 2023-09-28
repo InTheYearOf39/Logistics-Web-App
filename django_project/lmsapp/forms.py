@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from lmsapp.models import User, Package, DropPickZone, Warehouse
 from django.contrib.auth import password_validation
-from django.contrib.auth.forms import SetPasswordForm
+from django.contrib.auth.forms import SetPasswordForm, PasswordChangeForm
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
 from django.core.validators import EmailValidator, RegexValidator, MinLengthValidator, MaxLengthValidator
@@ -695,7 +695,7 @@ class EditCourierForm(forms.ModelForm):
         fields = ['name', 'username', 'phone', 'address', 'warehouse', 'email']
 
 
-class ChangePasswordForm(SetPasswordForm):
+class ChangePasswordForm(PasswordChangeForm):
     error_messages = {
         'password_mismatch': _("The two password fields didn't match."),
         'password_entirely_numeric': _("Your password can't be entirely numeric."),
@@ -725,11 +725,19 @@ class ChangePasswordForm(SetPasswordForm):
         super().__init__(*args, **kwargs)
         self.fields['new_password1'].validators.append(self.validate_password)
 
+
     def clean_old_password(self):
         old_password = self.cleaned_data.get('old_password')
         if not self.user.check_password(old_password):
             raise forms.ValidationError(_("The old password is incorrect."))
         return old_password
+    
+    def clean_new_password1(self):
+        password1 = self.cleaned_data.get("new_password1")
+        old_password = self.cleaned_data.get("old_password")
+        if password1 == old_password:
+            raise ValidationError(_("New password cannot be the same as the old password."))        
+        return password1
     
     def clean_new_password2(self):
         password1 = self.cleaned_data.get("new_password1")
