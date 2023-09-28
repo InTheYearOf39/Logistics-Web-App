@@ -13,6 +13,7 @@ from lmsapp.utils import generate_and_store_api_key
 from lmsapp.forms import ApiForm
 from django.contrib.auth.decorators import login_required
 from allauth.account.views import LoginView, SignupView
+from django.urls import reverse
 
 """
 A function to handle user registration. The form data is validated, and if valid, a user is created, saved to the database, 
@@ -238,14 +239,15 @@ def generate_api_key(request):
 
 
 class CustomLoginView(LoginView):
-    template_name = 'auth/timeout.html' 
+    template_name = 'auth/session_error.html' 
 
 class CustomSignupView(SignupView):
-    template_name = 'auth/timeout.html'
+    template_name = 'auth/session_error.html'
 
 
-def password_change(request):
-    # Mapping of user roles to dashboard URLs
+@login_required 
+def password_change(request): #route not be confused with the change password above, this is used to change password for first time logins
+    
     dashboard_urls = {
         'warehouse': 'warehouse_dashboard',
         'courier': 'courier_dashboard',
@@ -261,21 +263,19 @@ def password_change(request):
             user.save()
 
             update_session_auth_hash(request, user)  # Important to update the session
-            messages.success(request, 'Your password has been successfully changed.')
+            success_message = 'Your password has been successfully changed.'
             
-            # Redirect to the user type dashboard based on the user's role
             user_role = user.role
             if user_role in dashboard_urls:
                 dashboard_url = dashboard_urls[user_role]
-                return redirect(dashboard_url)
-            else:
-                # Handle the case when the user's role is not in the mapping object
+                return redirect(reverse(dashboard_url)+ f'?success_message={success_message}')
+            else:              
                 return redirect('home')
         else:
-            messages.error(request, 'Please correct the error below.')
-    else:
-        form = ChangePasswordForm(request.user)
-
-    return render(request, 'auth/password_change.html', {'form': form})
+            return render(request, 'auth/password_change.html', {'form': form})
+        
+    if request.method == 'GET':
+        form = ChangePasswordForm(request.user) 
+        return render(request, 'auth/password_change.html', {'form': form})
 
 

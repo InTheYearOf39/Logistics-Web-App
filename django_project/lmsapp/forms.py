@@ -706,19 +706,19 @@ class ChangePasswordForm(SetPasswordForm):
 
     old_password = forms.CharField(
         label=_("Old Password"),
-        strip=False,
-        widget=forms.PasswordInput(attrs={'autocomplete': 'current-password', 'class': 'form-control'}),
+        strip=True,
+        widget=forms.PasswordInput(attrs={'autocomplete': 'current-password', 'class': 'form-control form-control-sm'}),
     )
     new_password1 = forms.CharField(
         label=_("New Password"),
-        strip=False,
-        widget=forms.PasswordInput(attrs={'autocomplete': 'new-password', 'class': 'form-control'}),
+        strip=True,
+        widget=forms.PasswordInput(attrs={'autocomplete': 'new-password', 'class': 'form-control form-control-sm'}),
         help_text=password_validation.password_validators_help_text_html(),
     )
     new_password2 = forms.CharField(
         label=_("Confirm New Password"),
-        strip=False,
-        widget=forms.PasswordInput(attrs={'autocomplete': 'new-password', 'class': 'form-control'}),
+        strip=True,
+        widget=forms.PasswordInput(attrs={'autocomplete': 'new-password', 'class': 'form-control form-control-sm'}),
     )
 
     def __init__(self, *args, **kwargs):
@@ -730,6 +730,17 @@ class ChangePasswordForm(SetPasswordForm):
         if not self.user.check_password(old_password):
             raise forms.ValidationError(_("The old password is incorrect."))
         return old_password
+    
+    def clean_new_password2(self):
+        password1 = self.cleaned_data.get("new_password1")
+        password2 = self.cleaned_data.get("new_password2")
+        if password1 and password2 and password1 != password2:
+            raise ValidationError(
+                self.error_messages["password_mismatch"],
+                code="password_mismatch",
+            )
+        password_validation.validate_password(password2, self.user)
+        return password2
 
     def validate_password(self, password):
         password_validation.validate_password(password, self.user)
@@ -739,7 +750,7 @@ class ApiForm(forms.Form):
     password = forms.CharField(
         max_length=150,
         label="Enter Password",
-        strip=False,
+        strip=True,
         widget=forms.PasswordInput(
             attrs={
                 "class": "form-control form-control-sm",
