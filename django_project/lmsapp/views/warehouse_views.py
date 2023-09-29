@@ -466,10 +466,10 @@ def add_package(request):
         form = PackageForm()
         user_warehouse = request.user.warehouse
 
-    # Get the warehouse data to populate the warehouse dropdown
-    warehouse = Warehouse.objects.all()
-    context = {'form': form, 'warehouse': warehouse, 'user_warehouse': user_warehouse, 'senders': senders}
-    return render(request, 'warehouse/add_package.html', context)
+        # Get the warehouse data to populate the warehouse dropdown
+        warehouse = Warehouse.objects.all()
+        context = {'form': form, 'warehouse': warehouse, 'user_warehouse': user_warehouse, 'senders': senders}
+        return render(request, 'warehouse/add_package.html', context)
 
 # def add_package(request):
 #     msg = None

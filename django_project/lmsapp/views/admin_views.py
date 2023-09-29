@@ -14,6 +14,7 @@ from django.views.decorators.clickjacking import xframe_options_exempt
 from django.contrib import messages
 from lmsapp.forms import CourierForm, WarehouseCreationForm, DropPickCreationForm, DropPickUserForm, WarehouseUserForm, EditWarehouseUserForm, EditDropPickUserForm, EditCourierForm
 from lmsapp.models import Package, User, Warehouse, DropPickZone
+from django.contrib.auth.hashers import make_password
 
 from calendar import monthrange
 from datetime import datetime, timedelta
@@ -479,7 +480,7 @@ def create_courier(request):
             courier.warehouse = warehouse_id
             courier.address = address
             courier.role = 'courier'
-            courier.password = 'courier@courier'
+            courier.password = make_password('courier@courier')
             courier.longitude = longitude        
             courier.latitude = latitude        
             courier.created_by = request.user
@@ -522,7 +523,7 @@ def create_warehouse_user(request):
             user.phone = phone
             user.warehouse = warehouse_id
             user.role = 'warehouse'
-            user.password = 'warehouse@warehouse'        
+            user.password = make_password('warehouse@warehouse')  
             user.created_by = request.user
             user.save()
 
@@ -564,7 +565,7 @@ def create_drop_pick_user(request):
             user.phone = phone
             user.drop_pick_zone = drop_pick_zone_id
             user.role = 'drop_pick_zone'
-            user.password = 'droppick@droppick'        
+            user.password = make_password('droppick@droppick')   
             user.created_by = request.user
             user.save()
 

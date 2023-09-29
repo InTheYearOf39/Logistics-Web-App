@@ -10,7 +10,7 @@ class PasswordChangeMiddleware:
         user = request.user
 
         # Add URLs that don't require authentication here
-        exempt_urls = [reverse('login_view'), reverse('register'), reverse('home'), reverse('services'), reverse('about'), reverse('contact'), reverse('password_change')]
+        exempt_urls = [reverse('login_view'), reverse('logout_user'), reverse('register'), reverse('home'), reverse('services'), reverse('about'), reverse('contact'), reverse('password_change')]
 
         if user.is_authenticated:
             enforced_roles = ['courier', 'warehouse', 'drop_pick_zone']

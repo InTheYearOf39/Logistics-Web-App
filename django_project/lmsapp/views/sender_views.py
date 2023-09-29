@@ -191,7 +191,6 @@ def register_package(request):
 
             return redirect('sender_dashboard')
         else:
-            form = PackageForm()
             return render(request, 'sender/register_package.html', {'form': form, 'api_key': google_api_key})
     else:
         form = PackageForm()
