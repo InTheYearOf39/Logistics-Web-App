@@ -103,7 +103,6 @@ urlpatterns = [
     path('courier_history/', courier_views.courier_history, name='courier_history'),
     path('notify_dropoff_delivery/<int:package_id>/', courier_views.notify_dropoff_delivery, name='notify_dropoff_delivery'),
     path('get_courier_location/', courier_views.get_courier_location, name='get_courier_location'),
-    path('live_directions_test/', courier_views.live_directions_view, name='live_directions_view'),
     path('api/get_gps_coordinates/', courier_views.get_gps_coordinates, name='get_gps_coordinates'),
 
 
@@ -120,6 +119,7 @@ urlpatterns = [
     path('add_package/', warehouse_views.add_package, name='add_package'),
     path('data/excel/upload/', warehouse_views.upload_excel, name='upload_excel'),
     path('data/google-sheet/extract/', warehouse_views.extract_google_sheet_data, name='extract_google_sheet_data'),
+    path('courier_tracking/', warehouse_views.courier_tracking, name='courier_tracking'),
 
 
     # Drop off and Pick up routes

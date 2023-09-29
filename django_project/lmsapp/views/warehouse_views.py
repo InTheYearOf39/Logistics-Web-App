@@ -215,7 +215,7 @@ def change_password(request):
 
 """ 
 Handles the confirmation of package arrival at the warehouse. It updates the package status, 
-updates the courier's status if applicable, sends an email notification to the sender
+updates the courier's status if applicable, sends an email  ication to the sender
 """
 @login_required
 @user_passes_test(is_warehouse_user)
@@ -307,7 +307,7 @@ def in_house(request):
 
     context = {
         'ready_packages': ready_packages,
-        'available_couriers': User.objects.filter(role='courier', status='available'),
+        'available_couriers': User.objects.filter(role='courier', status='available', warehouse=request.user.warehouse),
     }
     return render(request, 'warehouse/ready_packages.html', context)
 
@@ -1202,3 +1202,8 @@ def extract_google_sheet_data(request):
     else:
         
         return render(request, "warehouse/extract_google_sheet_data.html", {"sheets": sheets})
+    
+@login_required
+def courier_tracking(request):
+    couriers = User.objects.filter(role='courier', warehouse=request.user.warehouse)
+    return render(request, 'warehouse/courier_tracking.html', {'couriers': couriers})

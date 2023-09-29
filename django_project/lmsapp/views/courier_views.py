@@ -111,7 +111,7 @@ A function to handle notifying the recipient of a package arrival by sending an 
 @user_passes_test(is_courier_user)
 def notify_recipient(request, package_id):
     package = get_object_or_404(Package, id=package_id) 
-    print(package)
+    # print(package)
     if request.method == 'POST':
         # Check if the package deliveryType is premium
         if package.deliveryType in ['premium', 'express']:
@@ -198,13 +198,6 @@ def courier_history(request):
         'assigned_packages': assigned_packages,
     }
     return render(request, 'courier/courier_history.html', context)
-
-
-
-def live_directions_view(request):
-    couriers = User.objects.filter(role='courier')
-    return render(request, 'courier/courier_tracking.html', {'couriers': couriers})
-
 
 
 @xframe_options_exempt
