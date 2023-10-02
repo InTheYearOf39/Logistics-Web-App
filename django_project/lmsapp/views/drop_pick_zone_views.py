@@ -3,7 +3,7 @@ from lmsapp.models import Package, User, DropPickZone
 from lmsapp.forms import PackageForm
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import redirect, get_object_or_404
-from django.core.mail import send_mail, EmailMessage
+from django.core.mail import send_mail, EmailMessage, BadHeaderError
 from django.contrib.auth import get_user_model
 from django.contrib import messages
 import random
@@ -15,7 +15,6 @@ from django.views.decorators.csrf import csrf_exempt
 import math
 from django.http import JsonResponse
 import math
-from django.core.mail import send_mail, BadHeaderError
 from lmsapp.utils import send_sms
 from django.db.models import Q
 
