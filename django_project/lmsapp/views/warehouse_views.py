@@ -66,9 +66,9 @@ def warehouse_dashboard(request):
                 courier.status = 'on-trip'
                 courier.save()
 
-            messages.success(request, 'Packages successfully assigned to courier.')
-            return redirect('warehouse_dashboard')
-
+            # messages.success(request, 'Packages successfully assigned to courier.')
+            success_message='Packages successfully assigned to courier.'
+            return redirect(reverse('warehouse_dashboard') + f'?success_message={success_message}')
 
     if request.method == 'GET':
         success_message = request.GET.get('success_message', "")
@@ -118,20 +118,23 @@ def premium_dashboard(request):
                 courier.status = 'on-trip'
                 courier.save()
 
-            messages.success(request, 'Packages successfully assigned to courier.')
-            return redirect('warehouse_dashboard')
+            success_message='Packages successfully assigned to courier.'
+            return redirect(reverse('premium_dashboard') + f'?success_message={success_message}')
+            
+    if request.method == 'GET':
+        success_message = request.GET.get('success_message', "")
 
-    # Filter couriers based on the warehouse
-    available_couriers = User.objects.filter(
-        role='courier', status='available', warehouse=request.user.warehouse
-    )
+        available_couriers = User.objects.filter(
+            role='courier', status='available', warehouse=request.user.warehouse
+        )
 
-    context = {
-        'packages': packages,
-        'available_couriers': available_couriers
-    }
+        context = {
+            'packages': packages,
+            'available_couriers': available_couriers,
+            'success_message': success_message
+        }
 
-    return render(request, 'warehouse/premium_dashboard.html', context)
+        return render(request, 'warehouse/premium_dashboard.html', context)
 
 
 @login_required
@@ -166,19 +169,23 @@ def express_dashboard(request):
                 courier.status = 'on-trip'
                 courier.save()
 
-            messages.success(request, 'Packages successfully assigned to courier.')
-            return redirect('warehouse_dashboard')
+            success_message='Packages successfully assigned to courier.'
+            return redirect(reverse('express_dashboard') + f'?success_message={success_message}')
 
-    available_couriers = User.objects.filter(
-        role='courier', status='available', warehouse=request.user.warehouse
-    )
+    if request.method == 'GET':
+        success_message = request.GET.get('success_message', "")
 
-    context = {
-        'packages': packages,
-        'available_couriers': available_couriers
-    }
+        available_couriers = User.objects.filter(
+            role='courier', status='available', warehouse=request.user.warehouse
+        )
 
-    return render(request, 'warehouse/express_dashboard.html', context)
+        context = {
+            'packages': packages,
+            'available_couriers': available_couriers,
+            'success_message': success_message
+        }
+
+        return render(request, 'warehouse/express_dashboard.html', context)
 
 
 
@@ -215,7 +222,7 @@ def change_password(request):
 
 """ 
 Handles the confirmation of package arrival at the warehouse. It updates the package status, 
-updates the courier's status if applicable, sends an email  ication to the sender
+updates the courier's status if applicable, sends an email  notification to the sender
 """
 @login_required
 @user_passes_test(is_warehouse_user)

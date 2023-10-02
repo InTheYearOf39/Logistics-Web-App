@@ -4,7 +4,22 @@
 
 {% block content %}
 
+{% if messages %}
+{% for message in messages %}
 
+  {% if message.tags == 'error' %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+  {% elif message.tags == 'success' %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+  {% else %}
+    <div class="alert alert-info alert-dismissible fade show" role="alert">
+  {% endif %}
+        
+  {{ message }}
+    <button type="button" class="btn-close" data-coreui-dismiss="alert" aria-label="Close"></button>
+  </div>
+  {% endfor %}
+{% endif %}
 
 <div class="row">
     <div class="col-md-12">
@@ -96,14 +111,6 @@
   
     </div>
     <!-- /.col-->
-
-    {% if messages %}
-  <ul class="messages">
-    {% for message in messages %}
-      <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-    {% endfor %}
-  </ul>
-{% endif %}
 
   </div>
 
