@@ -233,17 +233,20 @@ def confirm_arrival(request, package_id):
 
         package = Package.objects.get(pk=package_id)
         package.status = 'in_house'
-        courier = package.courier
-        if courier:
-            courier.status = 'available'
-            courier.save()
-        
-        # Assign the warehouse to the package
         package.warehouse = warehouse
-        
-        # Save the package
         package.save()
-        
+
+
+        courier = package.courier
+
+        if courier:
+            assigned_packages = Package.objects.filter(courier=courier, status='warehouse_arrival').count()
+
+            if assigned_packages == 0:
+                courier.status = 'available'
+                courier.save()
+
+         
         # Send email to sender
         subject = 'Package Dropped Off at Warehouse'
         message = f'Dear Customer, your package with delivery number {package.package_number} has been dropped off at the warehouse.'
@@ -257,7 +260,7 @@ def confirm_arrival(request, package_id):
     else:
         messages.error(request, "Invalid request.")
 
-    return redirect('in_house')  # Replace with the appropriate URL for the warehouse dashboard
+    return redirect('in_house')
 
 """ 
 The view displays a list of packages with the 'in_house'status and allows the user to assign selected packages 
@@ -312,11 +315,12 @@ def in_house(request):
         else:
             messages.error(request, 'Please select packages and a courier.')
 
-    context = {
-        'ready_packages': ready_packages,
-        'available_couriers': User.objects.filter(role='courier', status='available', warehouse=request.user.warehouse),
-    }
-    return render(request, 'warehouse/ready_packages.html', context)
+    if request.method == 'GET':
+        context = {
+            'ready_packages': ready_packages,
+            'available_couriers': User.objects.filter(role='courier', status='available', warehouse=request.user.warehouse),
+        }
+        return render(request, 'warehouse/ready_packages.html', context)
 
 
 """ 
