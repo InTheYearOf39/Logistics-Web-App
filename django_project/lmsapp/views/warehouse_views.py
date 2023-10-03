@@ -5,7 +5,6 @@ from lmsapp.models import Package, User,DropPickZone, Warehouse, UserGoogleSheet
 from django.contrib import messages
 from lmsapp.forms import ChangePasswordForm, PackageForm, ExcelUploadForm
 from django.contrib.auth import update_session_auth_hash
-from django.core.mail import send_mail
 from django.conf import settings
 from django.views.decorators.clickjacking import xframe_options_exempt
 import random
@@ -16,6 +15,8 @@ from django.db.models import Q
 import pandas as pd
 from django.http import HttpResponse
 from lmsapp.utils import send_sms
+
+from lmsapp.tasks import send_email_notification
 
 from openpyxl import load_workbook
 from openpyxl.workbook import Workbook
@@ -254,8 +255,10 @@ def confirm_arrival(request, package_id):
         sender_user = User.objects.get(username=package.user.username)
         sender_email = sender_user.email
 
-        send_mail(subject, message, settings.EMAIL_HOST_USER, [sender_email])   
+        # send_mail(subject, message, settings.EMAIL_HOST_USER, [sender_email])
 
+        send_email_notification.apply_async((subject, message, sender_email))
+           
         messages.success(request, "Package arrival notified successfully.")
     else:
         messages.error(request, "Invalid request.")
@@ -449,8 +452,8 @@ def add_package(request):
 
             message += f"Status: {package.status}"
             
-            from_email = settings.DEFAULT_FROM_EMAIL
-            recipient_list = [package.recipientEmail, package.sendersEmail]
+            # from_email = settings.DEFAULT_FROM_EMAIL
+            # recipient_list = [package.recipientEmail, package.sendersEmail]
                            
             sender_contact = str(package.sendersContact).strip()
 
@@ -460,7 +463,9 @@ def add_package(request):
             send_sms([sender_contact], message, settings.AFRICASTALKING_SENDER)
            
             try:
-                send_mail(subject, message, from_email, recipient_list, fail_silently=False)
+                # send_mail(subject, message, from_email, recipient_list, fail_silently=False)
+                send_email_notification.apply_async((subject, message, package.recipientEmail))
+                send_email_notification.apply_async((subject, message, package.sendersEmail))
             except BadHeaderError as e:
                 # Handle the BadHeaderError
                 print("Error: BadHeaderError:", str(e))
@@ -482,89 +487,6 @@ def add_package(request):
         context = {'form': form, 'warehouse': warehouse, 'user_warehouse': user_warehouse, 'senders': senders}
         return render(request, 'warehouse/add_package.html', context)
 
-# def add_package(request):
-#     msg = None
-#     user_warehouse = None  # Initialize user_warehouse
-    
-#     senders = User.objects.filter(role='sender')
-#     if request.method == 'POST':
-#         form = PackageForm(request.POST)
-
-#         if form.is_valid():
-#             package = form.save(commit=False)
-#             package.created_by = request.user
-#             package.package_number = generate_package_number()
-
-#             # Automatically set the warehouse to the one the user belongs to
-#             user_warehouse = request.user.warehouse
-#             if user_warehouse:
-#                 package.warehouse = user_warehouse
-#             else:
-#                 # Handle the case where the user does not have a warehouse
-#                 pass
-
-#             recipient_latitude = request.POST.get('recipient_latitude')
-#             recipient_longitude = request.POST.get('recipient_longitude')
-#             package.recipient_latitude = recipient_latitude
-#             package.recipient_longitude = recipient_longitude
-
-#             package.status = 'in_house'
-
-#             selected_user_id = request.POST.get('user')
-#             if selected_user_id:
-#                 selected_user = User.objects.get(id=selected_user_id)
-
-#                 package.sendersEmail = selected_user.email
-#                 package.sendersName = selected_user.username
-#             package.save()
-
-            
-#             # Send an email to the sender
-#             subject = 'Package Registered'
-#             message = (
-#                 f"Dear Customer, your package has been successfully registered.\n\n"
-#                 f"Package Number: {package.package_number}\n"
-#                 f"Recipient: {package.recipientName}\n"
-#                 f"Recipient Address: {package.recipientAddress}\n"
-#                 f"If you have any questions, please contact our customer support team.\n"
-#             )
-
-#             if package.dropOffLocation:
-#                 message += f"Drop-off Location: {package.dropOffLocation.name}\n"
-
-#             message += f"Status: {package.status}"
-            
-#             from_email = settings.DEFAULT_FROM_EMAIL
-#             recipient_list = [package.recipientEmail, package.sendersEmail]
-                           
-#             sender_contact = str(package.sendersContact).strip()
-
-#             if len(sender_contact) == 10 and sender_contact.startswith('0'):
-#                 sender_contact = '+256' + sender_contact[1:]
-
-#             send_sms([sender_contact], message, settings.AFRICASTALKING_SENDER)
-           
-#             try:
-#                 send_mail(subject, message, from_email, recipient_list, fail_silently=False)
-#             except BadHeaderError as e:
-#                 # Handle the BadHeaderError
-#                 print("Error: BadHeaderError:", str(e))
-#             except Exception as e:
-#                 # Handle other exceptions
-#                 print("Error:", str(e))
-
-#             msg = 'Package registered'
-#             return redirect('in_house')
-#         else:
-#             msg = 'Form is not valid'
-#     else:
-#         form = PackageForm()
-#         user_warehouse = request.user.warehouse
-
-#     # Get the warehouse data to populate the warehouse dropdown
-#     warehouse = Warehouse.objects.all()  # Adjust this based on your model
-#     context = {'form': form, 'warehouse': warehouse, 'user_warehouse': user_warehouse, 'senders': senders}
-#     return render(request, 'warehouse/add_package.html', context)
 
 @login_required
 @user_passes_test(is_warehouse_user)

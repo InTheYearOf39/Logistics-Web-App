@@ -14,6 +14,7 @@ from lmsapp.forms import ApiForm
 from django.contrib.auth.decorators import login_required
 from allauth.account.views import LoginView, SignupView
 from django.urls import reverse
+from lmsapp.tasks import send_email_notification
 
 """
 A function to handle user registration. The form data is validated, and if valid, a user is created, saved to the database, 
@@ -64,7 +65,8 @@ def register(request):
                       f"{current_site.domain}/verify-email?verification_token={user.verification_token}\n"\
                       f"If this wasn't you, ignore this message"
             
-            send_mail(subject, message, settings.EMAIL_HOST_USER, [user.email])
+            # send_mail(subject, message, settings.EMAIL_HOST_USER, [user.email])
+            send_email_notification.apply_async((subject, message, user.email))
 
             return redirect('email_verification_sent')
         else:

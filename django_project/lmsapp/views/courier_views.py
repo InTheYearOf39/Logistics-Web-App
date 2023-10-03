@@ -4,7 +4,6 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 import random
 from django.shortcuts import redirect, get_object_or_404
 from django.contrib import messages
-from django.core.mail import send_mail
 from django.conf import settings
 from django.core.mail import send_mail, BadHeaderError
 from django.http import HttpResponse
@@ -12,6 +11,7 @@ from lmsapp.utils import send_sms
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
+from lmsapp.tasks import send_email_notification
 
 def is_courier_user(user):
     return user.role == 'courier'
@@ -62,12 +62,15 @@ def notify_arrival(request, package_id):
 
                 message += f"Status: {package.status}"
                 
-                from_email = settings.DEFAULT_FROM_EMAIL
-                recipient_list = [package.recipientEmail]
+                # from_email = settings.DEFAULT_FROM_EMAIL
+                # recipient_list = [package.recipientEmail]
+                recipient_list = package.recipientEmail
 
                 # Try sending the email
                 try:
-                    send_mail(subject, message, from_email, recipient_list, fail_silently=False)
+                    # send_mail(subject, message, from_email, recipient_list, fail_silently=False)
+                    send_email_notification.apply_async((subject, message, recipient_list))
+
                     messages.success(request, "Package arrival notified successfully.")
                 except BadHeaderError as e:
                     messages.error(request, f"Error: BadHeaderError - {str(e)}")
@@ -135,8 +138,9 @@ def notify_recipient(request, package_id):
 
         # message += f"Status: {package.status}"
 
-        from_email = settings.DEFAULT_FROM_EMAIL
-        recipient_list = [package.recipientEmail]
+        # from_email = settings.DEFAULT_FROM_EMAIL
+        # recipient_list = [package.recipientEmail]
+        recipient_list = package.recipientEmail
 
 
         recipient_telephone = str(package.recipientTelephone).strip()
@@ -147,7 +151,9 @@ def notify_recipient(request, package_id):
         send_sms([recipient_telephone], message, settings.AFRICASTALKING_SENDER)
         
         try:
-            send_mail(subject, message, from_email, recipient_list, fail_silently=False)
+            # send_mail(subject, message, from_email, recipient_list, fail_silently=False)
+            send_email_notification.apply_async((subject, message, recipient_list))
+
             messages.success(request, "Package drop-off notified successfully.")
         except BadHeaderError as e:
             # Handle the BadHeaderError

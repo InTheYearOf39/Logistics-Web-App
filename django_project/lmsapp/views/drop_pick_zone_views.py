@@ -17,7 +17,7 @@ from django.http import JsonResponse
 import math
 from lmsapp.utils import send_sms
 from django.db.models import Q
-
+from lmsapp.tasks import send_email_notification
 
 def is_drop_pick_user(user):
     return user.role == 'drop_pick_zone'
@@ -127,8 +127,11 @@ def confirm_at_pickup(request, package_id):
         send_sms([recipient_contact], message_receiver, settings.AFRICASTALKING_SENDER)
 
         try:
-            send_mail(subject, message_receiver, settings.EMAIL_HOST_USER, [receiver])
-            send_mail(subject, message_sender, settings.EMAIL_HOST_USER, [sender_user.email])
+            # send_mail(subject, message_receiver, settings.EMAIL_HOST_USER, [receiver])
+            # send_mail(subject, message_sender, settings.EMAIL_HOST_USER, [sender_user.email])
+
+            send_email_notification.apply_async((subject, message_receiver, receiver))
+            send_email_notification.apply_async((subject, message_sender, sender_user.email))
             messages.success(request, "Email notification sent successfully.")
 
             # # Update the status to 'arrived'
@@ -219,7 +222,8 @@ def confirm_pickup(request, package_id):
         sender_user = User.objects.get(username=package.user.username)
         sender_email = sender_user.email
 
-        send_mail(subject, message, settings.EMAIL_HOST_USER, [sender_email])
+        # send_mail(subject, message, settings.EMAIL_HOST_USER, [sender_email])
+        send_email_notification.apply_async((subject, message, sender_email))
 
         return redirect('dispatched_packages')
 
@@ -354,8 +358,8 @@ def add_package_droppick(request):
 
             message += f"Status: {package.status}"
             
-            from_email = settings.DEFAULT_FROM_EMAIL
-            recipient_list = [package.recipientEmail, package.sendersEmail]
+            # from_email = settings.DEFAULT_FROM_EMAIL
+            # recipient_list = [package.recipientEmail, package.sendersEmail]
                            
             sender_contact = str(package.sendersContact).strip()
 
@@ -365,7 +369,9 @@ def add_package_droppick(request):
             send_sms([sender_contact], message, "LASTMILE-PUDONET")
 
             try:    
-                send_mail(subject, message, from_email, recipient_list, fail_silently=False)
+                # send_mail(subject, message, from_email, recipient_list, fail_silently=False)
+                send_email_notification.apply_async((subject, message, package.recipientEmail))
+                send_email_notification.apply_async((subject, message, package.sendersEmail))
             except BadHeaderError as e:
                 # Handle the BadHeaderError
                 print("Error: BadHeaderError:", str(e))
@@ -388,110 +394,6 @@ def add_package_droppick(request):
         drop_pick_zones = DropPickZone.objects.all()  
         context = {'form': form, 'drop_pick_zones': drop_pick_zones, 'user_drop_pick_zone': user_drop_pick_zone, 'senders': senders}
         return render(request, 'drop_pick_zone/add_package.html', context)
-
-# def add_package_droppick(request):
-#     senders = User.objects.filter(role='sender')
-#     if request.method == 'POST':
-#         form = PackageForm(request.POST)
-
-#         if form.is_valid():
-#             package = form.save(commit=False)
-#             package.created_by = request.user
-#             package.package_number = generate_package_number()
-
-#             # Automatically set the dropOffLocation to the one the user belongs to
-#             user_drop_pick_zone = request.user.drop_pick_zone
-#             if user_drop_pick_zone:
-#                 package.dropOffLocation = user_drop_pick_zone
-#             else:
-#                 # Handle the case where the user does not have a drop_pick_zone
-#                 pass
-
-#             recipient_latitude = request.POST.get('recipient_latitude')
-#             recipient_longitude = request.POST.get('recipient_longitude')
-#             package.recipient_latitude = recipient_latitude
-#             package.recipient_longitude = recipient_longitude
-
-#             package.status = 'dropped_off'
-
-#             selected_user_id = request.POST.get('user')
-#             if selected_user_id:
-#                 selected_user = User.objects.get(id=selected_user_id)
-
-#                 package.sendersEmail = selected_user.email
-#                 package.sendersName = selected_user.username
-#             package.save()
-
-
-#             subject = 'Package Registered'
-#             message = (
-#                 f"Dear Customer, your package has been successfully registered.\n\n"
-#                 f"Package Number: {package.package_number}\n"
-#                 f"Recipient: {package.recipientName}\n"
-#                 f"Recipient Address: {package.recipientAddress}\n"
-#                 f"If you have any questions, please contact our customer support team.\n"
-#             )
-
-#             if package.dropOffLocation:
-#                 message += f"Drop-off Location: {package.dropOffLocation.name}\n"
-
-#             message += f"Status: {package.status}"
-            
-#             from_email = settings.DEFAULT_FROM_EMAIL
-#             recipient_list = [package.recipientEmail, package.sendersEmail]
-                           
-#             sender_contact = str(package.sendersContact).strip()
-
-#             if len(sender_contact) == 10 and sender_contact.startswith('0'):
-#                 sender_contact = '+256' + sender_contact[1:]
-
-#             send_sms([sender_contact], message, "LASTMILE-PUDONET")
-
-#             try:    
-#                 send_mail(subject, message, from_email, recipient_list, fail_silently=False)
-#             except BadHeaderError as e:
-#                 # Handle the BadHeaderError
-#                 print("Error: BadHeaderError:", str(e))
-#             except Exception as e:
-#                 # Handle other exceptions
-#                 print("Error:", str(e))
-
-
-#             return redirect('received_packages')  # Redirect to a success page or wherever you want
-
-#     else:
-#         form = PackageForm()
-#         user_drop_pick_zone = request.user.drop_pick_zone  # Get the user's drop_pick_zone
-
-#     # Get the drop_pick_zones data to populate the recipientPickUpLocation dropdown
-#     drop_pick_zones = DropPickZone.objects.all()  # Adjust this based on your model
-#     context = {'form': form, 'drop_pick_zones': drop_pick_zones, 'user_drop_pick_zone': user_drop_pick_zone, 'senders': senders}
-#     return render(request, 'drop_pick_zone/add_package.html', context)
-
-
-
-
-# def add_package(request):
-#     sender = request.user
-
-#     if request.method == 'POST':
-#         form = PackageForm(request.POST)
-
-#         if form.is_valid():
-#             package = form.save(commit=False)
-#             package.sender = sender
-#             package.save()
-
-#             return redirect('drop_pick_zone_dashboard')  # Redirect to a success page or wherever you want
-
-#     else:
-#         form = PackageForm()
-
-#     # Get the drop_pick_zones data to populate the recipientPickUpLocation dropdown
-#     drop_pick_zones = DropPickZone.objects.all()  # Adjust this based on your model
-#     context = {'form': form, 'drop_pick_zones': drop_pick_zones}
-#     return render(request, 'sender/add_package.html', context)
-
 
 
 def calculate_distance(lat1, lon1, lat2, lon2):

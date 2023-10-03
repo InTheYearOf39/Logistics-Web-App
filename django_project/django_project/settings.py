@@ -48,7 +48,8 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
-    'allauth.socialaccount.providers.google'
+    'allauth.socialaccount.providers.google',
+    'celery'
 ]
 
 SOCIALACCOUNT_PROVIDERS = {
@@ -221,3 +222,14 @@ AFRICASTALKING_USERNAME=config('AFRICASTALKING_USERNAME')
 AFRICASTALKING_API_KEY=config('AFRICASTALKING_API_KEY')
 
 AFRICASTALKING_SENDER=config('AFRICASTALKING_SENDER')
+
+
+
+# Celery Configuration
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+# CELERY_TIMEZONE = 'Africa/Kampala'
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True 
