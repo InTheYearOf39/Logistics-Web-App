@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, redirect
-from lmsapp.models import User, Package, CourierLocationData
+from lmsapp.models import User, Package, CourierLocationData, CourierHistory
 from django.contrib.auth.decorators import login_required, user_passes_test
 import random
 from django.shortcuts import redirect, get_object_or_404
@@ -210,12 +210,22 @@ the assigned packages are passed to the template through the context.
 """
 @login_required
 @user_passes_test(is_courier_user)
+# def courier_history(request):
+#     assigned_packages = Package.objects.filter(courier=request.user, status__in=['completed'])
+#     context = {
+#         'assigned_packages': assigned_packages,
+#     }
+#     return render(request, 'courier/courier_history.html', context)
+
 def courier_history(request):
-    assigned_packages = Package.objects.filter(courier=request.user, status__in=['completed'])
+    courier_history = CourierHistory.objects.filter(courier=request.user).order_by('-timestamp')
+
     context = {
-        'assigned_packages': assigned_packages,
+        'courier': request.user, 
+        'history': courier_history
     }
     return render(request, 'courier/courier_history.html', context)
+
 
 
 @xframe_options_exempt

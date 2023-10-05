@@ -13,58 +13,38 @@
               <thead class="table-white fw-semibold">
                 <tr>
                   <th>No</th>
-                  <th>Package</th>
-                  <th>Recipient</th>
-                  <th>From</th>
-                  <th>To</th>
-                  <th>Package No</th>
-                  <th>status</th>
-                  <th></th>
+                  <th>Package Name</th>
+                  <th>Package No.</th>
+                  <th>Status</th>
+                  <th>Timestamp</th>
                 </tr>
               </thead>
               <tbody>
-                {% for package in assigned_packages %}
+                {% for activity in history %}
                 <tr class="align-middle">
                   <td class="text-start">
                     <div class="small text-medium-emphasis"><span>{{ forloop.counter }}</span></div>
                   </td>
                   <td class="text-start">
-                    <div class="small text-medium-emphasis"><span>{{ package.packageName }}</span></div>
+                    <div class="small text-medium-emphasis"><span>{{ activity.package.packageName }}</span></div>
                   </td>
                   <td class="text-start">
-                    <div class="small text-medium-emphasis"><span>{{ package.recipientName }}</span></div>
+                    <div class="small text-medium-emphasis"><span>{{ activity.package.package_number }}</span></div>
                   </td>
                   <td class="text-start">
-                    <div class="small text-medium-emphasis"><span>{{ package.sendersAddress }}</span></div>
+                    <div class="small text-medium-emphasis"><span>{{ activity.get_status_display }}</span></div>
                   </td>
                   <td class="text-start">
-                    <div class="small text-medium-emphasis"><span>{{ package.recipientAddress }}</span></div>
-                  </td>
-                  <td class="text-start">
-                    <div class="small text-medium-emphasis"><span>{{ package.package_number }}</span></div>
-                  </td>
-                  <td class="text-start">
-                    <div class="small text-medium-emphasis"><span>{% if package.status == 'completed' %}
-                            
-                        <form method="post">
-                            {% csrf_token %}
-                            <!-- <button type="button" class="btn btn-sm btn-secondary text-white">Completed</button> -->
-                            <img src="{% static 'img/success.png' %}" alt="" width="30px" height="30px">
-                        </form>
-                        {% endif %}</span>
-                    </div>
-                  </td>
-                    
-                  <td>
-                    <div class="dropdown">
-                      <button class="btn btn-transparent p-0" type="button" data-coreui-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <i class="icon cil-options"></i>
-                      </button>
-                      <div class="dropdown-menu dropdown-menu-end"><a class="dropdown-item" href="#">Info</a><a class="dropdown-item" href="#">Edit</a><a class="dropdown-item text-danger" href="#">Delete</a></div>
-                    </div>
+                    <div class="small text-medium-emphasis"><span>{{ activity.timestamp }}</span></div>
                   </td>
                 </tr>
+
+                {% empty %}
+                    <td class="text-start">
+                      <div class="small text-medium-emphasis"><span>No activities found for this courier.</span></div>
+                    </td>
                 {% endfor %}
+
               </tbody>
             </table>
           </div>
@@ -72,5 +52,5 @@
     </div>
     <!-- /.col-->
   </div>
-
+  
 {% endblock %}

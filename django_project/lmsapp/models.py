@@ -209,6 +209,14 @@ class Package(models.Model):
                 
         super().save(*args, **kwargs)
 
+        if self.courier:
+            CourierHistory.objects.create(
+                courier=self.courier,
+                status=self.status,
+                package=self,
+                timestamp=self.modified_on
+            )
+
     def generate_package_number(self):
         package_number = Package.PACKAGE_PREFIX + ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
         return package_number
@@ -252,4 +260,11 @@ class CourierLocationData(models.Model):
     date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Selected courier: {str(self.courier.username)}"   
+        return f"Selected courier: {str(self.courier.username)}"
+
+class CourierHistory(models.Model):
+    courier = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    status = models.CharField(max_length=20, choices=Package.STATUS_CHOICES)
+    package = models.ForeignKey(Package, on_delete=models.SET_NULL, null=True, blank=True)
+    timestamp = models.DateTimeField(default=timezone.now)
+   

@@ -189,19 +189,6 @@ def express_dashboard(request):
         return render(request, 'warehouse/express_dashboard.html', context)
 
 
-
-# def warehouse_dashboard(request):
-#     # Assuming you have the warehouse information from the user or some other source
-#     # Replace this with the correct warehouse ID
-#     packages = Package.objects.all()
-
-#     context = {
-#         'packages': packages,
-#     }
-
-#     return render(request, 'warehouse/warehouse_dashboard.html', context)
-
-
 """
 The view handles the change password functionality and renders a template with a form 
 for users to enter their new password.
@@ -304,13 +291,13 @@ def in_house(request):
 
             if status_updated:
                 if 'premium' in package_types and 'express' in package_types:
-                    messages.success(request, 'Premium and Express packages successfully assigned to courier.')
+                    messages.success(request, f'Premium and Express packages successfully assigned to {courier.username}.')
                 elif 'premium' in package_types:
-                    messages.success(request, 'Premium packages successfully assigned to courier.')
+                    messages.success(request, f'Premium packages successfully assigned to {courier.username}.')
                 elif 'express' in package_types:
-                    messages.success(request, 'Express packages successfully assigned to courier.')
+                    messages.success(request, f'Express packages successfully assigned to {courier.username}.')
                 else:
-                    messages.success(request, 'Standard packages successfully assigned to courier.')
+                    messages.success(request, f'Standard packages successfully assigned to {courier.username}.')
             else:
                 messages.error(request, 'No packages were assigned.')
 
