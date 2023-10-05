@@ -11,6 +11,25 @@
 </div>
 {% endif %}
 
+{% if messages %}
+{% for message in messages %}
+
+  {% if message.tags == 'error' %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+  {% elif message.tags == 'success' %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+  {% elif message.tags == 'warning' %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+  {% else %}
+    <div class="alert alert-info alert-dismissible fade show" role="alert">
+  {% endif %}
+        
+  {{ message }}
+    <button type="button" class="btn-close" data-coreui-dismiss="alert" aria-label="Close"></button>
+  </div>
+  {% endfor %}
+{% endif %}
+
 <div class="row">
     <div class="col-md-12">
           
@@ -102,7 +121,7 @@
                             </div>
                             <div class="d-flex justify-content-center mb-3">
                               <!-- <button type="button" class="btn btn-danger btn-sm text-white" data-coreui-dismiss="modal">Close</button> -->
-                              <button type="submit" class="btn btn-info btn-md text-white">Confirm</button>
+                              <button type="submit" class="btn btn-primary btn-md text-white">Confirm</button>
                             </div>
                             </div>
                           </div>

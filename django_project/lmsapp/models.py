@@ -138,17 +138,16 @@ class Package(models.Model):
         ('in_transit', 'In Transit'),
         ('at_pickup', 'At Pickup'),
         ('ready_for_pickup', 'Ready for Pickup'),
-        ('pending_delivery', 'Pending Delivery'),
-        ('out_for_delivery', 'Out for Delivery'),
-        ('ongoing', 'Ongoing'),
         ('arrived', 'Arrived'),
         ('completed', 'Completed'),
     )
+
     DELIVERY_CHOICES = (
         ('standard', 'Standard'),
         ('premium', 'Premium'),
         ('express', 'Express'),
     )
+    
     GENDER_CHOICES = (
         ('male', 'Male'),
         ('female', 'Female'),

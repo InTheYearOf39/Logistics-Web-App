@@ -130,8 +130,6 @@ urlpatterns = [
     path('confirm_pickup/<int:package_id>/', drop_pick_zone_views.confirm_pickup, name='confirm_pickup'),
     path('confirm_at_pickup/<int:package_id>/', drop_pick_zone_views.confirm_at_pickup, name='confirm_at_pickup'),
     path('confirm_recipient_pickup/<int:package_id>/', drop_pick_zone_views.confirm_recipient_pickup, name='confirm_recipient_pickup'),
-    # path('delivery_courier/<int:package_id>/', drop_pick_zone_views.delivery_courier, name='delivery_courier'),
-    path('confirm_pickedup/<int:package_id>/', drop_pick_zone_views.confirm_pickedup, name='confirm_pickedup'),
     path('add_package_droppick/', drop_pick_zone_views.add_package_droppick, name='add_package_droppick'),
     path('calculate_distances/', drop_pick_zone_views.calculate_distances, name='calculate_distances'),
     

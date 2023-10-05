@@ -27,7 +27,7 @@ to the courier on their dashboard.
 def courier_dashboard(request):
     courier_id = request.user.id
     google_api_key = settings.API_KEY
-    assigned_packages = Package.objects.filter(courier=request.user, status__in=['dispatched', 'ongoing', 'arrived', 'en_route', 'warehouse_arrival', 'in_transit', 'at_pickup'])
+    assigned_packages = Package.objects.filter(courier=request.user, status__in=['dispatched', 'arrived', 'en_route', 'warehouse_arrival', 'in_transit', 'at_pickup'])
     context = {
         'assigned_packages': assigned_packages,
         'api_key': google_api_key,
@@ -37,7 +37,9 @@ def courier_dashboard(request):
 
 """
 A function to handle the notification of package arrival at the warehouse. When the view is accessed with a POST request, 
-the package is retrieved by it's package id and then the package status is updated to 'warehouse_arrival', An email notification is sent to the sender and the warehouse. If the request method is not POST, it displays an error message. Finally, the user is redirected to the courier dashboard.
+the package is retrieved by it's package id and then the package status is updated to 'warehouse_arrival', 
+An email notification is sent to the sender and the warehouse. If the request method is not POST, it displays an error message. 
+Finally, the user is redirected to the courier dashboard.
  """
 @login_required
 @user_passes_test(is_courier_user)
@@ -71,7 +73,7 @@ def notify_arrival(request, package_id):
                     # send_mail(subject, message, from_email, recipient_list, fail_silently=False)
                     send_email_notification.apply_async((subject, message, recipient_list))
 
-                    messages.success(request, "Package arrival notified successfully.")
+                    messages.success(request, f"Notification of {package.packageName} arrival at {package.warehouse} warehouse successful.")
                 except BadHeaderError as e:
                     messages.error(request, f"Error: BadHeaderError - {str(e)}")
                 except Exception as e:
@@ -84,11 +86,13 @@ def notify_arrival(request, package_id):
     except Exception as e:
         messages.error(request, f"An error occurred: {str(e)}")
 
-    return redirect("courier_dashboard") # Replace with the appropriate URL
+    return redirect("courier_dashboard")
 
 
 """
-A function to handle the notification of package drop-off. When the view is accessed with a POST request, a package is retrieved by its id and it's status updated to 'at_pickup'. The user is then redirected to the courier dashboard.
+A function to handle the notification of package drop-off. When the view is accessed with a POST request, 
+a package is retrieved by its id and it's status updated to 'at_pickup'. 
+The user is then redirected to the courier dashboard.
 """
 @login_required
 @user_passes_test(is_courier_user)
@@ -102,13 +106,16 @@ def notify_dropoff_delivery(request, package_id):
 
         # Add any additional functionality or notifications here
 
-        messages.success(request, "Package drop-off notified successfully.")
+        messages.success(request, f"Notification of {package.packageName} drop-off at {package.recipientPickUpLocation} successful.")
         return redirect('courier_dashboard')
 
 
 
 """
-A function to handle notifying the recipient of a package arrival by sending an email with the OTP. A package is retrieved by its package id, then a random integer is generated and stored in a variable 'otp'. The otp is then associated to the package and the package is saved, The email is then sent and the the package status is updated from 'ongoing' to 'arrived'. The user is then redirected to the courier dashboard.
+A function to handle notifying the recipient of a package arrival by sending an email with the OTP. 
+A package is retrieved by its package id, then a random integer is generated and stored in a variable 'otp'. 
+The otp is then associated to the package and the package is saved, The email is then sent and the the package status is updated from 'in_transit' to 'arrived'. 
+The user is then redirected to the courier dashboard.
  """
 @login_required
 @user_passes_test(is_courier_user)
@@ -168,7 +175,9 @@ def notify_recipient(request, package_id):
 
 """
 A function to handle confirming the delivery of a package by checking the entered OTP. 
-If the entered OTP matches the stored OTP and the package status is 'arrived', the package status is updated to 'completed', a success message is displayed, and the associated courier's status is updated from 'on-trip' to 'available. If the entered OTP is invalid, an error message is displayed. The user is then redirected to the courier dashboard.
+If the entered OTP matches the stored OTP and the package status is 'arrived', the package status is updated to 'completed', a success message is displayed,
+and the associated courier's status is updated from 'on-trip' to 'available. If the entered OTP is invalid, an error message is displayed. 
+The user is then redirected to the courier dashboard.
 """
 @login_required
 @user_passes_test(is_courier_user)
@@ -180,21 +189,24 @@ def confirm_delivery(request, package_id):
         if package.status == 'arrived' and package.otp == entered_code:
             package.status = 'completed'
             package.save()
-            messages.success(request, "Package delivery confirmed successfully.")
+            messages.success(request, f"{package.packageName} delivery confirmed successfully.")
         else:
             messages.error(request, "Invalid OTP. Please try again.")
             
         courier = package.courier
+        
         if courier:
-            courier.status = 'available'
-            courier.save()
+            assigned_packages = Package.objects.filter(courier=request.user, status__in=['dispatched', 'arrived', 'en_route', 'warehouse_arrival', 'in_transit', 'at_pickup']).count()
+            if assigned_packages == 0:
+                courier.status = 'available'
+                courier.save()
 
-
-    return redirect('courier_dashboard')  # Replace with the appropriate URL
+    return redirect('courier_dashboard') 
 
 
 """
-A function to retrieve the completed packages assigned to the current courier and display them in the courier history template. i.e Packages with the status 'completed' The greeting message and the assigned packages are passed to the template through the context.
+A function to retrieve the completed packages assigned to the current courier and display them in the courier history template. i.e Packages with the status 'completed' 
+the assigned packages are passed to the template through the context.
 """
 @login_required
 @user_passes_test(is_courier_user)

@@ -229,65 +229,6 @@ def confirm_pickup(request, package_id):
 
     return render(request, 'drop_pick_zone/drop_pick_dashboard.html', {'package': package})
 
-# """ 
-# The view allows the drop pick zone to assign a courier to a package for delivery.
-# It updates the package's courier and status fields, as well as the courier's status
-#  """
-# def delivery_courier(request, package_id):
-#     package = get_object_or_404(Package, id=package_id)
-
-#     if request.method == 'POST':
-#         courier_id = request.POST.get('courier')
-#         courier = get_object_or_404(User, id=courier_id, role='courier')
-
-#         previous_courier_status = courier.status  # Save the previous status
-
-#         package.courier = courier
-
-#         # Update the package status based on the delivery type
-#         if (package.status == 'pending_delivery'):
-#             package.status = 'out_for_delivery'
-#         # elif package.deliveryType == 'premium' and package.status == 'upcoming':
-#         #     package.status = 'ongoing'
-
-#         package.save()
-        
-#         # Check if the courier has any packages assigned
-#         has_packages = Package.objects.filter(courier=courier).exists()
-
-#         # Update the courier status
-#         if has_packages:
-#             courier.status = 'on-trip'
-#         else:
-#             courier.status = 'available'
-        
-#         courier.save()
-
-
-#         return redirect('drop_pick_zone_dashboard')
-
-#     couriers = User.objects.filter(role='courier', status='available')  # Filter couriers by status='available'
-#     context = {
-#         'package_id': package_id,
-#         'couriers': couriers
-#         }
-    
-#     return render(request, 'drop_pick_zone/delivery_courier.html', context)
-
-""" 
-The view allows the drop pick zone to assign a courier to a package for delivery. 
-It updates the package's courier and status fields, as well as the courier's status
-"""
-@login_required
-@user_passes_test(is_drop_pick_user)
-def confirm_pickedup(request, package_id):
-    if request.method == 'POST':
-        package = Package.objects.get(pk=package_id)
-        package.status = 'ongoing'
-        package.save()
-    
-    return redirect('drop_pick_zone_dashboard')  # Replace with the appropriate URL for the warehouse dashboard
-
 def generate_package_number():
     prefix = 'PN'
     digits = ''.join(random.choices(string.digits, k=5))

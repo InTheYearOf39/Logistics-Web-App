@@ -25,8 +25,8 @@ def is_sender_user(user):
     return user.role == 'sender'
 
 """
-Renders out a sender dashboard template and shows packages with the statuses 
-'ongoing' & 'upcoming' that are for a specific sender.
+Renders out a sender dashboard template and shows packages with the diferent stages 
+they've reached in the ecos-system by click of a button using a modal timeline.
 """
 @login_required
 @user_passes_test(is_sender_user)
@@ -68,7 +68,7 @@ def sender_dashboard(request):
                                                                   <h3>At Warehouse</h3>
                                                                   <p>Your package has been dropped off at the Warehouse.</p>
                                                               </li>
-                                                              <li class='event  """ + ("active" if packages[ind]["status"] in ["ready_for_pickup", "pending_delivery", "out_for_delivery", "ongoing", "arrived"] else "" ) + """' step="Four" data-status="ready_for_pickup">
+                                                              <li class='event  """ + ("active" if packages[ind]["status"] in ["ready_for_pickup", "pending_delivery", "out_for_delivery", "arrived"] else "" ) + """' step="Four" data-status="ready_for_pickup">
                                                                   <h3>Package at Pick-Up location</h3>
                                                                   <p>Your package has been dropped off at the PickUp Location. It's ready for pick up.</p>
                                                               </li>

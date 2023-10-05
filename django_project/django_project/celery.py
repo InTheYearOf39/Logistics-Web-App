@@ -20,3 +20,6 @@ app.autodiscover_tasks()
 @app.task(bind=True, ignore_result=True)
 def debug_task(self):
     print(f'Request: {self.request!r}')
+
+
+# celery -A django_project worker -l INFO       run this command to start the celery tasks
