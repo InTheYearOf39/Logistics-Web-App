@@ -67,12 +67,10 @@ def warehouse_dashboard(request):
                 courier.status = 'on-trip'
                 courier.save()
 
-            # messages.success(request, 'Packages successfully assigned to courier.')
-            success_message='Packages successfully assigned to courier.'
-            return redirect(reverse('warehouse_dashboard') + f'?success_message={success_message}')
+            messages.success(request, 'Packages successfully assigned to courier.')
+            return redirect('warehouse_dashboard')
 
     if request.method == 'GET':
-        success_message = request.GET.get('success_message', "")
         # Filter available couriers based on the warehouse
         available_couriers = User.objects.filter(
             role='courier', status='available', warehouse=request.user.warehouse
@@ -81,7 +79,6 @@ def warehouse_dashboard(request):
         context = {
             'packages': packages,
             'available_couriers': available_couriers,
-            'success_message': success_message
         }
 
         return render(request, 'warehouse/warehouse_dashboard.html', context)
@@ -119,11 +116,10 @@ def premium_dashboard(request):
                 courier.status = 'on-trip'
                 courier.save()
 
-            success_message='Packages successfully assigned to courier.'
-            return redirect(reverse('premium_dashboard') + f'?success_message={success_message}')
+            messages.success(request, 'Packages successfully assigned to courier.')
+            return redirect('premium_dashboard')
             
     if request.method == 'GET':
-        success_message = request.GET.get('success_message', "")
 
         available_couriers = User.objects.filter(
             role='courier', status='available', warehouse=request.user.warehouse
@@ -132,7 +128,6 @@ def premium_dashboard(request):
         context = {
             'packages': packages,
             'available_couriers': available_couriers,
-            'success_message': success_message
         }
 
         return render(request, 'warehouse/premium_dashboard.html', context)
@@ -170,11 +165,10 @@ def express_dashboard(request):
                 courier.status = 'on-trip'
                 courier.save()
 
-            success_message='Packages successfully assigned to courier.'
-            return redirect(reverse('express_dashboard') + f'?success_message={success_message}')
+            messages.success(request, 'Packages successfully assigned to courier.')
+            return redirect('express_dashboard')
 
     if request.method == 'GET':
-        success_message = request.GET.get('success_message', "")
 
         available_couriers = User.objects.filter(
             role='courier', status='available', warehouse=request.user.warehouse
@@ -183,30 +177,10 @@ def express_dashboard(request):
         context = {
             'packages': packages,
             'available_couriers': available_couriers,
-            'success_message': success_message
         }
 
         return render(request, 'warehouse/express_dashboard.html', context)
 
-
-"""
-The view handles the change password functionality and renders a template with a form 
-for users to enter their new password.
-"""
-@login_required
-def change_password(request):
-    if request.method == 'POST':
-        form = ChangePasswordForm(request.user, request.POST)
-        if form.is_valid():
-            user = form.save()
-            update_session_auth_hash(request, user)  # Important to update the session
-            messages.success(request, 'Your password has been successfully changed.')
-            return redirect('warehouse_dashboard')
-        else:
-            messages.error(request, 'Please correct the error below.')
-    else:
-        form = ChangePasswordForm(request.user)
-    return render(request, 'warehouse/change_password.html', {'form': form})
 
 """ 
 Handles the confirmation of package arrival at the warehouse. It updates the package status, 
@@ -246,11 +220,12 @@ def confirm_arrival(request, package_id):
 
         send_email_notification.apply_async((subject, message, sender_email))
            
-        messages.success(request, "Package arrival notified successfully.")
+        messages.success(request, f"Confirmation of package: {package.packageName} with number: {package.package_number} successful.")
+        return redirect('in_house')
+    
     else:
         messages.error(request, "Invalid request.")
-
-    return redirect('in_house')
+        return redirect('new_arrivals')
 
 """ 
 The view displays a list of packages with the 'in_house'status and allows the user to assign selected packages 
@@ -317,17 +292,12 @@ def in_house(request):
 @user_passes_test(is_warehouse_user)
 def new_arrivals(request):
     arrived_packages = Package.objects.filter(status='warehouse_arrival')
-    success_message = ""
 
     if request.method == 'POST':
         return redirect(reverse('in_house'))
-    
-    elif request.method == 'GET':
-        success_message = request.GET.get('success_message', "")
             
     context = {
         'arrived_packages': arrived_packages,
-        "success_message": success_message,
     }
     
     # extract_google_sheet_data(request)
@@ -1083,9 +1053,10 @@ def extract_google_sheet_data(request):
             status_msg = "Failed to complete operation: {}".format(str(e))
             return render(request, "warehouse/extract_google_sheet_data.html", {"sheets": sheets
                                                                               , "status_msg": status_msg  })
-        success_message = f"inserted:{inserted_rows}, skipped:{skipped_rows}" 
+        
         # print(empty_rows, data_rows, skipped_rows, inserted_rows)
-        return redirect(reverse('new_arrivals') + f'?success_message={success_message}')
+        messages.success(request, f"inserted:{inserted_rows}, skipped:{skipped_rows}")
+        return redirect('new_arrivals')
     else:
         
         return render(request, "warehouse/extract_google_sheet_data.html", {"sheets": sheets})

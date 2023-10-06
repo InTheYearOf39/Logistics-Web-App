@@ -31,7 +31,7 @@ they've reached in the ecos-system by click of a button using a modal timeline.
 @login_required
 @user_passes_test(is_sender_user)
 def sender_dashboard(request):
-    packages = Package.objects.filter(user=request.user).exclude(status='completed').order_by('created_on').values()
+    packages = Package.objects.filter(user=request.user).exclude(status='completed').order_by('-created_on').values()
 
     # loop through all rows and add a ccustom status vlauetatus_htmls for each
     for ind in range(0,len(packages)):
@@ -261,6 +261,7 @@ def register_package(request):
             package.created_by = request.user
             package.save()
 
+            messages.success(request, f'The package: {package.packageName} with package number {package.package_number} has been registered successfully')
             return redirect('sender_dashboard')
         else:
             return render(request, 'sender/register_package.html', {'form': form, 'api_key': google_api_key})
@@ -355,28 +356,28 @@ def calculate_distance(lat1, lon1, lat2, lon2):
 def calculate_delivery_fee(request):
     if request.method == 'POST':
         params = dict(request.POST.items())
-        print("params")
-        print(params)
+        # print("params")
+        # print(params)
         # Retrieve the coordinates from the POST data
         sender_latitude = float(params.get('sender_latitude', 0))
         sender_longitude = float(request.POST.get('sender_longitude', 0))
         recipient_latitude = float(request.POST.get('recipient_latitude', 0))
         recipient_longitude = float(request.POST.get('recipient_longitude', 0))
 
-        print("Sender Latitude:", sender_latitude)
-        print("Sender Longitude:", sender_longitude)
-        print("Recipient Latitude:", recipient_latitude)
-        print("Recipient Longitude:", recipient_longitude)
+        # print("Sender Latitude:", sender_latitude)
+        # print("Sender Longitude:", sender_longitude)
+        # print("Recipient Latitude:", recipient_latitude)
+        # print("Recipient Longitude:", recipient_longitude)
 
         # Calculate the distance between sender and recipient coordinates (you can reuse your existing calculate_distance function)
         distance_km = calculate_distance(sender_latitude, sender_longitude, recipient_latitude, recipient_longitude)
 
-        print("Distance (km):", distance_km)
+        # print("Distance (km):", distance_km)
 
         # Calculate the delivery fee (assuming 1000 per kilometer)
         delivery_fee = distance_km * 500
 
-        print("Delivery Fee:", delivery_fee)
+        # print("Delivery Fee:", delivery_fee)
 
         # Return the calculated delivery fee as a JSON response
         return JsonResponse({'delivery_fee': delivery_fee})

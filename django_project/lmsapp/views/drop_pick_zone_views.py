@@ -82,6 +82,7 @@ def confirm_drop_off(request, package_id):
         # Send the email
         email.send()
 
+        messages.success(request, f'{package.packageName} package drop off confirmed successfully.')
         return redirect('received_packages')
 
     return render(request, 'drop_pick_zone/drop_pick_dashboard.html', {'package': package})
@@ -225,6 +226,7 @@ def confirm_pickup(request, package_id):
         # send_mail(subject, message, settings.EMAIL_HOST_USER, [sender_email])
         send_email_notification.apply_async((subject, message, sender_email))
 
+        messages.success(request, "Package collection by courier confirmed successfully.")
         return redirect('dispatched_packages')
 
     return render(request, 'drop_pick_zone/drop_pick_dashboard.html', {'package': package})
