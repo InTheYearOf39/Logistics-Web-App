@@ -210,6 +210,12 @@ li.event.active:after {
         
     </div>
     <!-- /.col-->
+
+    {% for package in packages %}
+      {% empty %}
+      <div class="h3 text-center mt-4 mb-4"><span>No registered packages to view at the moment !</span></div>           
+    {% endfor %}
+
   </div>
 
 {% endblock %}

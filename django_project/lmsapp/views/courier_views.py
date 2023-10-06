@@ -210,13 +210,6 @@ the assigned packages are passed to the template through the context.
 """
 @login_required
 @user_passes_test(is_courier_user)
-# def courier_history(request):
-#     assigned_packages = Package.objects.filter(courier=request.user, status__in=['completed'])
-#     context = {
-#         'assigned_packages': assigned_packages,
-#     }
-#     return render(request, 'courier/courier_history.html', context)
-
 def courier_history(request):
     courier_history = CourierHistory.objects.filter(courier=request.user).order_by('-timestamp')
 
@@ -225,7 +218,6 @@ def courier_history(request):
         'history': courier_history
     }
     return render(request, 'courier/courier_history.html', context)
-
 
 
 @xframe_options_exempt
@@ -276,9 +268,7 @@ def get_courier_location(request):  #function to get courier location and save i
                 latitude= latitude,
                 longitude= longitude
             ).save()
-
-            
-           
+        
             # Optionally, you can return a JSON response to indicate success
             return JsonResponse({'success': True, 'message': 'Location data saved successfully'})
         except Exception as e:

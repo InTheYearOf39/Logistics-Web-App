@@ -1,10 +1,153 @@
 {% extends 'dashboard_base.html' %}
 {% load static %}
 
+{% block static_links %}
 
+<style>
+body{margin-top:20px;}
+.timeline {
+    border-left: 3px solid #727cf5;
+    border-bottom-right-radius: 4px;
+    border-top-right-radius: 4px;
+    background: rgba(114, 124, 245, 0.09);
+    margin: 0 auto;
+    letter-spacing: 0.2px;
+    position: relative;
+    line-height: 1.4em;
+    font-size: 1.03em;
+    padding: 50px;
+    list-style: none;
+    text-align: left;
+    max-width: 40%;
+}
+
+@media (max-width: 767px) {
+    .timeline {
+        max-width: 98%;
+        padding: 25px;
+    }
+}
+
+.timeline h1 {
+    font-weight: 300;
+    font-size: 1.4em;
+}
+
+.timeline h2,
+.timeline h3 {
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 10px;
+}
+
+.timeline .event {
+    /* border-bottom: 1px dashed #e8ebf1; */
+    border-bottom: 1px dashed #e8ebf1;
+    padding-bottom: 25px;
+    margin-bottom: 25px;
+    position: relative;
+}
+
+@media (max-width: 767px) {
+    .timeline .event {
+        padding-top: 30px;
+    }
+}
+
+.timeline .event:last-of-type {
+    padding-bottom: 0;
+    margin-bottom: 0;
+    border: none;
+}
+
+.timeline .event:before,
+.timeline .event:after {
+    position: absolute;
+    display: block;
+    top: 0;
+}
+
+.timeline .event:before {
+    left: -207px;
+    content: attr(step);
+    text-align: right;
+    font-weight: 400;
+    font-size: 0.9em;
+    min-width: 120px;
+}
+
+@media (max-width: 767px) {
+    .timeline .event:before {
+        left: 0px;
+        text-align: left;
+    }
+}
+
+.timeline .event:after {
+    -webkit-box-shadow: 0 0 0 3px #727cf5;
+    box-shadow: 0 0 0 3px #727cf5;
+    left: -55.8px;
+    background: #fff;
+    border-radius: 50%;
+    height: 9px;
+    width: 9px;
+    content: "";
+    top: 5px;
+}
+
+/* .timeline .event .active:after {
+    -webkit-box-shadow: 0 0 0 3px #727cf5;
+    box-shadow: 0 0 0 3px #727cf5;
+    left: -55.8px;
+    background: #727cf5;
+    border-radius: 50%;
+    height: 9px;
+    width: 9px;
+    content: "";
+    top: 5px;
+} */
+li.event.active:after {
+    -webkit-box-shadow: 0 0 0 3px #727cf5;
+    box-shadow: 0 0 0 3px #727cf5;
+    left: -55.8px;
+    background: #727cf5;
+    border-radius: 50%;
+    height: 9px;
+    width: 9px;
+    content: "";
+    top: 5px;
+}
+
+@media (max-width: 767px) {
+    .timeline .event:after {
+        left: -31.8px;
+    }
+}
+
+.rtl .timeline {
+    border-left: 0;
+    text-align: right;
+    border-bottom-right-radius: 0;
+    border-top-right-radius: 0;
+    border-bottom-left-radius: 4px;
+    border-top-left-radius: 4px;
+    border-right: 3px solid #727cf5;
+}
+
+.rtl .timeline .event::before {
+    left: 0;
+    right: -170px;
+}
+
+.rtl .timeline .event::after {
+    left: 0;
+    right: -55.8px;
+}
+</style>
+{% endblock %}
 
 {% block content %}
-{% if packages %}
+
 <div class="row">
     <div class="col-md-12">
           
@@ -52,23 +195,7 @@
                       </button>
 
                       <!-- Modal -->
-                      <div class="modal fade" id="staticBackdrop{{ package.id }}" data-coreui-backdrop="static" data-coreui-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                        <div class="modal-dialog">
-                          <div class="modal-content">
-                            <div class="modal-header">
-                              <!-- <h5 class="modal-title" id="staticBackdropLabel">Modal title</h5> -->
-                              <button type="button" class="btn-close" data-coreui-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                              {% if package.status == 'completed' %}
-                                      <div class="d-flex align-items-center justify-content-center">
-                                        <img src="{% static 'img/Complete.png' %}" alt="" width="498px" height="498px">
-                                      </div>
-                                    {% endif %}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
+                      {{ package.status_html | safe }}
 
                     </div>
                   </td>
@@ -81,10 +208,12 @@
         
     </div>
     <!-- /.col-->
+
+    {% for package in packages %}
+      {% empty %}
+      <div class="h3 text-center mt-4 mb-4"><span>No package package history to view yet !</span></div>           
+    {% endfor %}
   </div>
-{% else %}
-<h5 class="mt-5">Not yet available: !!! Yet to come.</h5>
-{% endif %}
 
 {% endblock %}
 

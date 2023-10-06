@@ -117,7 +117,7 @@ def admin_dashboard(request):
             "y_title": 'Packages'
         }
     }
-    return render(request, 'admin/master_dashboard.html', context)
+    return render(request, 'admin/admin_dashboard.html', context)
 
 @login_required
 @user_passes_test(is_admin_user)
@@ -184,54 +184,8 @@ def users(request):
 
 
 """
- A function to handle the assignment of a courier to a package. It retrieves the package and couriers, 
- updates the package and courier objects, and redirects to the admin dashboard after a successful assignment.
- """
-
-
-def assign_courier(request, package_id):
-    package = get_object_or_404(Package, id=package_id)
-
-    if request.method == 'POST':
-        courier_id = request.POST.get('courier')
-        courier = get_object_or_404(User, id=courier_id, role='courier')
-
-        previous_courier_status = courier.status  # Save the previous status
-
-        package.courier = courier
-
-        # Update the package status based on the delivery type
-        if (package.deliveryType == 'premium' and package.status == 'upcoming') or (
-                package.deliveryType == 'express' and package.status == 'upcoming'):
-            package.status = 'ongoing'
-        # elif package.deliveryType == 'premium' and package.status == 'upcoming':
-        #     package.status = 'ongoing'
-
-        package.save()
-
-        # Update the courier status to "on-trip" only if they were not already on-trip
-        if previous_courier_status != 'on-trip' and package.status == 'ongoing':
-            courier.status = 'on-trip'
-            courier.save()
-
-        return redirect('admin_dashboard')
-
-    couriers = User.objects.filter(role='courier', status='available')  # Filter couriers by status='available'
-    context = {
-        'package_id': package_id,
-        'couriers': couriers
-    }
-
-    return render(request, 'admin/assign_courier.html', context)
-
-
+A function to query and display all couriers available on the system
 """
-A function to update the status of couriers based on the status of their assigned packages. If a courier has assigned packages,
- their status is determined by the presence of 'ongoing' or 'arrived' packages. If a courier has no assigned packages, 
- their status is set to 'available'. The updated courier objects are saved in the database, and the 'admin/couriers.html' 
- template is rendered with the couriers queryset as context.
-"""
-
 
 def couriers(request):
     couriers = User.objects.filter(role='courier')
@@ -253,30 +207,10 @@ def admin_history(request):
 
 
 """
-A Function to retrieve dropped off items and group the packages by their respective drop-off locations and
-render them on the 'admin/dropoffs.html' template.
- """
-
-def dropoffs(request):
-    packages = Package.objects.filter(status='dropped_off').select_related('dropOffLocation')
-    sorted_packages = sorted(packages, key=lambda package: package.dropOffLocation.tag)
-
-    context = {
-        'packages': sorted_packages,
-    }
-    return render(request, 'admin/dropoffs.html', context)
-
-
-def dispatch(request):
-    return render(request, 'admin/dispatch.html', {})
-
-
-"""
 A function to handle the creation of a warehouse through a form i.e 'WarehouseForm'. 
 The form data is validated, and if valid, a warehouse is created, saved to the database.
 If the request method is not POST or the form is not valid, the form is displayed to the user for input.
 """
-
 
 # allow loading resources from other locations
 @xframe_options_exempt

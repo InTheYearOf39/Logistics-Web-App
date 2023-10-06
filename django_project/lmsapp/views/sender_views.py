@@ -31,11 +31,8 @@ they've reached in the ecos-system by click of a button using a modal timeline.
 @login_required
 @user_passes_test(is_sender_user)
 def sender_dashboard(request):
-    packages = Package.objects.filter(
-        user=request.user
-    ).order_by(
-        # Your existing order_by logic here
-    ).values()
+    packages = Package.objects.filter(user=request.user).exclude(status='completed').order_by('created_on').values()
+
     # loop through all rows and add a ccustom status vlauetatus_htmls for each
     for ind in range(0,len(packages)):
         status_html = """
@@ -110,16 +107,91 @@ def generate_package_number():
     digits = ''.join(random.choices(string.digits, k=5))
     return f'{prefix}{digits}'
 
+
+# @login_required
+# @user_passes_test(is_sender_user)
 # def sender_history(request):
-#     return render(request, 'sender/sender_history.html', {})
+#     # Retrieve the completed packages from the database
+#     completed_packages = Package.objects.filter(status='completed')
+
+#     return render(request, 'sender/sender_history.html', {'packages': completed_packages})
+
 
 @login_required
 @user_passes_test(is_sender_user)
 def sender_history(request):
     # Retrieve the completed packages from the database
-    completed_packages = Package.objects.filter(status='completed')
 
-    return render(request, 'sender/sender_history.html', {'packages': completed_packages})
+    packages = Package.objects.filter(user=request.user, status='completed').order_by('created_on').values()
+
+    # loop through all rows and add a ccustom status vlauetatus_htmls for each
+    for ind in range(0,len(packages)):
+        status_html = """
+        <div class="modal fade" id='staticBackdrop""" + str(packages[ind]["id"]) + """' data-coreui-backdrop="static" data-coreui-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-xl">
+                          <div class="modal-content">
+                            <div class="modal-header">
+                              <h5 class="modal-title" id="staticBackdropLabel">Package Status</h5> 
+                              <button type="button" class="btn-close" data-coreui-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+
+                                    <div class="container">
+                                      <div class="row">
+                                          <div class="col-md-12">
+                                              <div class="card">
+                                                  <div class="card-body">
+                                                      <h6 class="card-title">Timeline</h6>
+                                                      <div id="content">
+                                                          <ul class="timeline" >
+                                                              <li class='event  """ + ("active" if packages[ind]["status"] == "upcoming" else "" ) + """'  step="One" data-status="upcoming">
+                                                                  <h3>Registration</h3>
+                                                                  <p>Your package has been registered successfully. Awaiting to be dropped off at drop-off location.</p>
+                                                              </li>
+                                                              <li class='event  """ + ("active" if packages[ind]["status"] in ["dropped_off","dispatched", "en_route", "warehouse_arrival"] else "" ) + """' step="Two" data-status="dropped_off">
+                                                                  <h3>Package Dropped-Off</h3>
+                                                                  <p>Your package has been dropped off at the DropOff Location.</p>
+                                                              </li>
+                                                              <li class='event  """ + ("active" if packages[ind]["status"] in ["in_house", "in_transit", "at_pickup"] else "" ) + """' step="Three" data-status="in_house">
+                                                                  <h3>At Warehouse</h3>
+                                                                  <p>Your package has been dropped off at the Warehouse.</p>
+                                                              </li>
+                                                              <li class='event  """ + ("active" if packages[ind]["status"] in ["ready_for_pickup", "pending_delivery", "out_for_delivery", "arrived"] else "" ) + """' step="Four" data-status="ready_for_pickup">
+                                                                  <h3>Package at Pick-Up location</h3>
+                                                                  <p>Your package has been dropped off at the PickUp Location. It's ready for pick up.</p>
+                                                              </li>
+                                                              <li class='event  """ + ("active" if packages[ind]["status"] == "completed" else "" ) + """' step="Five" data-status="completed">
+                                                                  <h3>Picked Up !</h3>
+                                                                  <p>Thank you for choosing our services. We hope to see you soon!</p>
+                                                              </li>
+                                                          </ul>
+                                    
+                                                      </div>
+                                                  </div>
+                                              </div>
+                                          </div>
+                                      </div>
+                                    </div>
+
+
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+        """
+        # add this value to the list
+        packages[ind]["status_html"] = status_html
+
+    # Count the number of registered packages for the logged-in user
+    num_registered_packages = Package.objects.filter(user=request.user).count()
+
+
+    context = {
+        'packages': packages,
+        'num_registered_packages': num_registered_packages,
+    }
+
+    return render(request, 'sender/sender_history.html', context)
     
 """  
 Handles the registration of new packages by senders, ensuring the form data is valid 
@@ -195,74 +267,6 @@ def register_package(request):
     else:
         form = PackageForm()
         return render(request, 'sender/register_package.html', {'form': form, 'api_key': google_api_key})
-
-
-# def register_package(request):
-#     google_api_key = settings.API_KEY
-#     # drop_pick_zones = DropPickZone.objects.all().values()  # Retrieve users with the role of 'drop_pick_zone'
-
-#     if request.method == 'POST':
-#         form = PackageForm(request.POST)
-#         if form.is_valid():
-#             package = form.save(commit=False)
-#             package.user = request.user
-#             package.package_number = generate_package_number()
-
-#             sender_longitude = request.POST.get('sender_longitude') 
-#             sender_latitude = request.POST.get('sender_latitude')
-
-#             recipient_longitude = request.POST.get('recipient_longitude') 
-#             recipient_latitude = request.POST.get('recipient_latitude')
-
-#             package.recipient_latitude = recipient_latitude
-#             package.recipient_longitude = recipient_longitude
-#             package.sender_latitude = sender_latitude
-#             package.sender_longitude = sender_longitude
-            
-#             # Check if the selected courier is already assigned to a package
-#             courier = package.courier
-#             if courier and courier.assigned_packages.exists():
-#                 messages.error(request, 'Selected courier is already assigned to a package.')
-#                 return redirect('register_package')
-
-#             # Determine eligible warehouse based on delivery type and user's location
-#             user_coordinates = (float(sender_latitude), float(sender_longitude))
-#             warehouses = Warehouse.objects.all()
-
-#             eligible_warehouses = []
-#             for warehouse in warehouses:
-#                 warehouse_coordinates = (warehouse.latitude, warehouse.longitude)
-#                 distance = geodesic(user_coordinates, warehouse_coordinates).kilometers
-#                 if distance <= 10 and package.deliveryType in ['premium', 'express']:
-#                     eligible_warehouses.append(warehouse)
-
-#             if eligible_warehouses:
-#                 selected_warehouse = eligible_warehouses[0]  # You can choose any logic to select a warehouse
-#                 package.warehouse = selected_warehouse
-
-#             package.status = 'upcoming'
-#             # Save the additional fields to the package object
-#             package.recipientIdentification = form.cleaned_data['recipientIdentification']
-#             package.genderType = form.cleaned_data['genderType']
-#             package.created_by = request.user
-#             package.save()
-
-#             return redirect('sender_dashboard')
-#         else:
-#             error_message = 'Error processing your request'
-#     else:
-#         form = PackageForm()
-#         error_message = None
-    
-#     context = {
-#         'form': form, 
-#         'error_message': error_message, 
-#         # 'drop_pick_zones': drop_pick_zones, 
-#         'api_key': google_api_key
-#     }
-
-#     return render(request, 'sender/register_package.html', context)
-
 
 
 @xframe_options_exempt
@@ -378,124 +382,6 @@ def calculate_delivery_fee(request):
         return JsonResponse({'delivery_fee': delivery_fee})
 
     return JsonResponse({'error': 'Invalid request method.'}, status=400)
-
-
-# @csrf_exempt
-# def receive_data_view(request):
-#     # print(f"request: {request}")
-#     if request.method == 'POST':
-#         print(f"request: {request.headers}")
-#         print(f"request: {request.body}")
-
-#         try:
-#             data = json.loads(request.body)
-#             for field in data:
-#                 if isinstance(data[field], str):
-#                     data[field] = data[field].strip()
-
-#             expected_data_types = {
-#                 "recipientName": str,
-#                 "recipientEmail": str,
-#                 "recipientAddress": str,
-#                 "recipientContact": str,
-#                 "recipientIdentification": str,
-#                 "packageName": str,
-#                 "packageDescription": str,
-#                 "packageNumber": str,
-#                 "sendersName": str,
-#                 "sendersEmail": str,
-#                 "sendersAddress": str,
-#                 "sendersContact": str,
-#             }
-
-#             for field, expected_type in expected_data_types.items():
-#                 value = data.get(field)
-#                 if not isinstance(value, expected_type):
-#                     return JsonResponse({'error': f'{field} must be a {expected_type.__name__}'}, status=400)
-                
-#             for x in [
-#                 "recipientName", "recipientAddress", "recipientContact","packageName","sendersContact",
-#                 "packageDescription", "packageNumber", "sendersName","sendersAddress" 
-#             ]:
-#                 if data.get(x, "") == "":
-#                     return JsonResponse({'error': f'{x} is required'}, status=400)
-                                  
-#             recipient_name = data.get('recipientName')
-#             recipient_email = data.get('recipientEmail')
-#             recipient_address = data.get('recipientAddress')
-#             recipient_contact = data.get('recipientContact')
-#             recipient_ID = data.get('recipientIdentification')
-#             package_name = data.get('packageName')
-#             package_description = data.get('packageDescription')
-#             package_number = data.get('packageNumber')
-
-#             sender_name = data.get('sendersName')
-#             sender_email = data.get('sendersEmail')
-#             sender_address = data.get('sendersAddress')
-#             sender_contact = data.get('sendersContact')
-               
-#             try:
-#                 validate_email(recipient_email)
-#                 validate_email(sender_email)
-#             except ValidationError:
-#                 return JsonResponse({'error': 'Invalid email format'}, status=400)
-                     
-#             user = get_object_or_404(
-#                 User,
-#                 username='muhumuza',
-#                 role='sender'
-#             )
-                    
-#             package = Package(
-#                 user=user,
-#                 packageName=package_name,
-#                 deliveryType='premium', 
-#                 packageDescription=package_description,
-#                 recipientName=recipient_name,
-#                 recipientEmail=recipient_email,
-#                 recipientTelephone=recipient_contact,
-#                 recipientAddress=recipient_address,
-#                 recipientIdentification=recipient_ID,
-#                 sendersName=sender_name,
-#                 sendersEmail=sender_email,
-#                 sendersAddress=sender_address,
-#                 sendersContact=sender_contact,
-#                 package_number=package_number,
-#                 status='warehouse_arrival'
-#             )
-
-#             package.save()
-#             response_data = {
-#                 'response': {
-#                     'success': True,
-#                     'data': {
-#                     "recipientName" : recipient_name,
-#                     "recipientEmail" :recipient_email,
-#                     "recipientAddress" : recipient_address, 
-#                     "recipientContact" : recipient_contact,
-#                     "recipientIdentification" : recipient_ID,
-#                     "packageName" : package_name,
-#                     "packageDescription" : package_description,
-#                     "packageNumber" : package_number,
-#                     "sendersName" : sender_name,
-#                     "sendersEmail" : sender_email,
-#                     "sendersAddress" : sender_address,
-#                     "sendersContact" : sender_contact
-#                     }
-#                 }
-#             }
-
-#             return JsonResponse(response_data, status=200)
-        
-#         except ValueError as ve:
-#             return JsonResponse({'error': str(ve)}, status=400)
-#         except IntegrityError as ie:
-#                 if 'UNIQUE constraint failed: lmsapp_package.package_number' in str(ie):
-#                     return JsonResponse({'error': 'Package number already exists'}, status=400)
-#         except Exception as e:
-#             return JsonResponse({'error': str(e)}, status=400)
-#     else:
-#         return JsonResponse({'error': 'Only POST requests are allowed.'}, status=405)
 
 
 @csrf_exempt

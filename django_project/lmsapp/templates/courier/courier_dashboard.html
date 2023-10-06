@@ -152,12 +152,20 @@
         
     </div>
     <!-- /.col-->
+
+    {% for package in packages %}
+      {% empty %}
+      <div class="h3 text-center mt-4 mb-4"><span>No assigned packages at the moment !</span></div>           
+    {% endfor %}
+
   </div>
 
   <form>
     <input type="hidden" id="courier_latitude" name="courier_latitude" value="" >
     <input type="hidden" id="courier_longitude" name="courier_longitude" value="">                  
   </form>
+  
+  {% endblock %}
 
   {% block script_links %}
   <script data-courier_id="{{ courier_id }}">
@@ -242,5 +250,3 @@
   </script>
   {% endblock %}
 
-
-{% endblock %}

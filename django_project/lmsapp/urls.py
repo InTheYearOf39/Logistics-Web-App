@@ -59,9 +59,7 @@ urlpatterns = [
     path('drop_pick_users/', admin_views.drop_pick_users, name='drop_pick_users'),
     # path('master_dashboard/', admin_views.master_dashboard, name='master_dashboard'),
     path('admin_history/', admin_views.admin_history, name='admin_history'),
-    path('admin_dashboard/assign_courier/<int:package_id>/', admin_views.assign_courier, name='admin_assign_courier'),
-    path('dropoffs/', admin_views.dropoffs, name='dropoffs'),
-    path('admin_dispatch/', admin_views.dispatch, name='admin_dispatch'),
+
     path('create_warehouse/', admin_views.create_warehouse, name='create_warehouse'),
     path('create_warehouse_user/', admin_views.create_warehouse_user, name='create_warehouse_user'),
     path('create_drop_pick/', admin_views.create_drop_pick, name='create_drop_pick'),
