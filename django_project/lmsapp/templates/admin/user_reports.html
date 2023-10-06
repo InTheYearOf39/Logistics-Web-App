@@ -250,6 +250,11 @@
                   <div class="fw-semibold">{{ user.last_login }}</div>
                 </td>
               </tr>
+
+              {% empty %}
+                   <div class="h3 text-center mt-4 mb-4" style="color:#007780;">
+                    <span>No user reports at the moment !</span>
+                  </div>
               {% endfor %}
             </tbody>
           </table>

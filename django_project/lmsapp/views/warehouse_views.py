@@ -313,50 +313,15 @@ def in_house(request):
         return render(request, 'warehouse/ready_packages.html', context)
 
 
-""" 
-The view displays a list of packages ready for pickup and allows the user to assign selected packages 
-to couriers and drop_pick_zones. It handles form submissions, updates the package assignments and statuses, 
-and provides available couriers and drop_pick_zones in the context.
-""" 
-@login_required
-@user_passes_test(is_warehouse_user)
-def ready_for_pickup(request):
-    if request.method == 'POST':
-        selected_packages = request.POST.getlist('selected_packages')
-        courier_id = request.POST.get('courier')
-
-        if selected_packages and courier_id:
-            courier = get_object_or_404(User, id=courier_id, role='courier')
-
-            # Update the packages with the assigned courier and change their status
-            packages = Package.objects.filter(id__in=selected_packages, deliveryType=['premium', 'standard'])
-            packages.update(courier=courier, status='in_transit')
-            
-            courier.status = 'on-trip'
-            courier.save()
-
-            messages.success(request, 'Premium packages successfully assigned to courier.')
-
-            return redirect('in_house')
-
-    ready_packages = Package.objects.filter(status='in_transit', deliveryType='premium')
-    available_couriers = User.objects.filter(role='courier', status='available')
-
-    context = {
-        'ready_packages': ready_packages,
-        'available_couriers': available_couriers
-    }
-    return render(request, 'warehouse/ready_for_pickup.html', context)
-
-
 @login_required
 @user_passes_test(is_warehouse_user)
 def new_arrivals(request):
     arrived_packages = Package.objects.filter(status='warehouse_arrival')
     success_message = ""
-    if request.method == 'POST':
 
-        return redirect('ready_packages')
+    if request.method == 'POST':
+        return redirect(reverse('in_house'))
+    
     elif request.method == 'GET':
         success_message = request.GET.get('success_message', "")
             
@@ -460,6 +425,7 @@ def add_package(request):
                 # Handle other exceptions
                 print("Error:", str(e))
 
+            messages.success(request, f'The package: {package.packageName} for {package.sendersName} has been registered successfully')
             return redirect('in_house')
         else:
             warehouse = Warehouse.objects.all()
@@ -736,6 +702,7 @@ def upload_excel(request):
                     else:
                         messages.error(request, "An error occurred while saving the package.")
 
+            messages.success(request, "Package data successfully imported.")
             return redirect("new_arrivals")
     else:
         form = ExcelUploadForm()

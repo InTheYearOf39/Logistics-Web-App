@@ -55,6 +55,11 @@
                   </td>
                     
                 </tr>
+
+                {% empty %}
+                   <div class="h3 text-center mt-4 mb-4" style="color:#007780;">
+                    <span>No packages to be dispatched at the moment !</span>
+                  </div>
                 {% endfor %}
               </tbody>
             </table>
@@ -62,11 +67,6 @@
         
     </div>
     <!-- /.col-->
-
-    {% for package in packages %}
-      {% empty %}
-      <div class="h3 text-center mt-4 mb-4"><span>No packages to be dispatched at the moment !</span></div>           
-    {% endfor %}
 
   </div>
 

@@ -320,7 +320,7 @@ def add_package_droppick(request):
                 # Handle other exceptions
                 print("Error:", str(e))
 
-
+            messages.success(request, f'The package: {package.packageName} for {package.sendersName} has been registered successfully')
             return redirect('received_packages')
         else:
             drop_pick_zones = DropPickZone.objects.all()

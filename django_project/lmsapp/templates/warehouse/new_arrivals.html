@@ -11,6 +11,23 @@
 </div>
 {% endif %}
 
+{% if messages %}
+{% for message in messages %}
+
+  {% if message.tags == 'error' %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+  {% elif message.tags == 'success' %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+  {% else %}
+    <div class="alert alert-info alert-dismissible fade show" role="alert">
+  {% endif %}
+        
+  {{ message }}
+    <button type="button" class="btn-close" data-coreui-dismiss="alert" aria-label="Close"></button>
+  </div>
+  {% endfor %}
+{% endif %}
+
 <div class="row">
     <div class="col-md-12">
           
@@ -30,7 +47,6 @@
               </thead>
               <tbody>
                 {% for package in arrived_packages %}
-                {% if package.status == 'warehouse_arrival' %}
                 <tr class="align-middle">
                   <td class="text-start">
                     <div class="small text-medium-emphasis"><span>{{ forloop.counter }}</span></div>
@@ -66,7 +82,11 @@
                     </div>
                   </td>
                 </tr>
-                {% endif %}
+
+                {% empty %}
+                   <div class="h3 text-center mt-4 mb-4" style="color:#007780;">
+                    <span>No packages have arrived yet !</span>
+                  </div>
                 {% endfor %}
               </tbody>
             </table>

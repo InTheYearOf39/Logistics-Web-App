@@ -193,6 +193,11 @@
 
 <!-- sales-summary ends here -->
 <!-- /.row-->
+
+{% endblock %}
+
+{% block script_links %}
+
 <script>
   function plotWeeklyChart() {
     var mydata = {{ chart_data_week_packages|safe }};
