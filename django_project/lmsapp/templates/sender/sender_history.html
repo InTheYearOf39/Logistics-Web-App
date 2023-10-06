@@ -201,6 +201,11 @@ li.event.active:after {
                   </td>
 
                 </tr>
+
+                {% empty %}
+                   <div class="h3 text-center mt-4 mb-4" style="color:#007780;">
+                    <span>No package history to view yet!</span>
+                  </div>
                 {% endfor %}
               </tbody>
             </table>
@@ -208,11 +213,7 @@ li.event.active:after {
         
     </div>
     <!-- /.col-->
-
-    {% for package in packages %}
-      {% empty %}
-      <div class="h3 text-center mt-4 mb-4"><span>No package package history to view yet !</span></div>           
-    {% endfor %}
+    
   </div>
 
 {% endblock %}

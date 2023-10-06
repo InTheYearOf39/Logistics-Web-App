@@ -41,10 +41,11 @@
 
                 {% empty %}
                     <td class="text-start">
-                      <div class="small text-medium-emphasis"><span>No activities found for this courier.</span></div>
+                      <div class="h3 text-center mt-4 mb-4" style="color:#007780;">
+                       <span>No activities found for this courier.</span></div>
                     </td>
                 {% endfor %}
-
+                
               </tbody>
             </table>
           </div>
@@ -53,4 +54,15 @@
     <!-- /.col-->
   </div>
   
+
+  <form>
+    <input type="hidden" id="courier_latitude" name="courier_latitude" value="" >
+    <input type="hidden" id="courier_longitude" name="courier_longitude" value="">                  
+  </form>
+{% endblock %}
+
+{% block script_links %}
+
+  {% include 'includes/script/courier_gps.html' %}
+
 {% endblock %}

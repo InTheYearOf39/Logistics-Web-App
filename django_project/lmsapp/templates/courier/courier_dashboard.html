@@ -142,9 +142,14 @@
                     </div>
                   </td>
                   {% endif %}
-                  
                  
                 </tr>
+
+                {% empty %}
+                   <div class="h3 text-center mt-4 mb-4" style="color:#007780;">
+                    <span>No assigned packages at the moment !</span>
+                  </div>
+
                 {% endfor %}
               </tbody>
             </table>
@@ -152,11 +157,6 @@
         
     </div>
     <!-- /.col-->
-
-    {% for package in packages %}
-      {% empty %}
-      <div class="h3 text-center mt-4 mb-4"><span>No assigned packages at the moment !</span></div>           
-    {% endfor %}
 
   </div>
 
@@ -168,85 +168,8 @@
   {% endblock %}
 
   {% block script_links %}
-  <script data-courier_id="{{ courier_id }}">
-    const data = document.currentScript.dataset;
-    // Define a global variable to store the interval ID
-    let locationInterval;
 
-    // Function to start fetching courier's location at a 10-second interval
-    function startLocationTracking() {
-      // Clear any existing interval to avoid multiple simultaneous requests
-      clearInterval(locationInterval);
+    {% include 'includes/script/courier_gps.html' %}
 
-      // Start fetching location every 5 seconds
-      locationInterval = setInterval(getGPS, 10000); // 10000 milliseconds = 10 seconds
-    }
-
-    // Function to stop the location tracking interval
-    function stopLocationTracking() {
-      clearInterval(locationInterval);
-    }
-
-    function getGPS() {
-
-      // pick the location
-      if ("geolocation" in navigator) {
-        navigator.geolocation.getCurrentPosition(function (position) {
-          //console.log(position.coords);
-          //set the GPS into fields
-
-          const latitude = position.coords.latitude;
-          const longitude = position.coords.longitude;
-          // const courier_id = {{ courier_id }};
-          const courier_id = data.courier_id
-
-          document.getElementById("courier_latitude").value = latitude;
-          document.getElementById("courier_longitude").value = longitude;
-  
-          console.log("Courier Latitude:", latitude);
-          console.log("Courier Longitude:", longitude);
-
-          // get new couriers gps data
-          save_gps_data(latitude, longitude, courier_id);
-  
-        }, function (error) {
-          console.log("Failed to get location");
-          alert("Failed to get your GPS location. Please enable GPS.");
-          console.log(error);
-        }, { maximumAge: 0, enableHighAccuracy: true });
-      } else {
-        console.log("Device does not support geolocation!");
-        alert("Device does not support geolocation!");
-      }
-      
-    }
-  
-    // Start tracking the courier's location when needed, e.g., on page load
-    startLocationTracking();
-
-    // To stop tracking, you can call stopLocationTracking() when needed
-    // For example, when the courier logs out or navigates away from the tracking page
-    // stopLocationTracking();
-
-    
-    function save_gps_data(latitude, longitude, courier_id) {
-   
-      $.ajax({
-          type: "POST",
-          url: "/get_courier_location/",
-          dataType: "json",
-          data: {
-              rand_time: new Date().getTime(),
-              latitude: latitude, longitude: longitude, courier_id: courier_id
-          },
-          success: function (response) {
-          console.log(response);
-
-          }
-        }
-      )
-    }
-
-  </script>
   {% endblock %}
 

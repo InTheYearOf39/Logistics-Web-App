@@ -11,6 +11,22 @@
 
 {% block content %}
 
+{% if messages %}
+{% for message in messages %}
+
+  {% if message.tags == 'error' %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+  {% elif message.tags == 'success' %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+  {% else %}
+    <div class="alert alert-info alert-dismissible fade show" role="alert">
+  {% endif %}
+        
+  {{ message }}
+    <button type="button" class="btn-close" data-coreui-dismiss="alert" aria-label="Close"></button>
+  </div>
+  {% endfor %}
+{% endif %}
 
 <h3 class="mb-5">Select Client to connect upload to:</h3>
 
@@ -35,15 +51,9 @@
   </div>
 </form>
 
-{% if messages %}
-<div class="alert alert-danger" role="alert">
-  <ul>
-    {% for message in messages %}
-    <li>{{ message }}</li>
-    {% endfor %}
-  </ul>
-</div>
-{% endif %}
+{% endblock %}
+
+{% block script_links %}
 
 <script>
   $(document).ready(function () {

@@ -80,17 +80,17 @@
                   <input type="checkbox" name="selected_packages" value="{{ package.id }}">
                 </td>
               </tr>
+
+              {% empty %}
+                   <div class="h3 text-center mt-4 mb-4" style="color:#007780;">
+                    <span>No standard packages available at the moment !</span>
+                  </div>
             {% endfor %}
           </tbody>
         </table>
       </div>
     </div>
     <!-- /.col-->
-
-    {% for package in packages %}
-      {% empty %}
-      <div class="h3 text-center mt-4 mb-4"><span>No standard packages available at the moment !</span></div>           
-    {% endfor %}
 
     <button type="submit" class="btn btn-primary btn-sm text-white mb-3">Assign Courier</button>
   </form>

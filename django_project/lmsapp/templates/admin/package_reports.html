@@ -154,6 +154,11 @@
                   </div>
                 </td>
               </tr>
+
+              {% empty %}
+                   <div class="h3 text-center mt-4 mb-4" style="color:#007780;">
+                    <span>No package reports at the moment !</span>
+                  </div>
               {% endfor %}
             </tbody>
           </table>
@@ -162,6 +167,10 @@
     </div>
   </div>
 </div> -->
+
+{% endblock %}
+
+{% block script_links %}
 
 <script>
 
