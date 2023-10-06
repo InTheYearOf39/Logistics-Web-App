@@ -1,101 +1,208 @@
-{% extends 'dashboard_base.html' %}
+{% extends 'dashboard_base.html' %} {% load static %} {% block static_links %}
+<!-- We use those styles to show code examples, you should remove them in your application.-->
+<link href="{% static 'css/dist/examples.css' %}" rel="stylesheet" />
+<link href="{% static 'css/dist/coreui-chartjs.css' %}" rel="stylesheet" />
+<script src="{% static 'js/dist/chart.min.js' %}"></script>
+<script src="{% static 'js/dist/main.js' %}"></script>
+{% endblock %} {% block content %}
 
-{% load static %}
-
-{% block content %}
-
+<!-- statistics-summary cards  -->
 <div class="row">
-    <div class="col-md-12">
-          
-          <!-- /.row--><br>
-          <div class="table-responsive mb-4 bg-white">
-            <table class="table border mb-0">
-              <thead class="table-white fw-semibold">
-                <tr>
-                  <th>No</th>
-                  <th>Package</th>
-                  <th>Recipient</th>
-                  <th>From</th>
-                  <th>To</th>
-                  <th>Package No</th>
-                  <th>status</th>
-                  <th>Courier</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for package in packages %}
-                <tr class="align-middle">
-                  <td class="text-start">
-                    <div class="small text-medium-emphasis"><span>{{ forloop.counter }}</span></div>
-                  </td>
-                  <td class="text-start">
-                    <div class="small text-medium-emphasis"><span>{{ package.packageName }}</span></div>
-                  </td>
-                  <td class="text-start">
-                    <div class="small text-medium-emphasis"><span>{{ package.recipientName }}</span></div>
-                  </td>
-                  <td class="text-start">
-                    <div class="small text-medium-emphasis"><span>{{ package.sendersAddress }}</span></div>
-                  </td>
-                  <td class="text-start">
-                    <div class="small text-medium-emphasis"><span>{{ package.recipientAddress }}</span></div>
-                  </td>
-                  <td class="text-start">
-                    <div class="small text-medium-emphasis"><span>{{ package.package_number }}</span></div>
-                  </td>
-                  <td class="text-start">
-                    <div class="small text-medium-emphasis">
-                        {% if package.status == 'upcoming' %}
-                        <img src="{% static 'img/pending.png' %}" alt="" width="30px" height="30px">
-                        {% elif package.status == 'dropped_off' %}
-                        <img src="{% static 'img/dropped.png' %}" alt="" width="30px" height="30px">
-                        {% elif package.status == 'ongoing' %}
-                        <img src="{% static 'img/started.png' %}" alt="" width="30px" height="30px">
-                        {% elif package.status == 'completed' %}
-                        <img src="{% static 'img/completed.png' %}" alt="" width="30px" height="30px">
-                        {% elif package.status == 'ready_for_pickup'%}
-                        <img src="{% static 'img/box.png' %}" alt="" width="25px" height="25px">
-                        {% endif %}
-                    </div>
-                  </td>
-                  <td class="text-start">
-                    <div class="small text-medium-emphasis">
-                        {% if package.status == 'upcoming' and package.deliveryType == 'premium' or package.deliveryType == 'express' %}
-                        <a href="{% url 'admin_assign_courier' package_id=package.id %}">
-                            <button class="btn btn-sm btn-primary text-white">Assign</button>
-                        </a>
-                        {% elif package.status == 'dropped_off'%}
-                        <a href="{% url 'admin_assign_courier' package_id=package.id %}">
-                            <button class="btn btn-sm btn-primary text-white">Assign</button>
-                        </a>
-                        {% else %}
-                        {% if package.courier %}
-                        {{ package.courier.name }}
-                        {% else %}
-                        Not Accepted yet
-                        {% endif %}
-                        {% endif %}
-                    </div>
-                  </td>
-                    
-                  <td class="text-start">
-                    <div class="small text-medium-emphasis"><span>{% if package.status == 'in_transit' %}
-                        <form action="{% url 'notify_dropoff' package_id=package.id %}" method="post">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-sm btn-primary text-white">Notify Drop-off</button>
-                        </form>                            
-                    {% endif %}</span>
-                </div>
-                  </td>
-                  
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
+  <div class="col-sm-6 col-lg-3">
+    <div class="card mb-4 text-white bg-primary">
+      <div class="card-body pb-0 d-flex justify-content-between align-items-start">
+        <div>
+          <div class="fs-4 fw-semibold">
+            {{ total_packages }}
           </div>
-        
+          <div>Packages</div>
+        </div>
+      </div>
     </div>
-    <!-- /.col-->
   </div>
+  
+  <!-- /.col-->
+  <div class="col-sm-6 col-lg-3">
+    <div class="card mb-4 text-white bg-info">
+      <div
+        class="card-body pb-0 d-flex justify-content-between align-items-start"
+      >
+        <div>
+          <div class="fs-4 fw-semibold">
+            ###
+          </div>
+          <div>Income</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- /.col-->
+  <div class="col-sm-6 col-lg-3">
+    <div class="card mb-4 text-white bg-warning">
+      <div
+        class="card-body pb-0 d-flex justify-content-between align-items-start"
+      >
+        <div>
+          <div class="fs-4 fw-semibold">
+            ##%
+          </div>
+          <div>Conversion Rate</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- /.col-->
+  <div class="col-sm-6 col-lg-3">
+    <div class="card mb-4 text-white bg-danger">
+      <div
+        class="card-body pb-0 d-flex justify-content-between align-items-start"
+      >
+        <div>
+          <div class="fs-4 fw-semibold">
+            ###K
 
+          </div>
+          <div>Sessions</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- /.col-->
+</div>
+<!-- statistics-summary cards end here-->
+
+<!-- curve graph card -->
+<!-- /.row-->
+<div class="card mb-4">
+  <div class="card-body">
+    <div class="d-flex justify-content-between">
+      <div class="card-header">
+        <h4 class="card-title mb-0">Package Report(Weekly)</h4>
+        <div class="small text-medium-emphasis">{{ week_label }}</div>
+      </div>
+      <div
+        class="btn-toolbar d-none d-md-block"
+        role="toolbar"
+        aria-label="Toolbar with buttons"
+      >
+        <div
+          class="btn-group btn-group-toggle mx-3"
+          data-coreui-toggle="buttons"
+        >
+          <input
+            class="btn-check"
+            id="option1"
+            type="radio"
+            name="options"
+            autocomplete="off"
+          />
+          <label class="btn btn-outline-secondary"> Day</label>
+          <input
+            class="btn-check"
+            id="option2"
+            type="radio"
+            name="options"
+            autocomplete="off"
+            checked=""
+          />
+          <label class="btn btn-outline-secondary active"> Month</label>
+          <input
+            class="btn-check"
+            id="option3"
+            type="radio"
+            name="options"
+            autocomplete="off"
+          />
+          <label class="btn btn-outline-secondary"> Year</label>
+        </div>
+        <button class="btn btn-primary text-white" type="button">         
+          <a class="text-white" href="{% url 'data_export' %}"><i class="icon cil-cloud-download"></i></a>
+        </button>
+      </div>
+    </div>
+    <div class="c-chart-wrapper" style="height: 300px; margin-top: 40px">
+      <canvas id="myWeeklyChart" height="300"></canvas>
+    </div>
+  </div>
+  <div class="card-footer">
+    <div class="row row-cols-1 row-cols-md-4 text-center">
+      <div class="col mb-sm-2 mb-0">
+        <div class="text-medium-emphasis">Delivered Packages Today</div>
+        <div class="fw-semibold">{{ total_delivered_packages_day }}</div>
+        <div class="progress progress-thin mt-2">
+          <div
+            class="progress-bar bg-warning"
+            role="progressbar"
+            style="width: {{ percentage_delivered_day }}%"
+            aria-valuenow="{{ percentage_delivered_day }}"
+            aria-valuemin="0"
+            aria-valuemax="100"
+          ></div>
+        </div>
+      </div>
+
+      <div class="col mb-sm-2 mb-0">
+        <div class="text-medium-emphasis">Delayed Packages Today</div>
+        <div class="fw-semibold">{{ total_delayed_packages_day }}</div>
+        <div class="progress progress-thin mt-2">
+          <div
+            class="progress-bar bg-success"
+            role="progressbar"
+            style="width: {{ percentage_delayed_day }}%"
+            aria-valuenow="{{ percentage_delayed_day }}"
+            aria-valuemin="0"
+            aria-valuemax="100"
+          ></div>
+        </div>
+      </div>
+
+      <!-- At the end of the week, show the average percentages -->
+
+      <div class="col mb-sm-2 mb-0">
+        <div class="text-medium-emphasis">Average for the Week</div>
+        <div class="fw-semibold">{{ total_delivered_packages_week }}</div>
+        <div class="progress progress-thin mt-2">
+          <div
+            class="progress-bar bg-info"
+            role="progressbar"
+            style="width: {{ percentage_delivered_week }}%"
+            aria-valuenow="{{ percentage_delivered_week }}"
+            aria-valuemin="0"
+            aria-valuemax="100"
+          ></div>
+        </div>
+      </div>
+
+      <div class="col mb-sm-2 mb-0">
+        <div class="text-medium-emphasis">Av. Delayed for the Week</div>
+        <div class="fw-semibold">{{ total_delayed_packages_week }}</div>
+        <div class="progress progress-thin mt-2">
+          <div
+            class="progress-bar bg-danger"
+            role="progressbar"
+            style="width: {{ percentage_delayed_week }}%"
+            aria-valuenow="{{ percentage_delayed_week }}"
+            aria-valuemin="0"
+            aria-valuemax="100"
+          ></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- sales-summary ends here -->
+<!-- /.row-->
+<script>
+  function plotWeeklyChart() {
+    var mydata = {{ chart_data_week_packages|safe }};
+    draw_chartjs_chart(
+      mydata.chart_type, "myWeeklyChart", mydata.x_values, mydata.datasets,
+      mydata.chart_title, mydata.x_title, mydata.y_title,
+    );
+  }
+  document.addEventListener('DOMContentLoaded', function() {
+      plotWeeklyChart();
+  });
+</script>
 {% endblock %}

@@ -92,33 +92,6 @@ def verify_email(request):
 A function to handle user login. The form data is validated, and if valid, the user is authenticated and logged in. 
 The user is then redirected to their respective dashboard based on their role. If the form is not valid or the request method is not POST, the login form is displayed.
  """
-# def login_view(request):
-#     form = LoginForm(request.POST or None)
-#     msg = None
-#     if request.method == 'POST':
-#         if form.is_valid():
-#             username = form.cleaned_data.get('username')
-#             password = form.cleaned_data.get('password')
-#             user = authenticate(username=username, password=password)
-#             if user is not None:
-#                 login(request, user)
-#                 dashboard_mapping = {
-#                         'admin': 'admin_dashboard',
-#                         'courier': 'courier_dashboard',
-#                         'sender': 'sender_dashboard',
-#                         'drop_pick_zone': 'drop_pick_zone_dashboard',
-#                         'warehouse': 'warehouse_dashboard',
-#                     }
-#                 dashboard_url = dashboard_mapping.get(user.role)
-#                 if dashboard_url:
-#                     return redirect(dashboard_url)
-#             else:
-#                 msg = "No user matching given details"
-#                 return render(request, 'auth/login.html', {'form': form, 'msg': msg })
-#         else:
-#             return render(request, 'auth/login.html', {'form': form, })
-#     else:
-#         return render(request, 'auth/login.html', {'form': form, })
 
 def login_view(request):
     form = LoginForm(request.POST or None)
@@ -246,9 +219,10 @@ class CustomLoginView(LoginView):
 class CustomSignupView(SignupView):
     template_name = 'auth/session_error.html'
 
-
+# NB:: THIS route not be confused with the change password above, 
+# this is used to enforce password change for first time logins
 @login_required 
-def password_change(request): #route not be confused with the change password above, this is used to change password for first time logins
+def password_change(request): 
     
     dashboard_urls = {
         'warehouse': 'warehouse_dashboard',
