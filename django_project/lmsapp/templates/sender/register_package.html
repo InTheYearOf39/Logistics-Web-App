@@ -348,7 +348,7 @@
 
     $.ajax({
         method: "POST",
-        url: "/api",
+        url: "/api/",
         data: { action: "get_closest_drop_pick_locations", lat: lat, lng: lng }
     }).done(function( response ) {
         //console.log(response);
@@ -386,7 +386,7 @@
     // Function to redraw recipient drop-off locations based on recipient's latitude and longitude
     $.ajax({
       method: "POST",
-      url: "/api",
+      url: "/api/",
       data: { action: "get_closest_drop_pick_locations", lat: lat, lng: lng },
     }).done(function (response) {
       // Sort the drop-off locations based on distance before populating the dropdown
